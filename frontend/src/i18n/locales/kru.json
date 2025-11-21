@@ -1,0 +1,48 @@
+{
+  "app": {
+    "name": "REPRO PLAN",
+    "tagline": "Kru SRHR",
+    "description": "Kru, Kru, Kru SRHR Platform"
+  },
+  "navigation": {
+    "home": "Kru",
+    "chatbot": "Kru",
+    "clinics": "Kru",
+    "tracker": "Kru",
+    "games": "Kru",
+    "emergency": "Kru",
+    "mentorship": "Kru",
+    "settings": "Kru"
+  },
+  "auth": {
+    "welcome": "Kru REPRO PLAN",
+    "subtitle": "Kru SRHR companion",
+    "enterCode": "Kru secret code",
+    "createCode": "Kru new secret code",
+    "codePlaceholder": "Kru secret code",
+    "login": "Kru REPRO PLAN",
+    "create": "Kru Account",
+    "codeGenerated": "Kru secret code generated",
+    "saveCode": "Kru code safely. Kru REPRO PLAN.",
+    "yourCode": "Kru Secret Code",
+    "continue": "Kru",
+    "back": "Kru"
+  },
+  "common": {
+    "loading": "Kru...",
+    "error": "Kru wrong",
+    "retry": "Kru Again",
+    "save": "Kru",
+    "cancel": "Kru",
+    "delete": "Kru",
+    "edit": "Kru",
+    "close": "Kru",
+    "next": "Kru",
+    "previous": "Kru",
+    "done": "Kru",
+    "offline": "Kru offline. Kru limited.",
+    "online": "Kru online!",
+    "privacy": "Kru Protected",
+    "anonymous": "Kru"
+  }
+}

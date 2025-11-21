@@ -1,0 +1,48 @@
+{
+  "app": {
+    "name": "REPRO PLAN",
+    "tagline": "Bassa SRHR",
+    "description": "Bassa, Bassa, Bassa SRHR Platform"
+  },
+  "navigation": {
+    "home": "Bassa",
+    "chatbot": "Bassa",
+    "clinics": "Bassa",
+    "tracker": "Bassa",
+    "games": "Bassa",
+    "emergency": "Bassa",
+    "mentorship": "Bassa",
+    "settings": "Bassa"
+  },
+  "auth": {
+    "welcome": "Bassa REPRO PLAN",
+    "subtitle": "Bassa SRHR companion",
+    "enterCode": "Bassa secret code",
+    "createCode": "Bassa new secret code",
+    "codePlaceholder": "Bassa secret code",
+    "login": "Bassa REPRO PLAN",
+    "create": "Bassa Account",
+    "codeGenerated": "Bassa secret code generated",
+    "saveCode": "Bassa code safely. Bassa REPRO PLAN.",
+    "yourCode": "Bassa Secret Code",
+    "continue": "Bassa",
+    "back": "Bassa"
+  },
+  "common": {
+    "loading": "Bassa...",
+    "error": "Bassa wrong",
+    "retry": "Bassa Again",
+    "save": "Bassa",
+    "cancel": "Bassa",
+    "delete": "Bassa",
+    "edit": "Bassa",
+    "close": "Bassa",
+    "next": "Bassa",
+    "previous": "Bassa",
+    "done": "Bassa",
+    "offline": "Bassa offline. Bassa limited.",
+    "online": "Bassa online!",
+    "privacy": "Bassa Protected",
+    "anonymous": "Bassa"
+  }
+}

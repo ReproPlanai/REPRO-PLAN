@@ -13,36 +13,13 @@ REPRO PLAN/
 ├── frontend/          # React TypeScript frontend application
 │   ├── src/          # Source code
 │   ├── public/       # Public assets
-│   ├── build/        # Production build (generated, not committed)
 │   └── package.json  # Frontend dependencies
 │
 └── backend/          # Express.js PostgreSQL API server
     ├── src/          # Source code
-    ├── dist/         # Compiled JavaScript (generated)
+    ├── dist/         # Compiled JavaScript
     └── package.json  # Backend dependencies
 ```
-
-## 📁 About the Build Folder
-
-The `frontend/build/` folder contains the **compiled production build** of the React application. This is generated automatically when you run `npm run build` in the frontend directory.
-
-**Important Notes:**
-- ✅ **Already in `.gitignore`** - The build folder is ignored by git (you don't commit it)
-- ✅ **Can be regenerated** - You can delete it and rebuild anytime with `npm run build`
-- ✅ **Used for deployment** - Netlify/Railway use this folder to deploy your app
-- ⚠️ **Not needed for development** - Only needed when deploying to production
-
-**You can safely delete it** if you want - it will be regenerated on the next build.
-
-## 📦 About node_modules
-
-- **Root `node_modules/`**: Only needed if you have a root `package.json` for workspace management. Since we have separate backend/frontend folders, this can be removed if empty.
-- **Frontend `node_modules/`**: Contains React and frontend dependencies (in `.gitignore`)
-- **Backend `node_modules/`**: Contains Express and backend dependencies (in `.gitignore`)
-
-## 📝 About .gitignore
-
-The `.gitignore` file **should stay at the root** - this is standard practice. It tells Git which files/folders to ignore across the entire project (both backend and frontend).
 
 ## 🚀 Quick Start
 

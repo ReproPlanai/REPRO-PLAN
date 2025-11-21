@@ -1,0 +1,48 @@
+{
+  "app": {
+    "name": "REPRO PLAN",
+    "tagline": "Kpɛlɛ SRHR",
+    "description": "Kpɛlɛ, Kpɛlɛ, Kpɛlɛ SRHR Platform"
+  },
+  "navigation": {
+    "home": "Kpɛlɛ",
+    "chatbot": "Kpɛlɛ",
+    "clinics": "Kpɛlɛ",
+    "tracker": "Kpɛlɛ",
+    "games": "Kpɛlɛ",
+    "emergency": "Kpɛlɛ",
+    "mentorship": "Kpɛlɛ",
+    "settings": "Kpɛlɛ"
+  },
+  "auth": {
+    "welcome": "Kpɛlɛ REPRO PLAN",
+    "subtitle": "Kpɛlɛ SRHR companion",
+    "enterCode": "Kpɛlɛ secret code",
+    "createCode": "Kpɛlɛ new secret code",
+    "codePlaceholder": "Kpɛlɛ secret code",
+    "login": "Kpɛlɛ REPRO PLAN",
+    "create": "Kpɛlɛ Account",
+    "codeGenerated": "Kpɛlɛ secret code generated",
+    "saveCode": "Kpɛlɛ code safely. Kpɛlɛ REPRO PLAN.",
+    "yourCode": "Kpɛlɛ Secret Code",
+    "continue": "Kpɛlɛ",
+    "back": "Kpɛlɛ"
+  },
+  "common": {
+    "loading": "Kpɛlɛ...",
+    "error": "Kpɛlɛ wrong",
+    "retry": "Kpɛlɛ Again",
+    "save": "Kpɛlɛ",
+    "cancel": "Kpɛlɛ",
+    "delete": "Kpɛlɛ",
+    "edit": "Kpɛlɛ",
+    "close": "Kpɛlɛ",
+    "next": "Kpɛlɛ",
+    "previous": "Kpɛlɛ",
+    "done": "Kpɛlɛ",
+    "offline": "Kpɛlɛ offline. Kpɛlɛ limited.",
+    "online": "Kpɛlɛ online!",
+    "privacy": "Kpɛlɛ Protected",
+    "anonymous": "Kpɛlɛ"
+  }
+}
