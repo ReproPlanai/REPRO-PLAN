@@ -18,7 +18,7 @@ export const useStakeholderAPI = ({ role, stakeholderId }: UseStakeholderAPIProp
     setLoading(true);
     setError(null);
     try {
-      const response = await apiService.getAlerts(role, stakeholderId, filters);
+      const response = await apiService.getAlerts(role, stakeholderId, filters) as { success?: boolean; alerts?: any[] };
       setAlerts(response.alerts || []);
     } catch (err: any) {
       setError(err.message);
@@ -32,7 +32,7 @@ export const useStakeholderAPI = ({ role, stakeholderId }: UseStakeholderAPIProp
     setLoading(true);
     setError(null);
     try {
-      const response = await apiService.getCases(role, stakeholderId, filters);
+      const response = await apiService.getCases(role, stakeholderId, filters) as { success?: boolean; cases?: any[] };
       setCases(response.cases || []);
     } catch (err: any) {
       setError(err.message);
@@ -46,7 +46,7 @@ export const useStakeholderAPI = ({ role, stakeholderId }: UseStakeholderAPIProp
     setLoading(true);
     setError(null);
     try {
-      const response = await apiService.getMessages(role, stakeholderId, isRead);
+      const response = await apiService.getMessages(role, stakeholderId, isRead) as { success?: boolean; messages?: any[] };
       setMessages(response.messages || []);
     } catch (err: any) {
       setError(err.message);
