@@ -22,7 +22,7 @@ const ForgetCodeForm: React.FC<ForgetCodeFormProps> = ({ onBack, onCodeRecovered
 
     try {
       const { apiService } = await import('../../services/api');
-      const response = await apiService.forgetCode(surveyLink);
+      const response = await apiService.forgetCode(surveyLink) as { success: boolean; message?: string };
 
       if (response.success) {
         // In mock mode, generate a mock recovery code

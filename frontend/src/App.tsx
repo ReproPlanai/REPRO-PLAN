@@ -158,7 +158,7 @@ function App() {
     try {
       // Use API service (now uses mock data for prototype)
       const { apiService } = await import('./services/api');
-      const response = await apiService.loginUser(code);
+      const response = await apiService.loginUser(code) as { success: boolean; message?: string; user?: any };
 
       if (response.success) {
         // Store code locally after successful login

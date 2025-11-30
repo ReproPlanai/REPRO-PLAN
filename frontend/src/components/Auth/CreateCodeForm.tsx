@@ -57,7 +57,7 @@ const CreateCodeForm: React.FC<CreateCodeFormProps> = ({ onBack, onCodeCreated }
     try {
       // Use API service (now uses mock data for prototype)
       const { apiService } = await import('../../services/api');
-      const response = await apiService.registerUser(surveyLink, demographics);
+      const response = await apiService.registerUser(surveyLink, demographics) as { success: boolean; message?: string; user?: any };
 
       if (!response.success) {
         throw new Error(response.message || 'Failed to create account');
@@ -70,8 +70,8 @@ const CreateCodeForm: React.FC<CreateCodeFormProps> = ({ onBack, onCodeCreated }
       // Store demographics with the code (for analytics)
       secretCodeManager.storeUserDemographics(demographics);
       
-      // Store the secret code from backend
-      const code = data.secretCode;
+      // Store the secret code from backend response
+      const code = response.user?.secretCode || secretCodeManager.generateSecretCode();
       secretCodeManager.createSecretCodeFromBackend(code);
       
       setSecretCode({ code, backupCodes });

@@ -82,7 +82,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
       }
 
       // Validate and login regular user with backend
-      const response = await apiService.loginUser(code);
+      const response = await apiService.loginUser(code) as { success: boolean; message?: string; user?: any };
       
       if (response.success) {
         // Store user data
