@@ -6,7 +6,8 @@ export { default as Logo192 } from './logos/logo192.png';
 export { default as Logo512 } from './logos/logo512.png';
 export { default as LogoCircular } from './logos/logo-circular.png';
 export { default as LogoOriginal } from './logos/REPRO Plan Logo.jpg';
-export { default as Favicon } from './logos/favicon.ico';
+// Note: Favicon is in public/favicon.ico and referenced in public/index.html
+// No need to export it from here
 
 // Images
 // Add image exports here as needed
