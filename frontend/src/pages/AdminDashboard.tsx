@@ -12,7 +12,8 @@ import {
   CheckCircle,
   TrendingUp,
   Activity,
-  MessageSquare
+  MessageSquare,
+  FileText
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
