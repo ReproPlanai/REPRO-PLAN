@@ -19,7 +19,8 @@ const IncidentReports: React.FC<{ userData: any }> = ({ userData }) => {
   const [reports, setReports] = useState<IncidentReport[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'investigating' | 'resolved'>('all');
-  const [_showNewReport, setShowNewReport] = useState(false); // Reserved for future modal implementation
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [showNewReport, setShowNewReport] = useState(false); // Reserved for future modal implementation
   const stakeholderAPI = useStakeholderAPI({ role: 'POLICE', stakeholderId: userData?.id });
 
   // Convert cases to incident reports
