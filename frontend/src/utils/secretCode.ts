@@ -88,6 +88,32 @@ export class SecretCodeManager {
     return secretCode;
   }
 
+  // Store code from backend with user data
+  storeCodeFromBackend(code: string, userId: number | string, surveyLink: string = ''): void {
+    const secretCode: SecretCode = {
+      code,
+      createdAt: Date.now(),
+      lastUsed: Date.now(),
+      isActive: true
+    };
+
+    // Store secret code
+    localStorage.setItem(this.storageKey, JSON.stringify(secretCode));
+    
+    // Store additional user data if provided
+    if (userId || surveyLink) {
+      try {
+        localStorage.setItem('repro-plan_user_data', JSON.stringify({
+          userId,
+          surveyLink,
+          updatedAt: Date.now()
+        }));
+      } catch (error) {
+        console.warn('Failed to store user data:', error);
+      }
+    }
+  }
+
   // Get existing secret code
   getSecretCode(): SecretCode | null {
     try {
