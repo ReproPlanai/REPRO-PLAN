@@ -24,6 +24,7 @@ import QRVerificationManager from '../components/QRCode/QRVerificationManager';
 import { generatePoliceData } from '../utils/sampleData';
 import { dataSecurityManager } from '../utils/dataSecurity';
 import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
+import IncidentReports from './police/IncidentReports';
 
 interface PoliceDashboardProps {
   userData: any;
