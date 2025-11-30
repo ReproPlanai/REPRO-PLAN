@@ -261,6 +261,34 @@ export class SecretCodeManager {
   clearUserDemographics(): void {
     localStorage.removeItem('repro-plan_user_demographics');
   }
+
+  // Get user ID from stored user data
+  getUserId(): number | string | undefined {
+    try {
+      const stored = localStorage.getItem('repro-plan_user_data');
+      if (stored) {
+        const userData = JSON.parse(stored);
+        return userData.userId;
+      }
+    } catch (error) {
+      console.error('Failed to get user ID:', error);
+    }
+    return undefined;
+  }
+
+  // Get survey link from stored user data
+  getSurveyLink(): string | undefined {
+    try {
+      const stored = localStorage.getItem('repro-plan_user_data');
+      if (stored) {
+        const userData = JSON.parse(stored);
+        return userData.surveyLink;
+      }
+    } catch (error) {
+      console.error('Failed to get survey link:', error);
+    }
+    return undefined;
+  }
 }
 
 export const secretCodeManager = SecretCodeManager.getInstance();
