@@ -117,15 +117,13 @@ const FloatingDownloadButton: React.FC<FloatingDownloadButtonProps> = ({
             }}
             className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center space-x-2 relative"
           >
-          <Smartphone className="w-5 h-5" />
-          {!isExpanded && (
-            <div className="flex items-center space-x-1">
-              <Download className="w-4 h-4" />
-              <span className="text-sm font-medium">App</span>
-            </div>
-          )}
-        </button>
-
+            <Smartphone className="w-5 h-5" />
+            {!isExpanded && (
+              <div className="flex items-center space-x-1">
+                <Download className="w-4 h-4" />
+                <span className="text-sm font-medium">App</span>
+              </div>
+            )}
             {/* Pulse Animation */}
             <div className="absolute inset-0 bg-blue-600 rounded-full animate-ping opacity-20"></div>
           </button>
