@@ -97,12 +97,14 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
         phoneNumber,
         email,
         name: email.split('@')[0] // Use email prefix as name
-      });
+      }) as { success: boolean; message?: string; stakeholder?: { id: number | string; secretCode: string; role: string; name?: string; organization?: string; permissions?: any } };
 
       if (response.success) {
         // Store the secret code for later use
-        sessionStorage.setItem('stakeholder_secret_code', response.stakeholder.secretCode);
-        sessionStorage.setItem('stakeholder_id', response.stakeholder.id.toString());
+        if (response.stakeholder) {
+          sessionStorage.setItem('stakeholder_secret_code', response.stakeholder.secretCode);
+          sessionStorage.setItem('stakeholder_id', response.stakeholder.id.toString());
+        }
         setIsNewUser(true);
         setCurrentStep('otp');
       } else {
@@ -134,9 +136,9 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
       // For now, we'll accept any 6-digit code and proceed to login
       if (otpCode.length === 6) {
         // Login stakeholder with backend
-        const response = await apiService.loginStakeholder(secretCode, phoneNumber);
+        const response = await apiService.loginStakeholder(secretCode, phoneNumber) as { success: boolean; message?: string; stakeholder?: { id: number | string; role: string; name?: string; organization?: string; permissions?: any } };
         
-        if (response.success) {
+        if (response.success && response.stakeholder) {
           const userData = {
             id: response.stakeholder.id,
             role: response.stakeholder.role,
