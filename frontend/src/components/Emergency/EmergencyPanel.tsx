@@ -199,7 +199,16 @@ const EmergencyPanel: React.FC = () => {
           city: 'Ghana'
         },
         description: emergencyMessage || 'Panic button activated - immediate assistance needed',
-        userId: secretCodeManager.getUserId() || undefined
+        userId: (() => {
+          const rawUserId = secretCodeManager.getUserId();
+          if (rawUserId === undefined) return undefined;
+          if (typeof rawUserId === 'number') return rawUserId;
+          if (typeof rawUserId === 'string') {
+            const num = Number(rawUserId);
+            return isNaN(num) ? undefined : num;
+          }
+          return undefined;
+        })()
       };
 
       // Send alert to backend
