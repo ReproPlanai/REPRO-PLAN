@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserPlus, Save, X } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 interface IntakeForm {
   name: string;

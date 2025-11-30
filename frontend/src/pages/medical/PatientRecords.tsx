@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Search, Plus, Eye, Calendar, Heart, Pill } from 'lucide-react';
+import { Search, Plus, Eye, Calendar, Heart, Pill } from 'lucide-react';
 
 interface PatientRecord {
   id: number;
@@ -16,7 +16,7 @@ interface PatientRecord {
 }
 
 const PatientRecords: React.FC = () => {
-  const [records, setRecords] = useState<PatientRecord[]>([
+  const [records] = useState<PatientRecord[]>([
     {
       id: 1,
       patientId: 'PAT-001',

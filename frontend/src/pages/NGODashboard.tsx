@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Users, 
-  Heart, 
   Calendar, 
   TrendingUp, 
   CheckCircle,
@@ -18,7 +17,7 @@ import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
 import { generateNGOData } from '../utils/sampleData';
 import { dataSecurityManager } from '../utils/dataSecurity';
 import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
-import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging';
+// import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging'; // Reserved for future use
 import ProgramDetails from './ngo/ProgramDetails';
 
 interface NGODashboardProps {
@@ -46,6 +45,7 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
       stakeholderAPI.fetchCases();
       stakeholderAPI.fetchMessages();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData?.id]);
 
 

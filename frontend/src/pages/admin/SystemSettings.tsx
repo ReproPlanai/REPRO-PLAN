@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, Save, Bell, Shield, Database, Globe, Mail, Key } from 'lucide-react';
+import { Save, Bell, Shield, Database, Globe, Mail } from 'lucide-react';
 
 const SystemSettings: React.FC = () => {
   const [settings, setSettings] = useState({

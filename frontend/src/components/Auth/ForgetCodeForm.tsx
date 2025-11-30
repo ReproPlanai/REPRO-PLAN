@@ -8,7 +8,8 @@ interface ForgetCodeFormProps {
 }
 
 const ForgetCodeForm: React.FC<ForgetCodeFormProps> = ({ onBack, onCodeRecovered }) => {
-  const { t } = useTranslation();
+  // Translation hook available for future use
+  // const { t } = useTranslation();
   const [surveyLink, setSurveyLink] = useState('');
   const [newSecretCode, setNewSecretCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);

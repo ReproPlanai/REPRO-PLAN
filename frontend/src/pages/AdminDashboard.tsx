@@ -20,7 +20,6 @@ import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
 import { generateAdminData } from '../utils/sampleData';
 import { dataSecurityManager } from '../utils/dataSecurity';
 import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
-import { apiService } from '../services/api';
 import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging';
 import UserManagement from './admin/UserManagement';
 import SystemSettings from './admin/SystemSettings';
@@ -33,7 +32,7 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
-  const [allStakeholders, setAllStakeholders] = useState<any[]>([]);
+  // const [allStakeholders, setAllStakeholders] = useState<any[]>([]); // Reserved for future use
 
   // Connect to backend API
   const stakeholderAPI = useStakeholderAPI({
@@ -51,6 +50,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
       stakeholderAPI.fetchCases();
       stakeholderAPI.fetchMessages();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData?.id]);
 
   // Dashboard data (combine API data with sample data)

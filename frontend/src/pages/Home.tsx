@@ -8,7 +8,6 @@ import {
   Gamepad2, 
   Shield, 
   Users,
-  Heart,
   BookOpen,
   Phone,
   Play,

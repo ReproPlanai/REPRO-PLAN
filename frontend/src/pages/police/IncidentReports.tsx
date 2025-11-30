@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Plus, Search, Filter, Download, Eye, MapPin, Clock, User } from 'lucide-react';
+import { Plus, Search, Eye, MapPin, Clock } from 'lucide-react';
 import { useStakeholderAPI } from '../../hooks/useStakeholderAPI';
 
 interface IncidentReport {
@@ -19,7 +19,7 @@ const IncidentReports: React.FC<{ userData: any }> = ({ userData }) => {
   const [reports, setReports] = useState<IncidentReport[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'investigating' | 'resolved'>('all');
-  const [showNewReport, setShowNewReport] = useState(false);
+  // const [showNewReport, setShowNewReport] = useState(false); // Reserved for future use
   const stakeholderAPI = useStakeholderAPI({ role: 'POLICE', stakeholderId: userData?.id });
 
   // Convert cases to incident reports

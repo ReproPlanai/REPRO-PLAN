@@ -12,7 +12,6 @@ import {
   QrCode,
   Share2,
   Apple,
-  Chrome,
   Monitor
 } from 'lucide-react';
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, Send, Bell, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { MessageSquare, Send, X, CheckCircle } from 'lucide-react';
 import { useStakeholderAPI } from '../../hooks/useStakeholderAPI';
 import { apiService } from '../../services/api';
 

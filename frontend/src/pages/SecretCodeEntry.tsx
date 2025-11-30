@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Shield, Eye, EyeOff, AlertTriangle, CheckCircle } from 'lucide-react';
-import { apiService } from '../services/api';
 
 interface SecretCodeEntryProps {
   onCodeVerified: (role: string) => void;

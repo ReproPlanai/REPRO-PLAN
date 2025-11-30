@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Search, Filter, Download, Eye, Edit, Trash2, Plus, Mail, Phone } from 'lucide-react';
-import { apiService } from '../../services/api';
+import { Search, Filter, Download, Eye, Edit, Trash2, Plus, Phone } from 'lucide-react';
 
 interface User {
   id: number;
@@ -27,13 +26,14 @@ const UserManagement: React.FC = () => {
 
   useEffect(() => {
     filterUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [users, searchQuery, filterStatus]);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
       // Use API service (now uses mock data for prototype)
-      const { apiService } = await import('../../services/api');
+      // const { apiService } = await import('../../services/api'); // Reserved for future use
       // Mock: Return empty array for user list (prototype mode)
       setUsers([]);
     } catch (error) {

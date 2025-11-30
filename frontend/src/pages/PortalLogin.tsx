@@ -168,16 +168,17 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
     }
   };
 
-  const getRolePermissions = (role: string) => {
-    const permissions: { [key: string]: string[] } = {
-      'ADMIN': ['system_access', 'user_management', 'analytics', 'content_management'],
-      'POLICE': ['emergency_alerts', 'case_management', 'location_access', 'reports'],
-      'SAFEHOUSE': ['resident_management', 'access_control', 'security_alerts', 'resources'],
-      'MEDICAL': ['patient_records', 'appointments', 'medical_resources', 'health_analytics'],
-      'NGO': ['program_management', 'community_outreach', 'resource_distribution', 'impact_tracking']
-    };
-    return permissions[role] || [];
-  };
+  // Reserved for future use
+  // const getRolePermissions = (role: string) => {
+  //   const permissions: { [key: string]: string[] } = {
+  //     'ADMIN': ['system_access', 'user_management', 'analytics', 'content_management'],
+  //     'POLICE': ['emergency_alerts', 'case_management', 'location_access', 'reports'],
+  //     'SAFEHOUSE': ['resident_management', 'access_control', 'security_alerts', 'resources'],
+  //     'MEDICAL': ['patient_records', 'appointments', 'medical_resources', 'health_analytics'],
+  //     'NGO': ['program_management', 'community_outreach', 'resource_distribution', 'impact_tracking']
+  //   };
+  //   return permissions[role] || [];
+  // };
 
   const resendOtp = async () => {
     setIsSendingOtp(true);

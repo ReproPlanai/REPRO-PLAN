@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Shield, 
   AlertTriangle, 
   MapPin, 
   Clock, 
@@ -13,8 +12,7 @@ import {
   FileText,
   Navigation,
   QrCode,
-  MessageSquare,
-  Send
+  MessageSquare
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
@@ -35,8 +33,8 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
   const [activeTab, setActiveTab] = useState('emergency');
   const [searchQuery, setSearchQuery] = useState('');
   const [emergencyLocations, setEmergencyLocations] = useState<any[]>([]);
-  const [showMessageModal, setShowMessageModal] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<string>('');
+  // const [showMessageModal, setShowMessageModal] = useState(false); // Reserved for future use
+  // const [selectedRole, setSelectedRole] = useState<string>(''); // Reserved for future use
 
   // Connect to backend API
   const stakeholderAPI = useStakeholderAPI({
@@ -54,6 +52,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
       stakeholderAPI.fetchCases();
       stakeholderAPI.fetchMessages();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData?.id]);
 
   // Helper functions (declared before use)

@@ -17,7 +17,7 @@ import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
 import { generateSafeHouseData } from '../utils/sampleData';
 import { dataSecurityManager } from '../utils/dataSecurity';
 import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
-import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging';
+// import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging'; // Reserved for future use
 import ResidentIntake from './safehouse/ResidentIntake';
 
 interface SafeHouseDashboardProps {
@@ -45,6 +45,7 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
       stakeholderAPI.fetchCases();
       stakeholderAPI.fetchMessages();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData?.id]);
 
   // Mock data for demonstration
