@@ -71,7 +71,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   
   // App download modal
-  const { showModal, closeModal, handleDownload } = useAppDownloadModal();
+  const { showModal, closeModal, handleDownload, openModal } = useAppDownloadModal();
 
   useEffect(() => {
     // Check if user has a valid secret code
