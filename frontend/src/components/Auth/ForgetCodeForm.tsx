@@ -21,22 +21,16 @@ const ForgetCodeForm: React.FC<ForgetCodeFormProps> = ({ onBack, onCodeRecovered
     setIsLoading(true);
 
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/auth/forget-code`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ surveyLink }),
-      });
+      const { apiService } = await import('../../services/api');
+      const response = await apiService.forgetCode(surveyLink);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to recover code');
+      if (response.success) {
+        // In mock mode, generate a mock recovery code
+        const mockCode = `RECOVERY${Date.now()}`.substring(0, 8);
+        setNewSecretCode(mockCode);
+      } else {
+        throw new Error(response.message || 'Failed to recover code');
       }
-
-      setNewSecretCode(data.secretCode);
     } catch (error: any) {
       setError(error.message || 'Something went wrong. Please try again.');
     } finally {

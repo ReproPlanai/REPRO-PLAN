@@ -55,23 +55,12 @@ const CreateCodeForm: React.FC<CreateCodeFormProps> = ({ onBack, onCodeCreated }
     setIsCreating(true);
     
     try {
-      // Call backend API to create user with survey link
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          surveyLink,
-          demographics
-        }),
-      });
+      // Use API service (now uses mock data for prototype)
+      const { apiService } = await import('../../services/api');
+      const response = await apiService.registerUser(surveyLink, demographics);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to create account');
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to create account');
       }
 
       // Generate backup codes locally (for display)

@@ -8,13 +8,25 @@ import {
   Heart, 
   Globe,
   ArrowRight,
-  ExternalLink
+  ExternalLink,
+  QrCode,
+  Share2,
+  Apple,
+  Chrome,
+  Monitor
 } from 'lucide-react';
 
 interface AppDownloadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDownload: () => void;
+}
+
+interface DeviceInfo {
+  platform: 'ios' | 'android' | 'desktop' | 'unknown';
+  browser: string;
+  isStandalone: boolean;
+  canInstall: boolean;
 }
 
 const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
@@ -25,6 +37,48 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
   const [isInstalling, setIsInstalling] = useState(false);
   const [installProgress, setInstallProgress] = useState(0);
   const [hasSeenModal, setHasSeenModal] = useState(false);
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>({
+    platform: 'unknown',
+    browser: 'unknown',
+    isStandalone: false,
+    canInstall: false
+  });
+  const [showInstructions, setShowInstructions] = useState(false);
+
+  // Detect device and platform
+  useEffect(() => {
+    const detectDevice = (): DeviceInfo => {
+      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+      const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
+      const isAndroid = /android/i.test(userAgent);
+      const isStandalone = (window.navigator as any).standalone || window.matchMedia('(display-mode: standalone)').matches;
+      
+      // Detect browser
+      let browser = 'unknown';
+      if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) browser = 'chrome';
+      else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'safari';
+      else if (userAgent.includes('Firefox')) browser = 'firefox';
+      else if (userAgent.includes('Edg')) browser = 'edge';
+      
+      // Check if PWA can be installed
+      const canInstall = 'serviceWorker' in navigator && 
+                        ('PushManager' in window || isIOS || isAndroid);
+      
+      let platform: DeviceInfo['platform'] = 'unknown';
+      if (isIOS) platform = 'ios';
+      else if (isAndroid) platform = 'android';
+      else if (window.innerWidth >= 768) platform = 'desktop';
+      
+      return {
+        platform,
+        browser,
+        isStandalone,
+        canInstall
+      };
+    };
+
+    setDeviceInfo(detectDevice());
+  }, []);
 
   // Check if user has seen the modal before
   useEffect(() => {
@@ -72,6 +126,84 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
     const reminderTime = Date.now() + (24 * 60 * 60 * 1000);
     localStorage.setItem('repro-plan-app-reminder', reminderTime.toString());
   };
+
+  const getDeviceInstructions = () => {
+    if (deviceInfo.isStandalone) {
+      return {
+        title: 'App Already Installed',
+        icon: <Star className="w-4 h-4 text-green-600" />,
+        steps: ['REPRO PLAN is already installed on your device!'],
+        bgClass: 'bg-green-50',
+        borderClass: 'border-green-200',
+        textClass: 'text-green-900',
+        iconClass: 'text-green-600'
+      };
+    }
+
+    switch (deviceInfo.platform) {
+      case 'ios':
+        return {
+          title: 'Install on iOS (iPhone/iPad)',
+          icon: <Apple className="w-4 h-4 text-gray-700" />,
+          steps: [
+            'Tap the Share button at the bottom of Safari',
+            'Scroll down and tap "Add to Home Screen"',
+            'Tap "Add" in the top right corner',
+            'The app will appear on your home screen'
+          ],
+          bgClass: 'bg-blue-50',
+          borderClass: 'border-blue-200',
+          textClass: 'text-blue-900',
+          iconClass: 'text-blue-600'
+        };
+      case 'android':
+        return {
+          title: 'Install on Android',
+          icon: <Smartphone className="w-4 h-4 text-green-600" />,
+          steps: [
+            'Tap the menu (3 dots) in Chrome',
+            'Select "Add to Home screen" or "Install app"',
+            'Tap "Add" or "Install"',
+            'The app will appear on your home screen'
+          ],
+          bgClass: 'bg-green-50',
+          borderClass: 'border-green-200',
+          textClass: 'text-green-900',
+          iconClass: 'text-green-600'
+        };
+      case 'desktop':
+        return {
+          title: 'Install on Desktop',
+          icon: <Monitor className="w-4 h-4 text-blue-600" />,
+          steps: [
+            'Look for the install icon in your browser address bar',
+            'Or click the menu and select "Install REPRO PLAN"',
+            'Click "Install" in the prompt',
+            'The app will open in its own window'
+          ],
+          bgClass: 'bg-blue-50',
+          borderClass: 'border-blue-200',
+          textClass: 'text-blue-900',
+          iconClass: 'text-blue-600'
+        };
+      default:
+        return {
+          title: 'How to Install',
+          icon: <ExternalLink className="w-4 h-4 text-yellow-600" />,
+          steps: [
+            'Look for "Add to Home Screen" in your browser menu',
+            'Or wait for the installation prompt to appear',
+            'Follow the on-screen instructions'
+          ],
+          bgClass: 'bg-yellow-50',
+          borderClass: 'border-yellow-200',
+          textClass: 'text-yellow-900',
+          iconClass: 'text-yellow-600'
+        };
+    }
+  };
+
+  const instructions = getDeviceInstructions();
 
   if (!isOpen) return null;
 
@@ -210,18 +342,60 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
               </div>
           </div>
 
-            {/* PWA Instructions */}
-            <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <div className="flex items-start space-x-2">
-                <div className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 mt-0.5 flex-shrink-0">
-                  <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+            {/* Device-Specific Instructions */}
+            <div className={`mt-3 sm:mt-4 p-3 sm:p-4 ${instructions.bgClass} border ${instructions.borderClass} rounded-lg`}>
+              <div className="flex items-start space-x-3">
+                <div className={`w-5 h-5 sm:w-6 sm:h-6 ${instructions.iconClass} mt-0.5 flex-shrink-0 flex items-center justify-center`}>
+                  {instructions.icon}
                 </div>
-                <div className="text-xs sm:text-sm text-yellow-800 min-w-0">
-                  <p className="font-medium">How to install:</p>
-                  <p>Look for the "Add to Home Screen" option in your browser menu, or follow the installation prompt when it appears.</p>
+                <div className="flex-1 min-w-0">
+                  <p className={`font-semibold ${instructions.textClass} text-sm sm:text-base mb-2`}>
+                    {instructions.title}
+                  </p>
+                  {!deviceInfo.isStandalone ? (
+                    <ol className="text-xs sm:text-sm text-gray-700 space-y-1.5 list-decimal list-inside">
+                      {instructions.steps.map((step, index) => (
+                        <li key={index} className="leading-relaxed">{step}</li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className="text-xs sm:text-sm text-green-700">{instructions.steps[0]}</p>
+                  )}
                 </div>
               </div>
             </div>
+
+            {/* Quick Actions */}
+            {!deviceInfo.isStandalone && (
+              <div className="mt-3 flex items-center justify-center space-x-3">
+                <button
+                  onClick={() => setShowInstructions(!showInstructions)}
+                  className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  <QrCode className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span>Need help?</span>
+                </button>
+                {navigator.share && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        await navigator.share({
+                          title: 'REPRO PLAN - Download the App',
+                          text: 'Get the REPRO PLAN app for better access to SRHR resources',
+                          url: window.location.href
+                        });
+                      } catch (err) {
+                        console.log('Share cancelled');
+                      }
+                    }}
+                    className="flex items-center space-x-1 text-xs sm:text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                  >
+                    <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Share</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

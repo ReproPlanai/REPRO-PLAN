@@ -96,8 +96,15 @@ playwright/.cache/
 
 # PWA
 **/service-worker.js
-**/sw.js
 **/workbox-*.js
+# Note: sw.js in public folder should be committed for PWA functionality
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# DigitalOcean
+.do/
 
 # Railway
 .railway/

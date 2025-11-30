@@ -19,6 +19,7 @@ import InclusiveYouthSupport from './components/Inclusive/InclusiveYouthSupport'
 import DashboardAccessManager from './components/Dashboard/DashboardAccessManager';
 import AppDownloadModal from './components/AppDownloadModal';
 import AppInstallBanner from './components/AppInstallBanner';
+import FloatingDownloadButton from './components/FloatingDownloadButton';
 
 // Contexts
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
@@ -155,31 +156,28 @@ function App() {
 
   const handleLogin = async (code: string) => {
     try {
-      // Call backend API to login
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ secretCode: code }),
-      });
+      // Use API service (now uses mock data for prototype)
+      const { apiService } = await import('./services/api');
+      const response = await apiService.loginUser(code);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message || 'Login failed');
-        return;
-      }
-
-      // Store code locally after successful backend login
-      if (secretCodeManager.validateSecretCode(code)) {
-        secretCodeManager.updateLastUsed();
-        setIsAuthenticated(true);
+      if (response.success) {
+        // Store code locally after successful login
+        if (secretCodeManager.validateSecretCode(code)) {
+          secretCodeManager.updateLastUsed();
+          setIsAuthenticated(true);
+        }
+      } else {
+        alert(response.message || 'Login failed');
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      alert('Failed to login. Please try again.');
+      // Fallback to local validation if API fails
+      if (secretCodeManager.validateSecretCode(code)) {
+        secretCodeManager.updateLastUsed();
+        setIsAuthenticated(true);
+      } else {
+        alert('Invalid secret code. Please try again.');
+      }
     }
   };
 
@@ -296,6 +294,11 @@ function App() {
               isOpen={showModal}
               onClose={closeModal}
               onDownload={handleDownload}
+            />
+
+            {/* Floating Download Button */}
+            <FloatingDownloadButton
+              onOpenModal={openModal}
             />
         </div>
       </Router>

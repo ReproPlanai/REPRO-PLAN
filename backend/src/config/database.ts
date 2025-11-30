@@ -11,12 +11,17 @@ const databaseUrl = process.env.DATABASE_URL;
 let sequelize: Sequelize;
 
 if (databaseUrl) {
-  // Railway PostgreSQL connection
+  // Production database connection (Railway, DigitalOcean, etc.)
+  // DigitalOcean requires SSL for all connections
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isDigitalOcean = databaseUrl.includes('digitalocean.com') || databaseUrl.includes('ondigitalocean.com');
+  
   sequelize = new Sequelize(databaseUrl, {
     dialect: 'postgres',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
     dialectOptions: {
-      ssl: process.env.NODE_ENV === 'production' ? {
+      // DigitalOcean and production environments require SSL
+      ssl: (isProduction || isDigitalOcean) ? {
         require: true,
         rejectUnauthorized: false
       } : false
