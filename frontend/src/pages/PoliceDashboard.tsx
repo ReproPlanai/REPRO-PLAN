@@ -56,6 +56,33 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
     }
   }, [userData?.id]);
 
+  // Helper functions (declared before use)
+  const isToday = (date: string) => {
+    const today = new Date();
+    const alertDate = new Date(date);
+    return today.toDateString() === alertDate.toDateString();
+  };
+
+  const calculateAverageResponseTime = (alerts: any[]) => {
+    const resolved = alerts.filter(a => a.status === 'resolved' && a.responseTime);
+    if (resolved.length === 0) return 0;
+    const total = resolved.reduce((sum, a) => sum + a.responseTime, 0);
+    return Math.round(total / resolved.length);
+  };
+
+  const formatTimeAgo = (date: string) => {
+    const now = new Date();
+    const past = new Date(date);
+    const diffMs = now.getTime() - past.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} min ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  };
+
   // Emergency data from API
   const emergencyData = {
     activeAlerts: stakeholderAPI.alerts.filter(a => a.status === 'active').length,
@@ -85,33 +112,6 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
     status: caseRecord.status,
     assigned: caseRecord.assignedRole || 'Unassigned'
   }));
-
-  // Helper functions
-  const isToday = (date: string) => {
-    const today = new Date();
-    const alertDate = new Date(date);
-    return today.toDateString() === alertDate.toDateString();
-  };
-
-  const calculateAverageResponseTime = (alerts: any[]) => {
-    const resolved = alerts.filter(a => a.status === 'resolved' && a.responseTime);
-    if (resolved.length === 0) return 0;
-    const total = resolved.reduce((sum, a) => sum + a.responseTime, 0);
-    return Math.round(total / resolved.length);
-  };
-
-  const formatTimeAgo = (date: string) => {
-    const now = new Date();
-    const past = new Date(date);
-    const diffMs = now.getTime() - past.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} min ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-  };
 
   const tabs = [
     { id: 'emergency', label: 'Emergency Alerts', icon: AlertTriangle },
