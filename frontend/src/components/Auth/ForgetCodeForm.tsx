@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next'; // Reserved for future use
 import { Shield, ArrowLeft, RefreshCw, Check, Copy, AlertCircle } from 'lucide-react';
 
 interface ForgetCodeFormProps {
