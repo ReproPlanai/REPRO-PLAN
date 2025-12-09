@@ -3,6 +3,7 @@ import { User } from '../models';
 import { Stakeholder } from '../models/stakeholders';
 import { body, validationResult } from 'express-validator';
 import { signToken } from '../middleware/auth';
+import * as crypto from 'crypto';
 
 const router = Router();
 
@@ -25,9 +26,9 @@ const generateSurveyLink = (): string => {
 };
 
 // Recovery endpoint - GET /auth/recover?token=...
-const handleRecovery = async (req: Request, res: Response) => {
+const handleRecovery = async (_req: Request, res: Response) => {
   try {
-    const { token } = req.query;
+    const { token } = _req.query;
 
     if (!token || typeof token !== 'string') {
       return res.status(400).json({
