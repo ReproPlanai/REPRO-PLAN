@@ -33,7 +33,6 @@ const PatientRecords: React.FC = () => {
 
       if (!numericUserId || Number.isNaN(numericUserId)) {
         console.warn('No user ID available for health records');
-        setLoading(false);
         return;
       }
 
@@ -59,8 +58,6 @@ const PatientRecords: React.FC = () => {
       console.error('Failed to fetch health records:', error);
       // Set empty array instead of sample data
       setRecords([]);
-    } finally {
-      setLoading(false);
     }
   };
 
