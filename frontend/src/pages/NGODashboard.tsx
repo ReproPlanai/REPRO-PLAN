@@ -102,6 +102,17 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
     { id: 4, metric: 'Partner Organizations', value: '12', change: '+2', trend: 'up' }
   ]);
 
+  // Placeholder metrics for dashboard visualizations
+  const totalBeneficiaries = programs.reduce((sum, program) => sum + (Number(program.beneficiaries) || 0), 0);
+  const ngoData = {
+    ngoMetrics: {
+      totalBeneficiaries,
+      activePrograms: ngoMetrics.activePrograms,
+      completedPrograms: ngoMetrics.completedPrograms,
+      communityReach: 0 // Replace with real metric when available
+    }
+  };
+
   const tabs = [
     { id: 'programs', label: 'Programs', icon: Target },
     { id: 'program-details', label: 'Program Details', icon: FileText },
