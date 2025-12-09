@@ -4,7 +4,7 @@ import { body, validationResult } from 'express-validator';
 import crypto from 'crypto';
 import { emailService } from '../services/emailService';
 import { roleGuard } from '../middleware/roleGuard';
-import { signToken } from '../middleware/auth';
+import { authGuard, signToken } from '../middleware/auth';
 
 const router = Router();
 
@@ -203,7 +203,8 @@ router.get('/alerts',
   roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']),
   async (req: Request, res: Response) => {
   try {
-    const { role, stakeholderId, status, priority } = req.query;
+    const { stakeholderId: _stakeholderId, status, priority } = req.query;
+    const role = (req as any).user?.role;
 
     const where: any = {};
     if (status) where.status = status;
@@ -325,7 +326,7 @@ router.put('/alerts/:id', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 
 // Get all cases
 router.get('/cases', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']), async (req: Request, res: Response) => {
   try {
-    const { role, stakeholderId, status, priority } = req.query;
+    const { stakeholderId: _stakeholderId, status, priority } = req.query;
 
     const where: any = {};
     if (status) where.status = status;

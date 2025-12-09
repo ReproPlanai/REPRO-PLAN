@@ -9,7 +9,7 @@ import { roleGuard } from '../middleware/roleGuard';
 const router = Router();
 
 // API version info
-router.get('/', (req, res) => {
+router.get('/', (_req, res) => {
   res.json({
     success: true,
     message: 'REPRO PLAN API v3.0',

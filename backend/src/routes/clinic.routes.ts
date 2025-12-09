@@ -7,7 +7,7 @@ import { authGuard } from '../middleware/auth';
 const router = Router();
 
 // Get all clinics
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (_req: Request, res: Response) => {
   try {
     const clinics = await Clinic.findAll({
       where: { isActive: true },
@@ -31,8 +31,8 @@ router.get('/', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const clinic = await Clinic.findByPk(parseInt(id), {
-      where: { isActive: true }
+    const clinic = await Clinic.findOne({
+      where: { id: parseInt(id), isActive: true }
     });
 
     if (!clinic) {

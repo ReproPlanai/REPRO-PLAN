@@ -2,7 +2,6 @@ import { Router, Request, Response } from 'express';
 import { User } from '../models';
 import { Stakeholder } from '../models/stakeholders';
 import { body, validationResult } from 'express-validator';
-import crypto from 'crypto';
 import { signToken } from '../middleware/auth';
 
 const router = Router();
@@ -30,7 +29,7 @@ router.post(
         return res.status(400).json({ success: false, errors: errors.array() });
       }
 
-      const { surveyLink, demographics } = req.body;
+      const { surveyLink } = req.body;
 
       // Generate unique secret code
       let secretCode = generateSecretCode();
@@ -156,7 +155,7 @@ router.post(
       const { surveyLink } = req.body;
 
       // Find user by survey link first
-      let account = await User.findOne({
+      let account: User | Stakeholder | null = await User.findOne({
         where: { surveyLink },
         order: [['createdAt', 'DESC']] // Get the most recent user with this survey link
       });

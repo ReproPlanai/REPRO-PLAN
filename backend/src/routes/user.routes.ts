@@ -59,7 +59,7 @@ router.get('/:id', authGuard, async (req: Request, res: Response) => {
 router.put('/:id', authGuard, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { phoneNumber, isVerified } = req.body;
+    const { isVerified } = req.body;
 
     const user = await User.findByPk(id);
     if (!user) {
@@ -70,7 +70,6 @@ router.put('/:id', authGuard, async (req: Request, res: Response) => {
     }
 
     await user.update({
-      phoneNumber: phoneNumber || user.phoneNumber,
       isVerified: isVerified !== undefined ? isVerified : user.isVerified
     });
 
@@ -92,7 +91,7 @@ router.put('/:id', authGuard, async (req: Request, res: Response) => {
 });
 
 // Get all users (admin only)
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (_req: Request, res: Response) => {
   try {
     // In production, this should check for admin authentication
     // For now, allowing access (add authentication middleware later)

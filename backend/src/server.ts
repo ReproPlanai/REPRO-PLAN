@@ -1,4 +1,4 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -81,7 +81,7 @@ app.use('/api/auth/', authLimiter);
 app.use('/api/auth/forget-code', recoveryLimiter);
 
 // Health check endpoint
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'ok',
     message: 'REPRO PLAN API v3.0 is running',
@@ -94,7 +94,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/api', apiRoutes);
 
 // 404 handler
-app.use((req: Request, res: Response) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: 'Route not found'

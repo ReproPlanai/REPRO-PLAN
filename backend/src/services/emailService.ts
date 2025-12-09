@@ -18,13 +18,20 @@ export class EmailService {
 
   async sendEmail(data: EmailData): Promise<boolean> {
     try {
-      const { data: emailData, error } = await resend.emails.send({
+      const emailPayload: any = {
         from: this.fromEmail,
         to: data.to,
         subject: data.subject,
-        html: data.html,
-        text: data.text,
-      });
+      };
+
+      if (data.html) {
+        emailPayload.html = data.html;
+      }
+      if (data.text) {
+        emailPayload.text = data.text;
+      }
+
+      const { data: emailData, error } = await resend.emails.send(emailPayload);
 
       if (error) {
         console.error('Email send error:', error);

@@ -398,5 +398,5 @@ Case.belongsTo(Stakeholder, { foreignKey: 'assignedTo', as: 'assignedStakeholder
 Stakeholder.hasMany(InterRoleMessage, { foreignKey: 'fromStakeholderId', as: 'sentMessages' });
 Stakeholder.hasMany(InterRoleMessage, { foreignKey: 'toStakeholderId', as: 'receivedMessages' });
 
-export { Stakeholder, EmergencyAlert, Case, InterRoleMessage };
+// Export models (already exported above)
 
