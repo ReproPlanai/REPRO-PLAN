@@ -1,4 +1,4 @@
-# REPRO PLAN v3.0
+# REPRO PLAN
 
 **REPRO PLAN** - Anonymous, Inclusive & Scalable SRHR Platform for Youth across Africa
 

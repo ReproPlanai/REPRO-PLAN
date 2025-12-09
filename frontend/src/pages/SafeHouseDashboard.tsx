@@ -42,7 +42,12 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
       availableBeds: 12, // Calculated from capacity - occupants
       securityLevel: 'High', // This would come from system configuration
       occupancyRate: 40 // Calculated percentage
-    }
+    },
+    residentStatus: [
+      { name: 'Active Residents', value: 6, color: '#10B981' },
+      { name: 'Pending Transfer', value: 2, color: '#F59E0B' },
+      { name: 'Temporary Leave', value: 0, color: '#6B7280' }
+    ]
   };
 
   // Fetch real data from backend
