@@ -11,9 +11,9 @@ const databaseUrl = process.env.DATABASE_URL;
 let sequelize: Sequelize;
 
 if (databaseUrl) {
-  // Managed Postgres often uses self-signed certs; default to allowing them
+  // DigitalOcean and other managed Postgres use proper SSL certificates
   const sslRequired = (process.env.DB_SSL ?? 'true').toLowerCase() !== 'false';
-  const rejectUnauthorized = (process.env.DB_SSL_REJECT_UNAUTHORIZED ?? 'false').toLowerCase() === 'true';
+  const rejectUnauthorized = (process.env.DB_SSL_REJECT_UNAUTHORIZED ?? 'true').toLowerCase() === 'true';
 
   sequelize = new Sequelize(databaseUrl, {
     dialect: 'postgres',
@@ -34,38 +34,10 @@ if (databaseUrl) {
     }
   });
 } else {
-  // Local development connection
-  const dbName = process.env.DB_NAME || 'reproplan';
-  const dbUser = process.env.DB_USER || 'postgres';
-  const dbPassword = process.env.DB_PASSWORD;
-  const dbHost = process.env.DB_HOST || 'your-db-host.db.ondigitalocean.com';
-  const dbPort = parseInt(process.env.DB_PORT || '5432');
-
-  // Validate required environment variables
-  if (!dbPassword) {
-    console.error('❌ Error: DB_PASSWORD is not set in .env file');
-    console.error('Please create a .env file in the backend folder with your PostgreSQL password.');
-    console.error('See env.example.txt for the format.');
-    throw new Error('DB_PASSWORD environment variable is required');
-  }
-
-  sequelize = new Sequelize(
-    dbName,
-    dbUser,
-    dbPassword,
-    {
-      host: dbHost,
-      port: dbPort,
-      dialect: 'postgres',
-      logging: process.env.NODE_ENV === 'development' ? console.log : false,
-      pool: {
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-      }
-    }
-  );
+  // Production deployment - DATABASE_URL should be provided by DigitalOcean
+  console.error('❌ Error: DATABASE_URL environment variable is required');
+  console.error('This should be automatically provided by DigitalOcean App Platform');
+  throw new Error('DATABASE_URL environment variable is required for production deployment');
 }
 
 export { sequelize };
