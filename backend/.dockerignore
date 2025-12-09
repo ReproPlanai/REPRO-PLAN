@@ -18,7 +18,5 @@ coverage
 *.swo
 *~
 dist/
-src/
-tsconfig.json
 migrations/
 *.md
