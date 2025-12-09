@@ -73,7 +73,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAuthenticated }) 
         })}
       </div>
 
-      <style jsx>{`
+      <style>{`
         .safe-area-bottom {
           padding-bottom: max(0px, env(safe-area-inset-bottom));
         }
