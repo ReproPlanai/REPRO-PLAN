@@ -93,6 +93,34 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
     { id: 3, patient: 'Anonymous Patient C', time: '02:00 PM', type: 'Contraception Consultation', doctor: 'Dr. Brown', status: 'Scheduled' }
   ]);
 
+  // Placeholder data for secure visualizations
+  const medicalData = {
+    medicalMetrics: {
+      totalPatients: 0,
+      activePatients: 0,
+      appointmentsToday: 0,
+      emergencyCases: emergencyAlerts.filter((a) => a.severity === 'critical').length
+    },
+    patientConditions: [
+      { id: 1, label: 'Prenatal Care', value: 35 },
+      { id: 2, label: 'STI Testing', value: 25 },
+      { id: 3, label: 'Counseling', value: 20 },
+      { id: 4, label: 'Other', value: 20 }
+    ],
+    appointmentTrend: [
+      { id: 1, label: 'Week 1', value: 12 },
+      { id: 2, label: 'Week 2', value: 18 },
+      { id: 3, label: 'Week 3', value: 15 },
+      { id: 4, label: 'Week 4', value: 20 }
+    ],
+    patientAgeGroups: [
+      { id: 1, label: '18-24', value: 40 },
+      { id: 2, label: '25-34', value: 30 },
+      { id: 3, label: '35-44', value: 20 },
+      { id: 4, label: '45+', value: 10 }
+    ]
+  };
+
   // Map API alerts to display format
   const emergencyAlerts = stakeholderAPI.alerts.map(alert => ({
     id: alert.id,
