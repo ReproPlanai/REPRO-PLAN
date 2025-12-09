@@ -105,6 +105,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
     { id: 3, user: 'Anonymous User', action: 'Used emergency feature', time: '18 min ago', location: 'Tamale' }
   ]);
 
+  // Placeholder data for secure visualizations
+  const adminData = {
+    userActivity,
+    systemUsage: [
+      { id: 1, label: 'CPU', value: 45 },
+      { id: 2, label: 'Memory', value: 60 },
+      { id: 3, label: 'Network', value: 30 }
+    ],
+    securityAlerts: stakeholderAPI.alerts.map((alert) => ({
+      id: alert.id || alert.caseNumber || Math.random().toString(),
+      label: alert.alertType || 'alert',
+      value: 1
+    }))
+  };
+
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
