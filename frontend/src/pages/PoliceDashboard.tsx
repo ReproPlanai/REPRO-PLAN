@@ -98,6 +98,14 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
     coordinates: alert.location?.coordinates || { lat: 5.6037, lng: -0.1870 }
   }));
 
+  // Aggregated emergency metrics for cards/visuals
+  const emergencyData = {
+    activeAlerts: stakeholderAPI.alerts.filter(a => a.status === 'active').length,
+    resolvedToday: stakeholderAPI.alerts.filter(a => a.status === 'resolved' && isToday(a.createdAt)).length,
+    averageResponseTime: calculateAverageResponseTime(stakeholderAPI.alerts),
+    totalCases: stakeholderAPI.cases.length
+  };
+
   // Map API cases to display format
   const recentCases = stakeholderAPI.cases.map(caseRecord => ({
     id: caseRecord.id,
