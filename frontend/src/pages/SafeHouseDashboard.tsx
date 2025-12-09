@@ -47,6 +47,14 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
       { name: 'Active Residents', value: 6, color: '#10B981' },
       { name: 'Pending Transfer', value: 2, color: '#F59E0B' },
       { name: 'Temporary Leave', value: 0, color: '#6B7280' }
+    ],
+    capacityTrend: [
+      { month: 'Jan', capacity: 85, occupancy: 68 },
+      { month: 'Feb', capacity: 85, occupancy: 72 },
+      { month: 'Mar', capacity: 85, occupancy: 78 },
+      { month: 'Apr', capacity: 85, occupancy: 82 },
+      { month: 'May', capacity: 85, occupancy: 75 },
+      { month: 'Jun', capacity: 85, occupancy: 80 }
     ]
   };
 
