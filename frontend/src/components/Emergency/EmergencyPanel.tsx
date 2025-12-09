@@ -21,7 +21,7 @@ interface EmergencyContact {
   id: string;
   name: string;
   phone: string;
-  type: 'police' | 'medical' | 'gbv' | 'counseling' | 'hotline';
+  type: 'police' | 'medical' | 'gbv' | 'counseling' | 'hotline' | 'emergency';
   available: boolean;
 }
 
