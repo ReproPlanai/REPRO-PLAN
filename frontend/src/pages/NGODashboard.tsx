@@ -110,7 +110,24 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
       activePrograms: ngoMetrics.activePrograms,
       completedPrograms: ngoMetrics.completedPrograms,
       communityReach: 0 // Replace with real metric when available
-    }
+    },
+    programTypes: [
+      { id: 1, label: 'Education', value: 40 },
+      { id: 2, label: 'Health', value: 30 },
+      { id: 3, label: 'Counseling', value: 20 },
+      { id: 4, label: 'Other', value: 10 }
+    ],
+    beneficiaryTrend: [
+      { id: 1, label: 'Week 1', value: 120 },
+      { id: 2, label: 'Week 2', value: 180 },
+      { id: 3, label: 'Week 3', value: 160 },
+      { id: 4, label: 'Week 4', value: 200 }
+    ],
+    impactMetrics: [
+      { id: 1, label: 'Training Sessions', value: 24 },
+      { id: 2, label: 'Communities Reached', value: 18 },
+      { id: 3, label: 'Partners Engaged', value: 12 }
+    ]
   };
 
   const tabs = [
