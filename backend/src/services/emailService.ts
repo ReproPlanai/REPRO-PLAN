@@ -1,6 +1,8 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+// Initialize client only when key is provided to avoid crashing the app
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 export interface EmailData {
   to: string;
@@ -18,6 +20,11 @@ export class EmailService {
 
   async sendEmail(data: EmailData): Promise<boolean> {
     try {
+      if (!resend) {
+        console.warn('Email disabled: RESEND_API_KEY not configured');
+        return false;
+      }
+
       const emailPayload: any = {
         from: this.fromEmail,
         to: data.to,
