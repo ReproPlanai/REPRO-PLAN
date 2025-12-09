@@ -3,15 +3,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Get database URL from environment (Railway provides DATABASE_URL)
+// Get database URL from environment (DigitalOcean provides DATABASE_URL)
 const databaseUrl = process.env.DATABASE_URL;
 
-// If DATABASE_URL is provided (Railway), use it directly
+// If DATABASE_URL is provided (DigitalOcean), use it directly
 // Otherwise, construct from individual variables
 let sequelize: Sequelize;
 
 if (databaseUrl) {
-  // Production database connection (Railway, DigitalOcean, etc.)
+  // Production database connection (DigitalOcean)
   // DigitalOcean requires SSL for all connections
   const isProduction = process.env.NODE_ENV === 'production';
   const isDigitalOcean = databaseUrl.includes('digitalocean.com') || databaseUrl.includes('ondigitalocean.com');
