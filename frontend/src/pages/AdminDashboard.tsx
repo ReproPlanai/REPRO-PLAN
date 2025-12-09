@@ -61,8 +61,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
     try {
       // In a real implementation, you'd have API endpoints for these metrics
       // For now, we'll calculate from available data
-      const alertsResponse = await apiService.getAlerts('ADMIN', userData?.id);
-      const casesResponse = await apiService.getCases('ADMIN', userData?.id);
+      const alertsResponse = await apiService.getAlerts('ADMIN', userData?.id) as { success?: boolean; alerts?: any[] };
+      const casesResponse = await apiService.getCases('ADMIN', userData?.id) as { success?: boolean; cases?: any[] };
 
       // Calculate metrics from API responses
       const totalAlerts = alertsResponse?.success ? (alertsResponse.alerts?.length || 0) : 0;
