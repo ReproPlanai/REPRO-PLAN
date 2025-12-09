@@ -33,6 +33,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [dashboardMetrics, setDashboardMetrics] = useState({
+    totalAlerts: 0,
+    totalCases: 0,
+    activeAlerts: 0,
     totalUsers: 0,
     activeUsers: 0,
     totalStakeholders: 0,
