@@ -22,6 +22,7 @@ import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
 import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging';
 import UserManagement from './admin/UserManagement';
 import SystemSettings from './admin/SystemSettings';
+import { apiService } from '../services/api';
 
 interface AdminDashboardProps {
   userData: any;
