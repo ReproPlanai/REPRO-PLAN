@@ -23,7 +23,7 @@ const ForgetCodeForm: React.FC<ForgetCodeFormProps> = ({ onBack, onCodeRecovered
 
     try {
       const { apiService } = await import('../../services/api');
-      const response = await apiService.forgetCode(surveyLink) as { success: boolean; message?: string };
+      const response = await apiService.forgetCode(surveyLink) as { success: boolean; message?: string; secretCode?: string };
 
       if (response.success && response.secretCode) {
         setNewSecretCode(response.secretCode);
