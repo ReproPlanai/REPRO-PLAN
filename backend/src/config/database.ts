@@ -12,19 +12,17 @@ let sequelize: Sequelize;
 
 if (databaseUrl) {
   // DigitalOcean managed Postgres uses self-signed certificates; force allow them
-  const sslRequired = true;
-  const rejectUnauthorized = false;
+  // Remove any existing SSL parameters from DATABASE_URL and add our own
+  const cleanUrl = databaseUrl.replace(/[?&]sslmode=[^&]*/, '').replace(/[?&]sslcert=[^&]*/, '').replace(/[?&]sslkey=[^&]*/, '').replace(/[?&]sslrootcert=[^&]*/, '');
 
-  sequelize = new Sequelize(databaseUrl, {
+  sequelize = new Sequelize(`${cleanUrl}?sslmode=require`, {
     dialect: 'postgres',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
     dialectOptions: {
-      ssl: sslRequired
-        ? {
-            require: true,
-            rejectUnauthorized
-          }
-        : false
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
     },
     pool: {
       max: 5,
