@@ -41,13 +41,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
     stakeholderId: userData?.id
   });
 
-  // Real police metrics from API data
-  const policeMetrics = {
-    activeAlerts: stakeholderAPI.alerts.filter(a => a.status === 'active').length,
-    totalCases: stakeholderAPI.cases.length,
-    resolvedToday: stakeholderAPI.cases.filter(c => c.status === 'resolved').length,
-    emergencyCases: stakeholderAPI.alerts.filter(a => a.priority === 'critical').length
-  };
+  // Real police metrics from API data - using individual values instead of object
 
   // Fetch real data from backend
   useEffect(() => {

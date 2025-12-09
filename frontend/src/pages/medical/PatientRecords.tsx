@@ -19,7 +19,6 @@ interface PatientRecord {
 
 const PatientRecords: React.FC = () => {
   const [records, setRecords] = useState<PatientRecord[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<PatientRecord | null>(null);
 

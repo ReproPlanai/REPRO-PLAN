@@ -35,13 +35,7 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
     stakeholderId: userData?.id
   });
 
-  // Real medical metrics from API data
-  const medicalMetrics = {
-    totalPatients: 0, // Would need a separate API endpoint for patient count
-    activeAlerts: stakeholderAPI.alerts.filter(a => a.status === 'active').length,
-    totalCases: stakeholderAPI.cases.length,
-    emergencyCases: stakeholderAPI.alerts.filter(a => a.priority === 'critical').length
-  };
+  // Real medical metrics from API data - using individual values instead of object
 
   // Fetch real data from backend
   useEffect(() => {

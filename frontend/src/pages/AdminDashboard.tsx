@@ -70,6 +70,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
       const activeAlerts = stakeholderAPI.alerts.filter(a => a.status === 'active').length;
 
       setDashboardMetrics({
+        totalAlerts,
+        totalCases,
+        activeAlerts,
         totalUsers: 0, // Would need a separate API endpoint
         activeUsers: 0, // Would need a separate API endpoint
         totalStakeholders: 0, // Would need a separate API endpoint
