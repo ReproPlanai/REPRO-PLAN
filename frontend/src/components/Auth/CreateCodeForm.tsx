@@ -52,7 +52,7 @@ const CreateCodeForm: React.FC<CreateCodeFormProps> = ({ onBack, onCodeCreated }
     try {
       // Use API service for production user registration (survey link is auto-generated)
       const { apiService } = await import('../../services/api');
-      const response = await apiService.registerUser('', demographics) as { success: boolean; message?: string; user?: any; surveyLink?: string };
+      const response = await apiService.registerUser(demographics) as { success: boolean; message?: string; user?: any; surveyLink?: string };
 
       if (!response.success) {
         throw new Error(response.message || 'Failed to create account');
