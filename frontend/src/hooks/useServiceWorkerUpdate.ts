@@ -22,15 +22,27 @@ const useServiceWorkerUpdate = (): ServiceWorkerUpdate => {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js');
         
-        // Check for updates
+        // Check for updates - PRODUCTION: Apply immediately without user interaction
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
-          
+
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // New update is available
+                // PRODUCTION: Auto-apply update immediately
+                console.log('🔄 New app version detected - applying immediately...');
                 setIsUpdateAvailable(true);
+                // Auto-update after a brief delay to ensure UI updates
+                setTimeout(async () => {
+                  try {
+                    if (registration.waiting) {
+                      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                    }
+                  } catch (error) {
+                    console.error('Auto-update failed:', error);
+                    window.location.reload();
+                  }
+                }, 2000);
               }
             });
           }
@@ -49,6 +61,9 @@ const useServiceWorkerUpdate = (): ServiceWorkerUpdate => {
 
     registerServiceWorker();
 
+    // PRODUCTION: Check for updates immediately on load
+    checkForUpdates();
+
     // Check for updates on page load
     const checkForUpdates = async () => {
       try {
@@ -61,8 +76,8 @@ const useServiceWorkerUpdate = (): ServiceWorkerUpdate => {
       }
     };
 
-    // Check for updates every 30 minutes
-    const updateInterval = setInterval(checkForUpdates, 30 * 60 * 1000);
+    // PRODUCTION: Check for updates every 5 minutes (more frequent for immediate updates)
+    const updateInterval = setInterval(checkForUpdates, 5 * 60 * 1000);
 
     // Also check for updates when page becomes visible
     const handleVisibilityChange = () => {
@@ -81,17 +96,18 @@ const useServiceWorkerUpdate = (): ServiceWorkerUpdate => {
 
   const updateServiceWorker = async () => {
     setIsUpdating(true);
-    
+
     try {
       const registration = await navigator.serviceWorker.getRegistration();
       if (registration && registration.waiting) {
-        // Tell the waiting service worker to skip waiting and become active
+        // PRODUCTION: Immediately apply update
+        console.log('🚀 Applying app update immediately...');
         registration.waiting.postMessage({ type: 'SKIP_WAITING' });
       }
     } catch (error) {
       console.error('Failed to update service worker:', error);
-      // Fallback: reload the page
-      window.location.reload();
+      // PRODUCTION: Force reload on update failure
+      setTimeout(() => window.location.reload(), 1000);
     }
   };
 

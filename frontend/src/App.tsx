@@ -8,6 +8,7 @@ import OfflineIndicator from './components/OfflineIndicator';
 import UpdateNotification from './components/UI/UpdateNotification';
 import useServiceWorkerUpdate from './hooks/useServiceWorkerUpdate';
 import DesktopHeader from './components/Layout/DesktopHeader';
+import BottomNavigation from './components/Layout/BottomNavigation';
 import LoginForm from './components/Auth/LoginForm';
 import CreateCodeForm from './components/Auth/CreateCodeForm';
 import ForgetCodeForm from './components/Auth/ForgetCodeForm';
@@ -50,6 +51,7 @@ import QRVerification from './pages/QRVerification';
 // Utils
 import { secretCodeManager } from './utils/secretCode';
 import { smsIntegration } from './utils/smsIntegration';
+import { productionResetManager } from './utils/productionReset';
 
 // Hooks
 import { useAppDownloadModal } from './hooks/useAppDownloadModal';
@@ -74,10 +76,28 @@ function App() {
   const { showModal, closeModal, handleDownload, openModal } = useAppDownloadModal();
 
   useEffect(() => {
-    // Check if user has a valid secret code
-    const hasValidCode = secretCodeManager.hasValidSecretCode();
-    setIsAuthenticated(hasValidCode);
-    setIsLoading(false);
+    // Check for production reset first
+    const initializeApp = async () => {
+      try {
+        const resetResult = await productionResetManager.checkAndResetForProduction();
+
+        if (resetResult.wasReset) {
+          console.log('🔄 Production reset completed:', resetResult.reason);
+          // Show user notification about reset
+          alert('Welcome to REPRO PLAN v3.0! Your app has been updated for production use.');
+        }
+
+        // Check if user has a valid secret code
+        const hasValidCode = secretCodeManager.hasValidSecretCode();
+        setIsAuthenticated(hasValidCode);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('App initialization failed:', error);
+        setIsLoading(false);
+      }
+    };
+
+    initializeApp();
     
     // Handle stakeholder URL changes
     const handleStakeholderAccess = () => {
@@ -287,8 +307,10 @@ function App() {
                 </Routes>
               </div>
             </main>
-            
-            
+
+            {/* Bottom Navigation for Mobile Authenticated Users */}
+            <BottomNavigation isAuthenticated={isAuthenticated} />
+
             {/* App Download Modal */}
             <AppDownloadModal
               isOpen={showModal}
