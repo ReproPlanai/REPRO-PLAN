@@ -11,9 +11,9 @@ const databaseUrl = process.env.DATABASE_URL;
 let sequelize: Sequelize;
 
 if (databaseUrl) {
-  // DigitalOcean and other managed Postgres use proper SSL certificates
+  // DigitalOcean managed Postgres uses self-signed certificates; allow them for connection
   const sslRequired = (process.env.DB_SSL ?? 'true').toLowerCase() !== 'false';
-  const rejectUnauthorized = (process.env.DB_SSL_REJECT_UNAUTHORIZED ?? 'true').toLowerCase() === 'true';
+  const rejectUnauthorized = (process.env.DB_SSL_REJECT_UNAUTHORIZED ?? 'false').toLowerCase() === 'true';
 
   sequelize = new Sequelize(databaseUrl, {
     dialect: 'postgres',
