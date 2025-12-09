@@ -100,7 +100,7 @@ const handleRecovery = async (_req: Request, res: Response) => {
 router.post(
   '/register',
   [], // No validation needed - survey link is auto-generated
-  async (req: Request, res: Response) => {
+  async (_req: Request, res: Response) => {
     try {
       console.log('🔐 Starting user registration...');
       // Generate unique secret code
