@@ -232,7 +232,7 @@ self.addEventListener('fetch', (event) => {
             }
             return fetch(request)
               .then((response) => {
-                if (response.status === 200) {
+                if (response.status === 200 && request.url.startsWith('http')) {
                   const responseClone = response.clone();
                   caches.open(DYNAMIC_CACHE).then((cache) => {
                     cache.put(request, responseClone);
