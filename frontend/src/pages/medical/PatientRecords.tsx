@@ -30,18 +30,20 @@ const PatientRecords: React.FC = () => {
   const fetchHealthRecords = async () => {
     try {
       const userId = secretCodeManager.getUserId();
-      if (!userId) {
+      const numericUserId = typeof userId === 'string' ? Number(userId) : userId;
+
+      if (!numericUserId || Number.isNaN(numericUserId)) {
         console.warn('No user ID available for health records');
         setLoading(false);
         return;
       }
 
-      const response = await apiService.getHealthRecords(userId) as { success: boolean; records?: any[] };
+      const response = await apiService.getHealthRecords(numericUserId) as { success: boolean; records?: any[] };
       if (response.success && response.records) {
         // Transform API data to match component interface
         const transformedRecords = response.records.map((record: any, index: number) => ({
           id: record.id || index + 1,
-          patientId: `PAT-${String(userId).padStart(3, '0')}`,
+          patientId: `PAT-${String(numericUserId).padStart(3, '0')}`,
           name: 'Anonymous Patient', // Maintain privacy
           age: 25, // Default age since API may not provide
           gender: 'Not specified', // Maintain privacy
