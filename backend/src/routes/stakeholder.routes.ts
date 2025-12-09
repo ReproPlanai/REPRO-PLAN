@@ -203,43 +203,43 @@ router.get(
   authGuard,
   roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']),
   async (req: Request, res: Response) => {
-    try {
+  try {
       const { stakeholderId, status, priority } = req.query;
-      const role = (req as any).user?.role;
+    const role = (req as any).user?.role;
 
-      const where: any = {};
-      if (status) where.status = status;
-      if (priority) where.priority = priority;
+    const where: any = {};
+    if (status) where.status = status;
+    if (priority) where.priority = priority;
       if (stakeholderId) where.stakeholderId = stakeholderId;
 
-      // Role-based filtering
-      if (role === 'POLICE') {
-        // Police can see all alerts
-      } else if (role === 'MEDICAL') {
-        where.alertType = ['medical', 'gbv', 'panic'];
-      } else if (role === 'SAFEHOUSE') {
-        where.alertType = ['gbv', 'safety', 'panic'];
-      } else if (role === 'NGO') {
-        where.alertType = ['gbv', 'safety'];
-      }
-
-      const alerts = await EmergencyAlert.findAll({
-        where,
-        order: [['createdAt', 'DESC']],
-        limit: 100
-      });
-
-      return res.json({
-        success: true,
-        alerts
-      });
-    } catch (error: any) {
-      return res.status(500).json({
-        success: false,
-        message: 'Error fetching alerts',
-        error: error.message
-      });
+    // Role-based filtering
+    if (role === 'POLICE') {
+      // Police can see all alerts
+    } else if (role === 'MEDICAL') {
+      where.alertType = ['medical', 'gbv', 'panic'];
+    } else if (role === 'SAFEHOUSE') {
+      where.alertType = ['gbv', 'safety', 'panic'];
+    } else if (role === 'NGO') {
+      where.alertType = ['gbv', 'safety'];
     }
+
+    const alerts = await EmergencyAlert.findAll({
+      where,
+      order: [['createdAt', 'DESC']],
+      limit: 100
+    });
+
+    return res.json({
+      success: true,
+      alerts
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error fetching alerts',
+      error: error.message
+    });
+  }
   }
 );
 

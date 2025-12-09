@@ -45,7 +45,7 @@ const EmergencyPanel: React.FC = () => {
   const [isSharingLocation, setIsSharingLocation] = useState(false);
 
   // Liberian emergency contacts
-  const emergencyContacts: EmergencyContact[] = useMemo(() => [
+  const defaultEmergencyContacts: EmergencyContact[] = useMemo(() => [
     {
       id: '1',
       name: 'Liberia National Police',
@@ -90,13 +90,13 @@ const EmergencyPanel: React.FC = () => {
         offlineStorage.getData('emergency_logs')
       ]);
       
-      setEmergencyContacts(contacts || emergencyContacts);
+      setEmergencyContacts(contacts || defaultEmergencyContacts);
       setEmergencyLogs(logs || []);
     } catch (error) {
       console.error('Failed to load emergency data:', error);
-      setEmergencyContacts(emergencyContacts);
+      setEmergencyContacts(defaultEmergencyContacts);
     }
-  }, [emergencyContacts]);
+  }, [defaultEmergencyContacts]);
 
   const saveEmergencyData = useCallback(async () => {
     try {
