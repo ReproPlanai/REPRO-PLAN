@@ -86,14 +86,6 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
     return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
   };
 
-  // Emergency data from API
-  const emergencyData = {
-    activeAlerts: stakeholderAPI.alerts.filter(a => a.status === 'active').length,
-    resolvedToday: stakeholderAPI.alerts.filter(a => a.status === 'resolved' && isToday(a.createdAt)).length,
-    averageResponseTime: calculateAverageResponseTime(stakeholderAPI.alerts),
-    totalCases: stakeholderAPI.cases.length
-  };
-
   // Map API alerts to display format
   const emergencyAlerts = stakeholderAPI.alerts.map(alert => ({
     id: alert.id,
@@ -115,6 +107,24 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
     status: caseRecord.status,
     assigned: caseRecord.assignedRole || 'Unassigned'
   }));
+
+  // Placeholder data for secure visualizations
+  const policeData = {
+    emergencyTypes: [
+      { id: 1, label: 'GBV', value: stakeholderAPI.alerts.filter(a => a.alertType === 'gbv').length || 10 },
+      { id: 2, label: 'Medical', value: stakeholderAPI.alerts.filter(a => a.alertType === 'medical').length || 8 },
+      { id: 3, label: 'Safety', value: stakeholderAPI.alerts.filter(a => a.alertType === 'safety').length || 6 },
+      { id: 4, label: 'Other', value: stakeholderAPI.alerts.filter(a => a.alertType === 'other').length || 4 }
+    ],
+    responseTimes: [
+      { id: 1, label: 'Avg Response (min)', value: calculateAverageResponseTime(stakeholderAPI.alerts) }
+    ],
+    caseStatus: [
+      { id: 1, label: 'Open', value: stakeholderAPI.cases.filter(c => c.status === 'open').length },
+      { id: 2, label: 'In Progress', value: stakeholderAPI.cases.filter(c => c.status === 'in_progress').length },
+      { id: 3, label: 'Resolved', value: stakeholderAPI.cases.filter(c => c.status === 'resolved').length }
+    ]
+  };
 
   const tabs = [
     { id: 'emergency', label: 'Emergency Alerts', icon: AlertTriangle },
