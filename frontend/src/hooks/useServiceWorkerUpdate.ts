@@ -76,8 +76,8 @@ const useServiceWorkerUpdate = (): ServiceWorkerUpdate => {
     // PRODUCTION: Check for updates immediately on load
     checkForUpdates();
 
-    // PRODUCTION: Check for updates every 5 minutes (more frequent for immediate updates)
-    const updateInterval = setInterval(checkForUpdates, 5 * 60 * 1000);
+    // PRODUCTION: Check for updates every 5 seconds (ultra-frequent for immediate updates)
+    const updateInterval = setInterval(checkForUpdates, 5 * 1000);
 
     // Also check for updates when page becomes visible
     const handleVisibilityChange = () => {

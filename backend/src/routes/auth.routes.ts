@@ -101,6 +101,7 @@ router.post(
   [], // No validation needed - survey link is auto-generated
   async (req: Request, res: Response) => {
     try {
+      console.log('🔐 Starting user registration...');
       // Generate unique secret code
       let secretCode = generateSecretCode();
       let attempts = 0;
@@ -124,7 +125,9 @@ router.post(
       }
 
       // Generate unique survey link for account recovery
+      console.log('🔗 Generating survey link...');
       let surveyLink = generateSurveyLink();
+      console.log('🔗 Initial survey link:', surveyLink);
       let linkAttempts = 0;
 
       // Ensure survey link is unique
@@ -138,19 +141,25 @@ router.post(
       }
 
       if (linkAttempts >= maxAttempts) {
+        console.error('❌ Failed to generate unique survey link after', maxAttempts, 'attempts');
         return res.status(500).json({
           success: false,
           message: 'Failed to generate unique survey link. Please try again.'
         });
       }
 
+      console.log('✅ Final survey link:', surveyLink);
+
       // Create new user with auto-generated secret code and survey link
+      console.log('👤 Creating user with secretCode:', secretCode, 'surveyLink:', surveyLink);
       const user = await User.create({
         secretCode,
         surveyLink,
         isVerified: false,
         isUsed: false
       });
+
+      console.log('✅ User created successfully:', user.id);
 
       const token = signToken({ id: user.id, role: 'USER', type: 'user' });
 
