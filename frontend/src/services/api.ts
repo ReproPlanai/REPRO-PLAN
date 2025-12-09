@@ -1,7 +1,7 @@
 // Centralized API service for REPRO PLAN
 // Production API service - connects to backend
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://your-backend-app.ondigitalocean.app/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://repro-plan-v3-hihzd.ondigitalocean.app/api';
 const TOKEN_STORAGE_KEY = 'repro-plan_jwt';
 
 class APIService {

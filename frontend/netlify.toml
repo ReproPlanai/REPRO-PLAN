@@ -6,7 +6,7 @@
   NODE_VERSION = "18"
   NPM_VERSION = "9"
   # Production Environment Variables
-  REACT_APP_API_URL = "https://your-backend-app.ondigitalocean.app/api"
+  REACT_APP_API_URL = "https://repro-plan-v3-hihzd.ondigitalocean.app/api"
   REACT_APP_USE_MOCK_API = "false"
   REACT_APP_ENV = "production"
   REACT_APP_NAME = "REPRO PLAN"
