@@ -69,10 +69,10 @@ class APIService {
 
 
   // Auth endpoints
-  async registerUser(surveyLink: string, demographics?: any) {
+  async registerUser(demographics?: any) {
     const result = await this.request<any>('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ surveyLink, demographics }),
+      body: JSON.stringify({ demographics }),
     });
     if ((result as any)?.token) this.setToken((result as any).token);
     return result;

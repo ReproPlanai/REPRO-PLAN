@@ -36,7 +36,7 @@ const CreateCodeForm: React.FC<CreateCodeFormProps> = ({ onBack, onCodeCreated }
     hasChildren: '',
     srhrExperience: ''
   });
-  const [surveyLink, setSurveyLink] = useState('');
+  const [generatedSurveyLink, setGeneratedSurveyLink] = useState<string | null>(null);
 
   const handleDemographicsSubmit = () => {
     // Store demographics data (in a real app, this would be sent to analytics)
@@ -47,17 +47,12 @@ const CreateCodeForm: React.FC<CreateCodeFormProps> = ({ onBack, onCodeCreated }
   };
 
   const handleCreateCode = async () => {
-    if (!surveyLink) {
-      alert('Please enter a survey link');
-      return;
-    }
-
     setIsCreating(true);
-    
+
     try {
-      // Use API service for production user registration
+      // Use API service for production user registration (survey link is auto-generated)
       const { apiService } = await import('../../services/api');
-      const response = await apiService.registerUser(surveyLink, demographics) as { success: boolean; message?: string; user?: any };
+      const response = await apiService.registerUser('', demographics) as { success: boolean; message?: string; user?: any; surveyLink?: string };
 
       if (!response.success) {
         throw new Error(response.message || 'Failed to create account');
@@ -70,11 +65,14 @@ const CreateCodeForm: React.FC<CreateCodeFormProps> = ({ onBack, onCodeCreated }
       // Store demographics with the code (for analytics)
       secretCodeManager.storeUserDemographics(demographics);
       
-      // Store the secret code from backend response
+      // Store the secret code and survey link from backend response
       const code = response.user?.secretCode || secretCodeManager.generateSecretCode();
+      const surveyLink = response.surveyLink || response.user?.surveyLink;
+
       secretCodeManager.createSecretCodeFromBackend(code);
-      
+
       setSecretCode({ code, backupCodes });
+      setGeneratedSurveyLink(surveyLink);
     } catch (error: any) {
       console.error('Failed to create secret code:', error);
       alert(error.message || 'Failed to create account. Please try again.');
@@ -454,6 +452,26 @@ REPRO PLAN - Anonymous SRHR Platform`;
                 </div>
               </div>
 
+              {generatedSurveyLink && (
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                  <h3 className="font-medium text-green-800 mb-2">Account Recovery Link</h3>
+                  <p className="text-sm text-green-700 mb-3">
+                    Save this link to recover your account if you lose your codes:
+                  </p>
+                  <div className="bg-white rounded p-2 mb-2">
+                    <div className="text-xs font-mono break-all text-green-800">
+                      {generatedSurveyLink}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(generatedSurveyLink)}
+                    className="w-full btn-outline text-green-700 border-green-300 hover:bg-green-50"
+                  >
+                    Copy Recovery Link
+                  </button>
+                </div>
+              )}
+
               <button
                 onClick={handleDownloadCodes}
                 className="w-full btn-secondary flex items-center justify-center space-x-2"
@@ -526,21 +544,16 @@ REPRO PLAN - Anonymous SRHR Platform`;
           </div>
 
           <div className="space-y-6">
-            <div>
-              <label htmlFor="surveyLink" className="block text-sm font-medium text-gray-700 mb-2">
-                Survey Link <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="url"
-                id="surveyLink"
-                value={surveyLink}
-                onChange={(e) => setSurveyLink(e.target.value)}
-                placeholder="https://example.com/survey/... (optional)"
-                className="input-field"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Optional: Provide a survey link to enable code recovery. Without it, you'll remain fully anonymous but won't be able to recover your code.
-              </p>
+            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+              <div className="flex items-start space-x-3">
+                <Shield className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="text-green-800 font-medium">Automatic Account Recovery</p>
+                  <p className="text-green-700 mt-1">
+                    We'll automatically generate a secure recovery link for your account. Save it along with your secret code for future access.
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="p-4 bg-blue-50 rounded-lg">
@@ -552,7 +565,7 @@ REPRO PLAN - Anonymous SRHR Platform`;
                     <li>• No personal information required</li>
                     <li>• Your identity remains completely anonymous</li>
                     <li>• Code can only be used once for security</li>
-                    <li>• Save your survey link to recover your code</li>
+                    <li>• Auto-generated recovery link for account access</li>
                   </ul>
                 </div>
               </div>
@@ -560,7 +573,7 @@ REPRO PLAN - Anonymous SRHR Platform`;
 
             <button
               onClick={handleCreateCode}
-              disabled={isCreating || !surveyLink}
+              disabled={isCreating}
               className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               {isCreating ? (

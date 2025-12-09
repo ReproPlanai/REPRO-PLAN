@@ -16,21 +16,91 @@ const generateSecretCode = (): string => {
   return code;
 };
 
+// Generate a unique survey link for account recovery
+const generateSurveyLink = (): string => {
+  const baseUrl = process.env.FRONTEND_URL || 'https://repro-plan.netlify.app';
+  const recoveryPath = '/recover';
+  const uniqueId = crypto.randomBytes(16).toString('hex');
+  return `${baseUrl}${recoveryPath}?token=${uniqueId}`;
+};
+
+// Recovery endpoint - GET /auth/recover?token=...
+const handleRecovery = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.query;
+
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid recovery token'
+      });
+    }
+
+    // Find user by survey link token
+    const surveyLinkPattern = `%token=${token}`;
+    const user = await User.findOne({
+      where: {
+        surveyLink: {
+          [require('sequelize').Op.like]: surveyLinkPattern
+        }
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Recovery link not found or expired'
+      });
+    }
+
+    // Generate new secret code
+    let newSecretCode = generateSecretCode();
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (attempts < maxAttempts) {
+      const existingUser = await User.findOne({ where: { secretCode: newSecretCode } });
+      const existingStakeholder = await Stakeholder.findOne({ where: { secretCode: newSecretCode } });
+
+      if (!existingUser && !existingStakeholder) {
+        break;
+      }
+      newSecretCode = generateSecretCode();
+      attempts++;
+    }
+
+    if (attempts >= maxAttempts) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to generate new code. Please try again.'
+      });
+    }
+
+    // Update user's secret code
+    await user.update({ secretCode: newSecretCode });
+
+    return res.json({
+      success: true,
+      message: 'Account recovered successfully',
+      newSecretCode,
+      surveyLink: user.surveyLink
+    });
+
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: 'Recovery failed',
+      error: error.message
+    });
+  }
+};
+
 // Create secret code (anonymous registration)
 router.post(
   '/register',
-  [
-    body('surveyLink').optional().isURL().withMessage('Survey link must be a valid URL')
-  ],
+  [], // No validation needed - survey link is auto-generated
   async (req: Request, res: Response) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, errors: errors.array() });
-      }
-
-      const { surveyLink } = req.body;
-
       // Generate unique secret code
       let secretCode = generateSecretCode();
       let attempts = 0;
@@ -53,7 +123,28 @@ router.post(
         });
       }
 
-      // Create new user with secret code and survey link
+      // Generate unique survey link for account recovery
+      let surveyLink = generateSurveyLink();
+      let linkAttempts = 0;
+
+      // Ensure survey link is unique
+      while (linkAttempts < maxAttempts) {
+        const existingUserWithLink = await User.findOne({ where: { surveyLink } });
+        if (!existingUserWithLink) {
+          break;
+        }
+        surveyLink = generateSurveyLink();
+        linkAttempts++;
+      }
+
+      if (linkAttempts >= maxAttempts) {
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to generate unique survey link. Please try again.'
+        });
+      }
+
+      // Create new user with auto-generated secret code and survey link
       const user = await User.create({
         secretCode,
         surveyLink,
@@ -68,6 +159,7 @@ router.post(
         message: 'User registered successfully',
         userId: user.id,
         secretCode: user.secretCode,
+        surveyLink: user.surveyLink, // Auto-generated recovery link
         token
       });
     } catch (error: any) {
@@ -138,7 +230,10 @@ router.post(
   }
 );
 
-// Regenerate secret code using survey link
+// Recover account using survey link token - GET endpoint
+router.get('/recover', handleRecovery);
+
+// Regenerate secret code using survey link (legacy endpoint)
 router.post(
   '/forget-code',
   [
