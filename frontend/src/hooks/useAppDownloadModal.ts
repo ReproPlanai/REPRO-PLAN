@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 
+const IOS_APP_URL = process.env.REACT_APP_IOS_APP_URL;
+const ANDROID_APP_URL = process.env.REACT_APP_ANDROID_APP_URL;
+
 interface UseAppDownloadModalReturn {
   showModal: boolean;
   openModal: () => void;
@@ -81,28 +84,55 @@ export const useAppDownloadModal = (): UseAppDownloadModalReturn => {
   };
 
   const handleDownload = () => {
-    // Check if PWA install is available
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-      // Trigger PWA install prompt
-      const installPrompt = (window as any).deferredPrompt;
-      if (installPrompt) {
-        installPrompt.prompt();
-        installPrompt.userChoice.then((choiceResult: any) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted the install prompt');
-          } else {
-            console.log('User dismissed the install prompt');
-          }
-          (window as any).deferredPrompt = null;
-        });
-      }
+    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
+    const isAndroid = /android/i.test(userAgent);
+
+    let appStoreUrl: string | null = null;
+    if (isIOS && IOS_APP_URL) appStoreUrl = IOS_APP_URL;
+    if (isAndroid && ANDROID_APP_URL) appStoreUrl = ANDROID_APP_URL;
+
+    if (appStoreUrl) {
+      window.open(appStoreUrl, '_blank');
+      console.log('Redirecting to app store:', appStoreUrl);
     } else {
-      // Fallback: Show instructions for manual installation
-      alert('To install REPRO PLAN as an app:\n\n1. Open this page in your browser\n2. Look for "Add to Home Screen" in your browser menu\n3. Tap "Add" to install the app');
+      // Fallback to PWA installation
+      if ('serviceWorker' in navigator && 'PushManager' in window) {
+        const installPrompt = (window as any).deferredPrompt;
+        if (installPrompt) {
+          installPrompt.prompt();
+          installPrompt.userChoice.then((choiceResult: any) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('User accepted the PWA install prompt');
+            } else {
+              console.log('User dismissed the PWA install prompt');
+            }
+            (window as any).deferredPrompt = null;
+          });
+        } else {
+          showPWAManualInstructions();
+        }
+      } else {
+        showPWAManualInstructions();
+      }
     }
-    
+
     setShowModal(false);
     localStorage.setItem('repro-plan-app-download-seen', 'true');
+  };
+
+  const showPWAManualInstructions = () => {
+    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
+    const isAndroid = /android/i.test(userAgent);
+
+    if (isIOS) {
+      alert('To install REPRO PLAN as an app:\n\n1. Tap the Share button at the bottom of Safari\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right corner\n4. The app will appear on your home screen');
+    } else if (isAndroid) {
+      alert('To install REPRO PLAN as an app:\n\n1. Tap the menu (3 dots) in Chrome\n2. Select "Add to Home screen" or "Install app"\n3. Tap "Add" or "Install"\n4. The app will appear on your home screen');
+    } else {
+      alert('To install REPRO PLAN as an app:\n\n1. Look for the install icon in your browser address bar\n2. Or click the menu and select "Install REPRO PLAN"\n3. Click "Install" in the prompt\n4. The app will open in its own window');
+    }
   };
 
   return {

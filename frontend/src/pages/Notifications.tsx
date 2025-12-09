@@ -32,95 +32,16 @@ const Notifications: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'unread' | 'health' | 'safety' | 'education' | 'community' | 'system'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Sample notifications for SRHR app
-  const sampleNotifications: Notification[] = useMemo(() => [
-    {
-      id: '1',
-      type: 'reminder',
-      title: 'Health Check Reminder',
-      message: 'It\'s time for your monthly health check. Book an appointment with a healthcare provider.',
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-      isRead: false,
-      actionUrl: '/clinics',
-      actionText: 'Find Clinics',
-      category: 'health'
-    },
-    {
-      id: '2',
-      type: 'info',
-      title: 'New Educational Content',
-      message: 'New articles about contraception methods are now available in the Articles section.',
-      timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
-      isRead: false,
-      actionUrl: '/articles',
-      actionText: 'Read Articles',
-      category: 'education'
-    },
-    {
-      id: '3',
-      type: 'success',
-      title: 'Quiz Completed',
-      message: 'Great job! You completed the STI Prevention quiz with a score of 85%.',
-      timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-      isRead: true,
-      actionUrl: '/games',
-      actionText: 'Take More Quizzes',
-      category: 'education'
-    },
-    {
-      id: '4',
-      type: 'warning',
-      title: 'Privacy Reminder',
-      message: 'Remember to clear your browser history if you\'re using a shared device.',
-      timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-      isRead: true,
-      category: 'safety'
-    },
-    {
-      id: '5',
-      type: 'info',
-      title: 'Community Support',
-      message: 'New peer mentors are available for support. Connect with someone who understands your situation.',
-      timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-      isRead: false,
-      actionUrl: '/mentorship',
-      actionText: 'Find Mentors',
-      category: 'community'
-    },
-    {
-      id: '6',
-      type: 'success',
-      title: 'Appointment Confirmed',
-      message: 'Your appointment with Dr. Johnson has been confirmed for tomorrow at 2:00 PM.',
-      timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
-      isRead: true,
-      actionUrl: '/tracker',
-      actionText: 'View Details',
-      category: 'health'
-    },
-    {
-      id: '7',
-      type: 'reminder',
-      title: 'Medication Reminder',
-      message: 'Don\'t forget to take your prescribed medication. Set a reminder for consistent timing.',
-      timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-      isRead: true,
-      category: 'health'
-    },
-    {
-      id: '8',
-      type: 'info',
-      title: 'System Update',
-      message: 'REPRO PLAN has been updated with new features. Check out the improved accessibility options.',
-      timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
-      isRead: true,
-      category: 'system'
-    }
-  ], []);
+  // Real notifications would come from API
+  const notifications: Notification[] = useMemo(() => {
+    // For now, empty array - notifications would come from backend API
+    // Future: fetch from /api/notifications endpoint
+    return [];
+  }, []);
 
   useEffect(() => {
-    setNotifications(sampleNotifications);
-  }, [sampleNotifications]);
+    setNotifications(notifications);
+  }, [notifications]);
 
   const getNotificationIcon = (type: string, category: string) => {
     if (category === 'health') return Heart;

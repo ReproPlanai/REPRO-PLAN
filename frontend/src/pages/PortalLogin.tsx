@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, AlertTriangle, CheckCircle, LogIn, UserPlus } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, CheckCircle, LogIn, UserPlus, RefreshCw } from 'lucide-react';
 import { apiService } from '../services/api';
 
 interface PortalLoginProps {
@@ -11,12 +11,13 @@ interface PortalLoginProps {
 const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
+  const [surveyLink, setSurveyLink] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [error, setError] = useState('');
   const [isNewUser, setIsNewUser] = useState(false);
-  const [currentStep, setCurrentStep] = useState<'login' | 'signup' | 'otp'>('login');
+  const [currentStep, setCurrentStep] = useState<'login' | 'signup' | 'otp' | 'forget-code'>('login');
 
   // Role-specific configurations
   const roleConfig = {
@@ -85,6 +86,30 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
     }
   };
 
+  const handleForgetCodeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsSendingOtp(true);
+
+    try {
+      const { apiService } = await import('../../services/api');
+      const response = await apiService.forgetCode(surveyLink) as { success: boolean; message?: string; secretCode?: string; accountType?: string };
+
+      if (response.success && response.secretCode) {
+        // Show success message with new code
+        alert(`Your new secret code is: ${response.secretCode}\n\nPlease save this code securely. You can use it to sign in to your ${response.accountType} account.`);
+        setCurrentStep('login');
+        setSurveyLink('');
+      } else {
+        setError(response.message || 'Failed to recover code. Please check your survey link.');
+      }
+    } catch (error: any) {
+      setError(error.message || 'Failed to recover code. Please try again.');
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
   const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -96,6 +121,7 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
         role,
         phoneNumber,
         email,
+        surveyLink: surveyLink.trim() || undefined, // Optional for anonymity
         name: email.split('@')[0] // Use email prefix as name
       }) as { success: boolean; message?: string; stakeholder?: { id: number | string; secretCode: string; role: string; name?: string; organization?: string; permissions?: any } };
 
@@ -279,14 +305,22 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
             </button>
           </form>
 
-            <div className="text-center">
-              <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">Don't have an account?</p>
+            <div className="text-center space-y-2">
               <button
-                onClick={() => setCurrentStep('signup')}
-                className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium"
+                onClick={() => setCurrentStep('forget-code')}
+                className="text-gray-600 hover:text-gray-800 text-xs sm:text-sm"
               >
-                Create New Account
+                Forgot your secret code?
               </button>
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Don't have an account?</p>
+                <button
+                  onClick={() => setCurrentStep('signup')}
+                  className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium"
+                >
+                  Create New Account
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -332,6 +366,24 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
                 />
               </div>
 
+              <div>
+                <label htmlFor="surveyLink" className="block text-sm font-medium text-gray-700 mb-2">
+                  Survey Link (Optional)
+                </label>
+                <input
+                  type="url"
+                  id="surveyLink"
+                  value={surveyLink}
+                  onChange={(e) => setSurveyLink(e.target.value)}
+                  placeholder="https://example.com/survey/... (optional)"
+                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                  disabled={isSendingOtp}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Optional: Provide a survey link to enable account recovery. Without it, you'll remain fully anonymous.
+                </p>
+              </div>
+
               <button
                 type="submit"
                 disabled={!phoneNumber.trim() || !email.trim() || isSendingOtp}
@@ -358,6 +410,64 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
                 className="text-blue-600 hover:text-blue-800 text-sm font-medium"
               >
                 Sign In Instead
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Forget Code Form */}
+        {currentStep === 'forget-code' && (
+          <div className="space-y-4">
+            <div className="text-center mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">Recover Your Secret Code</h2>
+              <p className="text-sm text-gray-600">Enter your survey link to get a new secret code</p>
+            </div>
+
+            <form onSubmit={handleForgetCodeSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="surveyLink" className="block text-sm font-medium text-gray-700 mb-2">
+                  Survey Link
+                </label>
+                <input
+                  type="url"
+                  id="surveyLink"
+                  value={surveyLink}
+                  onChange={(e) => setSurveyLink(e.target.value)}
+                  placeholder="https://example.com/survey/..."
+                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                  required
+                  disabled={isSendingOtp}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter the survey link you provided during registration
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                disabled={!surveyLink.trim() || isSendingOtp}
+                className="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+              >
+                {isSendingOtp ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    <span>Recovering Code...</span>
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw size={18} />
+                    <span>Recover Secret Code</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="text-center">
+              <button
+                onClick={() => setCurrentStep('login')}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              >
+                Back to Sign In
               </button>
             </div>
           </div>

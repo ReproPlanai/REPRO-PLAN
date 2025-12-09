@@ -7,6 +7,7 @@ export interface StakeholderAttributes {
   role: 'ADMIN' | 'POLICE' | 'SAFEHOUSE' | 'MEDICAL' | 'NGO';
   secretCode: string;
   phoneNumber: string;
+  surveyLink?: string;
   name?: string;
   organization?: string;
   email?: string;
@@ -22,6 +23,7 @@ export class Stakeholder extends Model<StakeholderAttributes> implements Stakeho
   public role!: 'ADMIN' | 'POLICE' | 'SAFEHOUSE' | 'MEDICAL' | 'NGO';
   public secretCode!: string;
   public phoneNumber!: string;
+  public surveyLink?: string;
   public name?: string;
   public organization?: string;
   public email?: string;
@@ -51,6 +53,10 @@ Stakeholder.init(
     phoneNumber: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    surveyLink: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     name: {
       type: DataTypes.STRING,

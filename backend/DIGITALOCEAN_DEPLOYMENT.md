@@ -1,12 +1,34 @@
 # DigitalOcean Deployment Guide for REPRO PLAN Backend
 
-This guide will help you deploy the REPRO PLAN backend API and PostgreSQL database to DigitalOcean.
+This guide will help you deploy the complete REPRO PLAN stack to DigitalOcean:
+- ✅ PostgreSQL Database (Managed Database)
+- ✅ Backend API (App Platform)
+- ✅ Frontend (via Netlify)
 
 ## Prerequisites
 
 1. A DigitalOcean account ([Sign up here](https://www.digitalocean.com))
 2. Git repository with your backend code
 3. Basic knowledge of DigitalOcean App Platform
+
+## Pre-deployment: Set up Resend Email Service
+
+1. **Sign up for Resend**:
+   - Go to [resend.com](https://resend.com)
+   - Create an account and verify your email
+
+2. **Get your API Key**:
+   - Go to API Keys section in your Resend dashboard
+   - Create a new API key
+   - Copy the API key (starts with `re_`)
+
+3. **Verify your domain** (optional but recommended):
+   - Go to Domains section
+   - Add your domain (e.g., `yourdomain.com`)
+   - Follow DNS verification steps
+   - Set up SPF, DKIM, and DMARC records
+
+4. **Note your API key** - you'll need it for deployment
 
 ## Step 1: Create a Managed PostgreSQL Database
 
@@ -17,7 +39,7 @@ This guide will help you deploy the REPRO PLAN backend API and PostgreSQL databa
    - **Version**: PostgreSQL 15 (or latest)
    - **Datacenter Region**: Choose closest to your users (e.g., New York, Amsterdam)
    - **Plan**: Start with Basic plan ($15/month) - can upgrade later
-   - **Database Name**: `reproplan` (or your preferred name)
+   - **Database Name**: `defaultdb` (DigitalOcean default)
 4. Click **Create Database Cluster**
 5. Wait for the database to be created (5-10 minutes)
 
@@ -25,13 +47,14 @@ This guide will help you deploy the REPRO PLAN backend API and PostgreSQL databa
 
 1. Once created, click on your database cluster
 2. Go to **Connection Details** tab
-3. Note down:
-   - **Host**: `your-db-host.db.ondigitalocean.com`
+3. **Important**: Copy the **Connection String** (it includes SSL parameters)
+   - Format: `postgresql://doadmin:password@host:port/defaultdb?sslmode=require`
+4. Note the individual details (for reference):
+   - **Host**: `your-cluster-host.db.ondigitalocean.com`
    - **Port**: `25060` (usually)
-   - **Database**: `defaultdb` (or your database name)
+   - **Database**: `defaultdb`
    - **Username**: `doadmin`
    - **Password**: (click "Show" to reveal)
-   - **Connection String**: Copy the full connection string
 
 ## Step 2: Deploy Backend to DigitalOcean App Platform
 
@@ -61,12 +84,15 @@ CORS_ORIGIN=https://your-frontend-domain.com
 RATE_LIMIT_MAX_REQUESTS=100
 RATE_LIMIT_WINDOW_MS=900000
 JWT_SECRET=<generate a strong random string>
+RESEND_API_KEY=<your-resend-api-key>
+FROM_EMAIL=noreply@yourdomain.com
 ```
 
    - **JWT_SECRET**: Generate using: `openssl rand -base64 32`
 5. Connect Database:
    - Click **Add Database** → Select your PostgreSQL database from Step 1
-   - DigitalOcean will automatically set `DATABASE_URL` if you use this method
+   - DigitalOcean will automatically set `DATABASE_URL` with SSL configuration
+   - **Note**: If you prefer manual configuration, you can set `DATABASE_URL` manually
 6. Choose a plan:
    - Start with Basic plan ($5/month) - can upgrade later
 7. Click **Create Resources**
@@ -139,11 +165,13 @@ When you're ready to connect the frontend to the backend:
 |----------|-------------|---------|
 | `NODE_ENV` | Environment mode | `production` |
 | `PORT` | Server port | `5000` |
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@host:port/db?sslmode=require` |
+| `DATABASE_URL` | PostgreSQL connection string (auto-set by DigitalOcean) | `postgresql://doadmin:pass@host:port/defaultdb?sslmode=require` |
 | `CORS_ORIGIN` | Allowed frontend origin | `https://repro-plan.netlify.app` |
 | `RATE_LIMIT_MAX_REQUESTS` | Max requests per window | `100` |
 | `RATE_LIMIT_WINDOW_MS` | Rate limit window (ms) | `900000` (15 min) |
 | `JWT_SECRET` | JWT signing secret | Random 32+ character string |
+| `RESEND_API_KEY` | Resend email API key | `re_xxx...` |
+| `FROM_EMAIL` | Sender email address | `noreply@yourdomain.com` |
 
 ## Database Connection Methods
 
@@ -220,15 +248,18 @@ DB_PASSWORD=your_password
 5. **Rate Limiting**: Configure appropriate limits
 6. **HTTPS**: DigitalOcean provides HTTPS automatically
 
-## Cost Estimation
+## Cost Estimation (Complete Stack)
 
-- **App Platform Basic**: ~$5/month
-- **PostgreSQL Basic**: ~$15/month
+- **DigitalOcean App Platform Basic**: ~$5/month
+- **DigitalOcean PostgreSQL Basic**: ~$15/month
+- **Netlify (Frontend)**: Free tier available, or ~$9/month for pro features
+- **Resend Email**: Free tier (3,000 emails/month)
 - **Total**: ~$20/month (minimum)
 
 Costs scale with usage and can be reduced with:
 - Smaller database plans for development
 - Pausing resources when not in use
+- Netlify free tier for basic hosting
 
 ## Support
 
@@ -240,8 +271,9 @@ Costs scale with usage and can be reduced with:
 
 1. ✅ Backend deployed and running
 2. ✅ Database connected and migrations run
-3. ⏳ Test API endpoints
-4. ⏳ Connect frontend when ready for production
-5. ⏳ Set up monitoring and alerts
-6. ⏳ Configure custom domain (optional)
+3. ✅ Email service (Resend) configured
+4. ⏳ Test API endpoints
+5. ⏳ Connect frontend when ready for production
+6. ⏳ Set up monitoring and alerts
+7. ⏳ Configure custom domain (optional)
 

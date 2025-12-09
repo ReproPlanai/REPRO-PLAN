@@ -4,6 +4,7 @@ import userRoutes from './user.routes';
 import healthRoutes from './health.routes';
 import clinicRoutes from './clinic.routes';
 import stakeholderRoutes from './stakeholder.routes';
+import { roleGuard } from '../middleware/roleGuard';
 
 const router = Router();
 
@@ -26,7 +27,7 @@ router.get('/', (req, res) => {
 // Route modules
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
-router.use('/health', healthRoutes);
+router.use('/health', roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL']), healthRoutes);
 router.use('/clinics', clinicRoutes);
 router.use('/stakeholders', stakeholderRoutes);
 

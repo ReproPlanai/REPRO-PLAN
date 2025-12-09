@@ -55,7 +55,7 @@ const CreateCodeForm: React.FC<CreateCodeFormProps> = ({ onBack, onCodeCreated }
     setIsCreating(true);
     
     try {
-      // Use API service (now uses mock data for prototype)
+      // Use API service for production user registration
       const { apiService } = await import('../../services/api');
       const response = await apiService.registerUser(surveyLink, demographics) as { success: boolean; message?: string; user?: any };
 
@@ -535,12 +535,11 @@ REPRO PLAN - Anonymous SRHR Platform`;
                 id="surveyLink"
                 value={surveyLink}
                 onChange={(e) => setSurveyLink(e.target.value)}
-                placeholder="https://example.com/survey/..."
+                placeholder="https://example.com/survey/... (optional)"
                 className="input-field"
-                required
               />
               <p className="mt-1 text-xs text-gray-500">
-                This link will be used to recover your code if you forget it. Make sure to save it!
+                Optional: Provide a survey link to enable code recovery. Without it, you'll remain fully anonymous but won't be able to recover your code.
               </p>
             </div>
 

@@ -35,7 +35,7 @@ cp .env.example .env
 
 3. Update `.env` with your database credentials:
 ```env
-DATABASE_URL=postgresql://username:password@localhost:5432/reproplan
+DATABASE_URL=postgresql://doadmin:password@your-db-host.db.ondigitalocean.com:25060/defaultdb?sslmode=require
 ```
 
 ## 🗄️ Database Setup
@@ -76,7 +76,7 @@ npm run build
 npm start
 ```
 
-The server will start on `http://localhost:5000` (or the PORT specified in `.env`).
+The server will start on the configured PORT (default: 5000) and be accessible via DigitalOcean App Platform URL.
 
 ## 📡 API Endpoints
 

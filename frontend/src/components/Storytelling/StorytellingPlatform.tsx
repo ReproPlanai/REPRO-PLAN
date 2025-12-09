@@ -158,7 +158,12 @@ const StorytellingPlatform: React.FC = () => {
       if (storedStories) {
         setStories(storedStories);
       } else {
-        // Load sample stories
+        // TODO: Load stories from API instead of sample data
+        // const { apiService } = await import('../../services/api');
+        // const response = await apiService.getStories();
+        // if (response.success) setStories(response.stories);
+
+        // For now, using sample stories for demonstration
         const sampleStories = generateSampleStories();
         setStories(sampleStories);
         await offlineStorage.storeData('srhr_stories', sampleStories);

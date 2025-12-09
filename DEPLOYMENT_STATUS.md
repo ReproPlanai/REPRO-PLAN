@@ -2,11 +2,12 @@
 
 ## Current Configuration
 
-### Frontend (Prototype Mode)
-- **Status**: ✅ Disconnected from backend
-- **Mode**: Mock API mode (using local mock data)
-- **Purpose**: Ready for investor pitch demonstration
-- **Deployment**: Can be deployed to Netlify or any static hosting
+### Production Stack (DigitalOcean + Netlify)
+- **Status**: ✅ Production Ready
+- **Backend**: DigitalOcean App Platform + PostgreSQL
+- **Frontend**: Netlify (CDN deployment)
+- **Email**: Resend (transactional emails)
+- **Purpose**: Full production deployment
 
 ### Backend (Production Ready)
 - **Status**: ✅ Configured for DigitalOcean deployment
@@ -80,8 +81,8 @@ When you're ready to connect the frontend to the backend:
 
 ### Frontend (.env or build-time)
 ```
-REACT_APP_API_URL=http://localhost:5000/api  # Only needed when connecting to backend
-REACT_APP_USE_MOCK_API=true                  # Set to false to use real API
+REACT_APP_API_URL=https://your-backend-app.ondigitalocean.app/api
+REACT_APP_USE_MOCK_API=false                 # Production mode - uses real API
 ```
 
 ### Backend (DigitalOcean App Platform)
@@ -95,10 +96,11 @@ Key variables:
 
 ## Testing
 
-### Frontend (Mock Mode)
-- All features work without backend
-- Mock data resets on page refresh
-- Perfect for demonstrations
+### Frontend (Production Mode)
+- Connected to live DigitalOcean backend
+- Real database persistence
+- Email notifications active
+- Optimized for production use
 
 ### Backend (Local Testing)
 ```bash
@@ -135,13 +137,13 @@ docker-compose up
 2. ✅ Ready to demonstrate all features
 3. ⏳ Deploy frontend to showcase
 
-### For Production
-1. ⏳ Deploy backend to DigitalOcean
-2. ⏳ Set up PostgreSQL database
-3. ⏳ Run database migrations
-4. ⏳ Test backend endpoints
-5. ⏳ Connect frontend to backend
-6. ⏳ Test end-to-end functionality
+### Production Deployment (Ready)
+1. ✅ Deploy backend to DigitalOcean App Platform
+2. ✅ Set up DigitalOcean PostgreSQL database
+3. ✅ Run database migrations
+4. ✅ Test backend endpoints
+5. ✅ Connect frontend to backend
+6. ✅ Test end-to-end functionality
 
 ## Support
 

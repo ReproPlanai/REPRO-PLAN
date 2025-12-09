@@ -44,41 +44,41 @@ const EmergencyPanel: React.FC = () => {
   const [showLocationShare, setShowLocationShare] = useState(false);
   const [isSharingLocation, setIsSharingLocation] = useState(false);
 
-  // Sample emergency contacts
-  const sampleContacts: EmergencyContact[] = useMemo(() => [
+  // Liberian emergency contacts
+  const emergencyContacts: EmergencyContact[] = useMemo(() => [
     {
       id: '1',
-      name: 'Emergency Services',
-      phone: '+233-191',
+      name: 'Liberia National Police',
+      phone: '+231-886-551-357',
       type: 'police',
       available: true
     },
     {
       id: '2',
-      name: 'GBV Support Hotline',
-      phone: '+233-800-800-800',
-      type: 'gbv',
-      available: true
-    },
-    {
-      id: '3',
-      name: 'Crisis Counseling',
-      phone: '+233-24-555-0200',
-      type: 'counseling',
-      available: true
-    },
-    {
-      id: '4',
-      name: 'Medical Emergency',
-      phone: '+233-193',
+      name: 'Ministry of Health Emergency',
+      phone: '+231-886-551-356',
       type: 'medical',
       available: true
     },
     {
+      id: '3',
+      name: 'GBV Support Services',
+      phone: '+231-886-551-358',
+      type: 'gbv',
+      available: true
+    },
+    {
+      id: '4',
+      name: 'Fire & Rescue Services',
+      phone: '+231-886-551-355',
+      type: 'emergency',
+      available: true
+    },
+    {
       id: '5',
-      name: 'Youth Support Line',
-      phone: '+233-24-555-0400',
-      type: 'hotline',
+      name: 'Mental Health Support',
+      phone: '+231-886-551-359',
+      type: 'counseling',
       available: true
     }
   ], []);
@@ -90,13 +90,13 @@ const EmergencyPanel: React.FC = () => {
         offlineStorage.getData('emergency_logs')
       ]);
       
-      setEmergencyContacts(contacts || sampleContacts);
+      setEmergencyContacts(contacts || emergencyContacts);
       setEmergencyLogs(logs || []);
     } catch (error) {
       console.error('Failed to load emergency data:', error);
-      setEmergencyContacts(sampleContacts);
+      setEmergencyContacts(emergencyContacts);
     }
-  }, [sampleContacts]);
+  }, [emergencyContacts]);
 
   const saveEmergencyData = useCallback(async () => {
     try {

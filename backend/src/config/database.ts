@@ -38,7 +38,7 @@ if (databaseUrl) {
   const dbName = process.env.DB_NAME || 'reproplan';
   const dbUser = process.env.DB_USER || 'postgres';
   const dbPassword = process.env.DB_PASSWORD;
-  const dbHost = process.env.DB_HOST || 'localhost';
+  const dbHost = process.env.DB_HOST || 'your-db-host.db.ondigitalocean.com';
   const dbPort = parseInt(process.env.DB_PORT || '5432');
 
   // Validate required environment variables

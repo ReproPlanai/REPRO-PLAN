@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { 
-  MapPin, 
-  Phone, 
-  Clock, 
-  Search, 
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  MapPin,
+  Phone,
+  Clock,
+  Search,
   Navigation,
   Heart,
   Shield,
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { offlineStorage } from '../../utils/offlineStorage';
 import UnifiedVerificationForm from '../Auth/UnifiedVerificationForm';
+import { apiService } from '../../services/api';
 
 interface Clinic {
   id: string;
@@ -38,90 +39,49 @@ const ClinicFinder: React.FC = () => {
   const [showVerification, setShowVerification] = useState(false);
   const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null);
 
-  // Sample clinic data (in a real app, this would come from an API)
-  const sampleClinics: Clinic[] = useMemo(() => [
-    {
-      id: '1',
-      name: 'Monrovia Health Center',
-      address: 'Broad Street, Monrovia',
-      phone: '+231-555-0101',
-      hours: 'Mon-Fri: 8AM-5PM, Sat: 9AM-1PM',
-      services: ['STI Testing', 'Contraception', 'Prenatal Care', 'Counseling'],
-      rating: 4.5,
-      distance: 2.3,
-      coordinates: { lat: 6.3008, lng: -10.7972 },
-      type: 'clinic',
-      isOpen: true
-    },
-    {
-      id: '2',
-      name: 'Youth Friendly Services Center',
-      address: 'Capitol Hill, Monrovia',
-      phone: '+231-555-0102',
-      hours: 'Mon-Sat: 9AM-6PM',
-      services: ['Youth Counseling', 'SRHR Education', 'Peer Support', 'Emergency Contraception'],
-      rating: 4.8,
-      distance: 1.8,
-      coordinates: { lat: 6.3108, lng: -10.8072 },
-      type: 'counseling',
-      isOpen: true
-    },
-    {
-      id: '3',
-      name: 'Redemption Hospital',
-      address: 'Bushrod Island, Monrovia',
-      phone: '+231-555-0103',
-      hours: '24/7 Emergency Services',
-      services: ['Emergency Care', 'Maternity', 'Surgery', 'Laboratory'],
-      rating: 4.2,
-      distance: 4.1,
-      coordinates: { lat: 6.3208, lng: -10.8172 },
-      type: 'hospital',
-      isOpen: true
-    },
-    {
-      id: '4',
-      name: 'GBV Support Center',
-      address: 'Sinkor, Monrovia',
-      phone: '+231-555-0104',
-      hours: '24/7 Hotline',
-      services: ['Crisis Counseling', 'Legal Support', 'Safe Shelter', 'Medical Care'],
-      rating: 4.9,
-      distance: 3.2,
-      coordinates: { lat: 6.3308, lng: -10.8272 },
-      type: 'emergency',
-      isOpen: true
-    },
-    {
-      id: '5',
-      name: 'Family Planning Clinic',
-      address: 'Paynesville, Monrovia',
-      phone: '+231-555-0105',
-      hours: 'Mon-Fri: 8AM-4PM',
-      services: ['Contraception', 'Pregnancy Testing', 'STI Prevention', 'Health Education'],
-      rating: 4.6,
-      distance: 5.7,
-      coordinates: { lat: 6.3408, lng: -10.8372 },
-      type: 'clinic',
-      isOpen: false
-    }
-  ], []);
-
   const loadClinics = useCallback(async () => {
+    try {
+      // Try to get fresh data from API first
+      const response = await apiService.getClinics() as { success: boolean; clinics?: any[] };
+      if (response.success && response.clinics) {
+        // Transform API data to match component interface
+        const apiClinics = response.clinics.map((clinic: any) => ({
+          id: clinic.id.toString(),
+          name: clinic.name,
+          address: clinic.address,
+          phone: clinic.phone || '',
+          hours: clinic.hours || 'Hours not specified',
+          services: clinic.services || [],
+          rating: 4.0, // Default rating since API doesn't provide it
+          distance: 0, // Will be calculated based on user location
+          coordinates: clinic.coordinates,
+          type: clinic.type,
+          isOpen: true // Default to open
+        }));
+        setClinics(apiClinics);
+        // Store for offline use
+        await offlineStorage.storeData('clinics', apiClinics);
+        return;
+      }
+    } catch (apiError) {
+      console.warn('API unavailable, trying offline storage:', apiError);
+    }
+
+    // Fallback to offline storage
     try {
       const storedClinics = await offlineStorage.getData('clinics');
       if (storedClinics && storedClinics.length > 0) {
         setClinics(storedClinics);
-      } else {
-        setClinics(sampleClinics);
-        // Store sample data for offline use
-        await offlineStorage.storeData('clinics', sampleClinics);
+        return;
       }
-    } catch (error) {
-      console.error('Failed to load clinics:', error);
-      setClinics(sampleClinics);
+    } catch (storageError) {
+      console.warn('Offline storage unavailable:', storageError);
     }
-  }, [sampleClinics]);
+
+    // Final fallback - empty array (no sample data)
+    console.warn('No clinic data available');
+    setClinics([]);
+  }, []);
 
   const getUserLocation = () => {
     setIsLoadingLocation(true);

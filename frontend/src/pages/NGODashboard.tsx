@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
-import { generateNGOData } from '../utils/sampleData';
 import { dataSecurityManager } from '../utils/dataSecurity';
 import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
 // import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging'; // Reserved for future use
@@ -35,8 +34,13 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
     stakeholderId: userData?.id
   });
 
-  // Generate sample data
-  const ngoData = generateNGOData();
+  // Real NGO metrics from API data
+  const ngoMetrics = {
+    activePrograms: 0, // Would need separate API endpoint
+    totalCases: stakeholderAPI.cases.length,
+    activeAlerts: stakeholderAPI.alerts.filter(a => a.status === 'active').length,
+    completedPrograms: stakeholderAPI.cases.filter(c => c.status === 'resolved').length
+  };
 
   // Fetch real data from backend
   useEffect(() => {

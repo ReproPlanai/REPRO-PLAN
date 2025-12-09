@@ -156,7 +156,7 @@ function App() {
 
   const handleLogin = async (code: string) => {
     try {
-      // Use API service (now uses mock data for prototype)
+      // Use API service for production authentication
       const { apiService } = await import('./services/api');
       const response = await apiService.loginUser(code) as { success: boolean; message?: string; user?: any };
 

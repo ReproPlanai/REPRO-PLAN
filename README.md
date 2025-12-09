@@ -54,7 +54,7 @@ npm install
 npm start
 ```
 
-Frontend runs on `http://localhost:3000`
+Frontend deployed on Netlify
 
 ### Backend Setup
 
@@ -66,7 +66,7 @@ cp .env.example .env
 npm run dev
 ```
 
-Backend runs on `http://localhost:5000`
+Backend deployed on DigitalOcean App Platform
 
 ## 📚 Documentation
 

@@ -25,10 +25,8 @@ const ForgetCodeForm: React.FC<ForgetCodeFormProps> = ({ onBack, onCodeRecovered
       const { apiService } = await import('../../services/api');
       const response = await apiService.forgetCode(surveyLink) as { success: boolean; message?: string };
 
-      if (response.success) {
-        // In mock mode, generate a mock recovery code
-        const mockCode = `RECOVERY${Date.now()}`.substring(0, 8);
-        setNewSecretCode(mockCode);
+      if (response.success && response.secretCode) {
+        setNewSecretCode(response.secretCode);
       } else {
         throw new Error(response.message || 'Failed to recover code');
       }
@@ -166,6 +164,9 @@ const ForgetCodeForm: React.FC<ForgetCodeFormProps> = ({ onBack, onCodeRecovered
                 className="input-field"
                 required
               />
+              <p className="mt-1 text-xs text-gray-500">
+                Enter the survey link you provided during registration. If you registered anonymously without a survey link, recovery is not possible for privacy protection.
+              </p>
               {error && (
                 <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
                   <AlertCircle size={16} />

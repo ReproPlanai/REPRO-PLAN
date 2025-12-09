@@ -1,8 +1,13 @@
 import { Router, Request, Response } from 'express';
 import { HealthRecord, User } from '../models';
 import { body, validationResult } from 'express-validator';
+import { authGuard } from '../middleware/auth';
+import { roleGuard } from '../middleware/roleGuard';
 
 const router = Router();
+
+// Protect all health routes
+router.use(authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL']));
 
 // Get health records for a user
 router.get('/records/:userId', async (req: Request, res: Response) => {

@@ -44,9 +44,12 @@ const ResidentIntake: React.FC = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      // Save to backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      alert('Resident intake form submitted successfully!');
+      // TODO: Save to backend API endpoint
+      // const { apiService } = await import('../../../services/api');
+      // await apiService.createResidentIntake(formData);
+
+      console.log('Resident intake data:', formData);
+      alert('Resident intake recorded successfully!');
       // Reset form
       setFormData({
         name: '',

@@ -32,13 +32,16 @@ const UserManagement: React.FC = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Use API service (now uses mock data for prototype)
-      // const { apiService } = await import('../../services/api'); // Reserved for future use
-      // Mock: Return empty array for user list (prototype mode)
-      setUsers([]);
+      const { apiService } = await import('../../services/api');
+      const response = await apiService.getUsers() as { success: boolean; users?: any[] };
+
+      if (response.success && response.users) {
+        setUsers(response.users);
+      } else {
+        setUsers([]);
+      }
     } catch (error) {
       console.error('Failed to fetch users:', error);
-      // Use empty array for demo
       setUsers([]);
     } finally {
       setLoading(false);

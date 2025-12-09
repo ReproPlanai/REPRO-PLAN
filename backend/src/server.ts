@@ -7,6 +7,9 @@ import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import { sequelize } from './config/database';
 import { errorHandler } from './middleware/errorHandler';
+import { requestId } from './middleware/requestId';
+import { auditLogger } from './middleware/auditLogger';
+import { authLimiter, recoveryLimiter } from './middleware/rateLimiters';
 import apiRoutes from './routes';
 import './models'; // Import all models to ensure they're registered
 
@@ -16,13 +19,40 @@ dotenv.config();
 const app: Express = express();
 const PORT = process.env.PORT || 5000;
 
-// Security middleware
-app.use(helmet());
+// Security middleware with stricter defaults for production
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      connectSrc: ["'self'", process.env.CORS_ORIGIN || 'https://your-frontend-app.netlify.app'],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      fontSrc: ["'self'", "https:", "data:"],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"]
+    }
+  },
+  // Keep this disabled to avoid breakage with third-party embeds
+  crossOriginEmbedderPolicy: false
+}));
+// HSTS for HTTPS-only in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(helmet.hsts({
+    maxAge: 15552000, // 180 days
+    includeSubDomains: true,
+    preload: false
+  }));
+}
 app.use(compression());
+
+// Request tracing and audit logging
+app.use(requestId);
+app.use(auditLogger);
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: process.env.CORS_ORIGIN || 'https://your-frontend-app.netlify.app',
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -46,6 +76,9 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api/', limiter);
+// Stricter rate limits for sensitive routes
+app.use('/api/auth/', authLimiter);
+app.use('/api/auth/forget-code', recoveryLimiter);
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
@@ -88,7 +121,7 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(`🚀 REPRO PLAN API v3.0 server running on port ${PORT}`);
       console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+      console.log(`🌐 Health check: /health`);
     });
   } catch (error) {
     console.error('❌ Unable to start server:', error);

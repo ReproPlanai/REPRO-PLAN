@@ -2,6 +2,9 @@ import { Router, Request, Response } from 'express';
 import { Stakeholder, EmergencyAlert, Case, InterRoleMessage } from '../models/stakeholders';
 import { body, validationResult } from 'express-validator';
 import crypto from 'crypto';
+import { emailService } from '../services/emailService';
+import { roleGuard } from '../middleware/roleGuard';
+import { signToken } from '../middleware/auth';
 
 const router = Router();
 
@@ -19,7 +22,8 @@ router.post(
   [
     body('role').isIn(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']).withMessage('Invalid role'),
     body('phoneNumber').notEmpty().withMessage('Phone number is required'),
-    body('phoneNumber').matches(/^\+?[1-9]\d{1,14}$/).withMessage('Invalid phone number format')
+    body('phoneNumber').matches(/^\+?[1-9]\d{1,14}$/).withMessage('Invalid phone number format'),
+    body('surveyLink').optional({ nullable: true, checkFalsy: true }).isURL().withMessage('Survey link must be a valid URL')
   ],
   async (req: Request, res: Response) => {
     try {
@@ -28,7 +32,7 @@ router.post(
         return res.status(400).json({ success: false, errors: errors.array() });
       }
 
-      const { role, phoneNumber, name, organization, email } = req.body;
+      const { role, phoneNumber, surveyLink, name, organization, email } = req.body;
 
       // Generate unique secret code
       let secretCode = generateStakeholderCode(role);
@@ -53,12 +57,25 @@ router.post(
         role,
         secretCode,
         phoneNumber,
+        surveyLink,
         name,
         organization,
         email,
         isActive: true,
         permissions: getDefaultPermissions(role)
       });
+
+      // Send welcome email if email was provided
+      if (email && email.trim()) {
+        try {
+          await emailService.sendRegistrationEmail(email, secretCode);
+        } catch (emailError) {
+          console.error('Failed to send welcome email:', emailError);
+          // Don't fail registration if email fails
+        }
+      }
+
+      const token = signToken({ id: stakeholder.id, role: stakeholder.role, type: 'stakeholder' });
 
       res.status(201).json({
         success: true,
@@ -67,7 +84,8 @@ router.post(
           id: stakeholder.id,
           role: stakeholder.role,
           secretCode: stakeholder.secretCode
-        }
+        },
+        token
       });
     } catch (error: any) {
       res.status(500).json({
@@ -155,6 +173,8 @@ router.post(
 
       await stakeholder.update({ lastLogin: new Date() });
 
+      const token = signToken({ id: stakeholder.id, role: stakeholder.role, type: 'stakeholder' });
+
       res.json({
         success: true,
         message: 'Login successful',
@@ -164,7 +184,8 @@ router.post(
           name: stakeholder.name,
           organization: stakeholder.organization,
           permissions: stakeholder.permissions
-        }
+        },
+        token
       });
     } catch (error: any) {
       res.status(500).json({
@@ -177,7 +198,10 @@ router.post(
 );
 
 // Get all emergency alerts (filtered by role permissions)
-router.get('/alerts', async (req: Request, res: Response) => {
+router.get('/alerts',
+  authGuard,
+  roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']),
+  async (req: Request, res: Response) => {
   try {
     const { role, stakeholderId, status, priority } = req.query;
 
@@ -218,6 +242,8 @@ router.get('/alerts', async (req: Request, res: Response) => {
 // Create emergency alert
 router.post(
   '/alerts',
+  authGuard,
+  roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']),
   [
     body('alertType').isIn(['panic', 'medical', 'gbv', 'safety', 'other']).withMessage('Invalid alert type'),
     body('priority').isIn(['low', 'medium', 'high', 'critical']).withMessage('Invalid priority'),
@@ -262,7 +288,7 @@ router.post(
 );
 
 // Update alert status
-router.put('/alerts/:id', async (req: Request, res: Response) => {
+router.put('/alerts/:id', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { status, assignedTo, assignedRole, responseTime } = req.body;
@@ -297,7 +323,7 @@ router.put('/alerts/:id', async (req: Request, res: Response) => {
 });
 
 // Get all cases
-router.get('/cases', async (req: Request, res: Response) => {
+router.get('/cases', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']), async (req: Request, res: Response) => {
   try {
     const { role, stakeholderId, status, priority } = req.query;
 
@@ -328,6 +354,8 @@ router.get('/cases', async (req: Request, res: Response) => {
 // Create case
 router.post(
   '/cases',
+  authGuard,
+  roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']),
   [
     body('caseType').notEmpty().withMessage('Case type is required'),
     body('location').isObject().withMessage('Location must be an object'),
@@ -375,7 +403,7 @@ router.post(
 );
 
 // Update case
-router.put('/cases/:id', async (req: Request, res: Response) => {
+router.put('/cases/:id', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { status, priority, assignedTo, assignedRole, notes } = req.body;
@@ -415,6 +443,8 @@ router.put('/cases/:id', async (req: Request, res: Response) => {
 // Inter-role messaging
 router.post(
   '/messages',
+  authGuard,
+  roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']),
   [
     body('fromRole').notEmpty().withMessage('From role is required'),
     body('fromStakeholderId').isInt().withMessage('From stakeholder ID is required'),
@@ -462,7 +492,7 @@ router.post(
 );
 
 // Get messages for a role
-router.get('/messages', async (req: Request, res: Response) => {
+router.get('/messages', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']), async (req: Request, res: Response) => {
   try {
     const { toRole, toStakeholderId, isRead } = req.query;
 
@@ -491,7 +521,7 @@ router.get('/messages', async (req: Request, res: Response) => {
 });
 
 // Mark message as read
-router.put('/messages/:id/read', async (req: Request, res: Response) => {
+router.put('/messages/:id/read', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const message = await InterRoleMessage.findByPk(id);

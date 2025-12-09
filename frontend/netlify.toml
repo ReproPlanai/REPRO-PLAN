@@ -5,6 +5,17 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
+  # Production Environment Variables
+  REACT_APP_API_URL = "https://your-backend-app.ondigitalocean.app/api"
+  REACT_APP_USE_MOCK_API = "false"
+  REACT_APP_ENV = "production"
+  REACT_APP_NAME = "REPRO PLAN"
+  REACT_APP_VERSION = "3.0.0"
+  REACT_APP_PWA_ENABLED = "true"
+  REACT_APP_ENABLE_OFFLINE_MODE = "true"
+  REACT_APP_ENABLE_PUSH_NOTIFICATIONS = "true"
+  REACT_APP_ENABLE_LOCATION_SERVICES = "true"
+  # No app store URLs needed - this is a web app only
 
 [[redirects]]
   from = "/*"

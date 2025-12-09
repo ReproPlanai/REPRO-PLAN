@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Plus, Eye, Calendar, Heart, Pill } from 'lucide-react';
+import { apiService } from '../../services/api';
+import { secretCodeManager } from '../../utils/secretCode';
 
 interface PatientRecord {
   id: number;
@@ -16,37 +18,50 @@ interface PatientRecord {
 }
 
 const PatientRecords: React.FC = () => {
-  const [records] = useState<PatientRecord[]>([
-    {
-      id: 1,
-      patientId: 'PAT-001',
-      name: 'Anonymous Patient A',
-      age: 24,
-      gender: 'Female',
-      condition: 'Prenatal Care',
-      visitDate: '2024-01-15',
-      diagnosis: 'Normal pregnancy, 12 weeks',
-      treatment: 'Routine prenatal checkup',
-      medications: ['Folic Acid', 'Iron Supplement'],
-      nextAppointment: '2024-01-22'
-    },
-    {
-      id: 2,
-      patientId: 'PAT-002',
-      name: 'Anonymous Patient B',
-      age: 19,
-      gender: 'Female',
-      condition: 'STI Testing',
-      visitDate: '2024-01-14',
-      diagnosis: 'Chlamydia positive',
-      treatment: 'Antibiotic course prescribed',
-      medications: ['Azithromycin'],
-      nextAppointment: '2024-01-21'
-    }
-  ]);
-
+  const [records, setRecords] = useState<PatientRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<PatientRecord | null>(null);
+
+  useEffect(() => {
+    fetchHealthRecords();
+  }, []);
+
+  const fetchHealthRecords = async () => {
+    try {
+      const userId = secretCodeManager.getUserId();
+      if (!userId) {
+        console.warn('No user ID available for health records');
+        setLoading(false);
+        return;
+      }
+
+      const response = await apiService.getHealthRecords(userId) as { success: boolean; records?: any[] };
+      if (response.success && response.records) {
+        // Transform API data to match component interface
+        const transformedRecords = response.records.map((record: any, index: number) => ({
+          id: record.id || index + 1,
+          patientId: `PAT-${String(userId).padStart(3, '0')}`,
+          name: 'Anonymous Patient', // Maintain privacy
+          age: 25, // Default age since API may not provide
+          gender: 'Not specified', // Maintain privacy
+          condition: record.recordType || 'Health Record',
+          visitDate: new Date(record.createdAt).toLocaleDateString(),
+          diagnosis: record.data?.diagnosis || 'Record available',
+          treatment: record.data?.treatment || 'Treatment provided',
+          medications: record.data?.medications || [],
+          nextAppointment: record.data?.nextAppointment
+        }));
+        setRecords(transformedRecords);
+      }
+    } catch (error) {
+      console.error('Failed to fetch health records:', error);
+      // Set empty array instead of sample data
+      setRecords([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredRecords = records.filter(record =>
     record.patientId.toLowerCase().includes(searchQuery.toLowerCase()) ||

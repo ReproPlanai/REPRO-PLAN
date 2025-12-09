@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
-import { generateMedicalData } from '../utils/sampleData';
 import { dataSecurityManager } from '../utils/dataSecurity';
 import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
 // import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging'; // Reserved for future use
@@ -36,8 +35,13 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
     stakeholderId: userData?.id
   });
 
-  // Generate sample data
-  const medicalData = generateMedicalData();
+  // Real medical metrics from API data
+  const medicalMetrics = {
+    totalPatients: 0, // Would need a separate API endpoint for patient count
+    activeAlerts: stakeholderAPI.alerts.filter(a => a.status === 'active').length,
+    totalCases: stakeholderAPI.cases.length,
+    emergencyCases: stakeholderAPI.alerts.filter(a => a.priority === 'critical').length
+  };
 
   // Fetch real data from backend
   useEffect(() => {

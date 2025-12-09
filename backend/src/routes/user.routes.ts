@@ -1,10 +1,34 @@
 import { Router, Request, Response } from 'express';
 import { User } from '../models';
+import { roleGuard } from '../middleware/roleGuard';
+import { authGuard } from '../middleware/auth';
 
 const router = Router();
 
+// Get all users (admin only)
+router.get('/', authGuard, roleGuard(['ADMIN']), async (_req: Request, res: Response) => {
+  try {
+    const users = await User.findAll({
+      attributes: { exclude: ['secretCode'] },
+      order: [['createdAt', 'DESC']],
+      limit: 200
+    });
+
+    res.json({
+      success: true,
+      users
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching users',
+      error: error.message
+    });
+  }
+});
+
 // Get user profile
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/:id', authGuard, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const user = await User.findByPk(id, {
@@ -32,7 +56,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 // Update user profile
-router.put('/:id', async (req: Request, res: Response) => {
+router.put('/:id', authGuard, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { phoneNumber, isVerified } = req.body;
@@ -62,6 +86,32 @@ router.put('/:id', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: 'Error updating user',
+      error: error.message
+    });
+  }
+});
+
+// Get all users (admin only)
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    // In production, this should check for admin authentication
+    // For now, allowing access (add authentication middleware later)
+
+    const users = await User.findAll({
+      attributes: { exclude: ['secretCode'] }, // Don't expose secret codes
+      order: [['createdAt', 'DESC']],
+      limit: 100 // Limit results
+    });
+
+    res.json({
+      success: true,
+      users,
+      total: users.length
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching users',
       error: error.message
     });
   }

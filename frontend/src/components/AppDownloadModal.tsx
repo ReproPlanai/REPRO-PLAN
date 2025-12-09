@@ -28,6 +28,9 @@ interface DeviceInfo {
   canInstall: boolean;
 }
 
+const IOS_APP_URL = process.env.REACT_APP_IOS_APP_URL;
+const ANDROID_APP_URL = process.env.REACT_APP_ANDROID_APP_URL;
+
 const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
   isOpen,
   onClose,
@@ -99,19 +102,64 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
     setIsInstalling(true);
     setInstallProgress(0);
 
-    // Simulate installation process
-    const interval = setInterval(() => {
-      setInstallProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsInstalling(false);
-          onDownload();
-          localStorage.setItem('repro-plan-app-download-seen', 'true');
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 200);
+    // Check device type and provide appropriate download
+    const downloadUrl = getDownloadUrl();
+
+    if (downloadUrl) {
+      // Real download - redirect to app store or download link
+      setTimeout(() => {
+        window.open(downloadUrl, '_blank');
+        setIsInstalling(false);
+        onDownload();
+        localStorage.setItem('repro-plan-app-download-seen', 'true');
+      }, 1000);
+    } else {
+      // Fallback to PWA installation
+      const interval = setInterval(() => {
+        setInstallProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setIsInstalling(false);
+            triggerPWAInstall();
+            onDownload();
+            localStorage.setItem('repro-plan-app-download-seen', 'true');
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 200);
+    }
+  };
+
+  const getDownloadUrl = (): string | null => {
+    switch (deviceInfo.platform) {
+      case 'ios':
+        return IOS_APP_URL || null;
+      case 'android':
+        return ANDROID_APP_URL || null;
+      default:
+        return null; // Use PWA installation
+    }
+  };
+
+  const triggerPWAInstall = () => {
+    // Check if PWA install is available
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      const installPrompt = (window as any).deferredPrompt;
+      if (installPrompt) {
+        installPrompt.prompt();
+        installPrompt.userChoice.then((choiceResult: any) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          } else {
+            console.log('User dismissed the install prompt');
+          }
+          (window as any).deferredPrompt = null;
+        });
+      }
+    } else {
+      alert('To install REPRO PLAN as an app:\n\n1. Open this page in your browser\n2. Look for "Add to Home Screen" in your browser menu\n3. Tap "Add" to install the app');
+    }
   };
 
   const handleClose = () => {
@@ -127,6 +175,8 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
   };
 
   const getDeviceInstructions = () => {
+    const downloadUrl = getDownloadUrl();
+
     if (deviceInfo.isStandalone) {
       return {
         title: 'App Already Installed',
@@ -139,10 +189,61 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
       };
     }
 
+    // If we have actual download URLs, show download instructions
+    if (downloadUrl) {
+      switch (deviceInfo.platform) {
+        case 'ios':
+          return {
+            title: 'Download from App Store',
+            icon: <Apple className="w-4 h-4 text-gray-700" />,
+            steps: [
+              'Click "Download & Install" above',
+              'You will be redirected to the App Store',
+              'Tap "Get" to download REPRO PLAN',
+              'The app will install automatically'
+            ],
+            bgClass: 'bg-blue-50',
+            borderClass: 'border-blue-200',
+            textClass: 'text-blue-900',
+            iconClass: 'text-blue-600'
+          };
+        case 'android':
+          return {
+            title: 'Download from Google Play',
+            icon: <Smartphone className="w-4 h-4 text-green-600" />,
+            steps: [
+              'Click "Download & Install" above',
+              'You will be redirected to Google Play Store',
+              'Tap "Install" to download REPRO PLAN',
+              'The app will install automatically'
+            ],
+            bgClass: 'bg-green-50',
+            borderClass: 'border-green-200',
+            textClass: 'text-green-900',
+            iconClass: 'text-green-600'
+          };
+        default:
+          return {
+            title: 'Download App',
+            icon: <Download className="w-4 h-4 text-purple-600" />,
+            steps: [
+              'Click "Download & Install" above',
+              'You will be redirected to download the app',
+              'Follow the installation instructions'
+            ],
+            bgClass: 'bg-purple-50',
+            borderClass: 'border-purple-200',
+            textClass: 'text-purple-900',
+            iconClass: 'text-purple-600'
+          };
+      }
+    }
+
+    // Fallback to PWA installation instructions
     switch (deviceInfo.platform) {
       case 'ios':
         return {
-          title: 'Install on iOS (iPhone/iPad)',
+          title: 'Install as Web App (iOS)',
           icon: <Apple className="w-4 h-4 text-gray-700" />,
           steps: [
             'Tap the Share button at the bottom of Safari',
@@ -157,7 +258,7 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
         };
       case 'android':
         return {
-          title: 'Install on Android',
+          title: 'Install as Web App (Android)',
           icon: <Smartphone className="w-4 h-4 text-green-600" />,
           steps: [
             'Tap the menu (3 dots) in Chrome',
@@ -172,7 +273,7 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
         };
       case 'desktop':
         return {
-          title: 'Install on Desktop',
+          title: 'Install as Web App (Desktop)',
           icon: <Monitor className="w-4 h-4 text-blue-600" />,
           steps: [
             'Look for the install icon in your browser address bar',
@@ -187,7 +288,7 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
         };
       default:
         return {
-          title: 'How to Install',
+          title: 'Install as Web App',
           icon: <ExternalLink className="w-4 h-4 text-yellow-600" />,
           steps: [
             'Look for "Add to Home Screen" in your browser menu',
@@ -223,8 +324,12 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
               <Smartphone className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-lg sm:text-xl font-bold truncate">Download REPRO PLAN App</h2>
-              <p className="text-blue-100 text-xs sm:text-sm">Get the full experience</p>
+              <h2 className="text-lg sm:text-xl font-bold truncate">
+                {getDownloadUrl() ? 'Download REPRO PLAN App' : 'Install REPRO PLAN App'}
+              </h2>
+              <p className="text-blue-100 text-xs sm:text-sm">
+                {getDownloadUrl() ? 'Download from app store' : 'Install as web app'}
+              </p>
             </div>
           </div>
         </div>
@@ -279,15 +384,22 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
             {isInstalling && (
               <div className="mb-4 sm:mb-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-900">Installing REPRO PLAN...</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {getDownloadUrl() ? 'Redirecting to Download...' : 'Installing REPRO PLAN...'}
+                </span>
                 <span className="text-sm text-gray-600">{installProgress}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
+                <div
                   className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${installProgress}%` }}
                 ></div>
               </div>
+              {getDownloadUrl() && (
+                <p className="text-xs text-gray-600 mt-2">
+                  You'll be redirected to the app store to complete the download
+                </p>
+              )}
             </div>
           )}
 
@@ -314,12 +426,12 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
                 {isInstalling ? (
                   <>
                     <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent"></div>
-                    <span>Installing...</span>
+                    <span>{getDownloadUrl() ? 'Redirecting...' : 'Installing...'}</span>
                   </>
                 ) : (
                   <>
                     <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>Download & Install</span>
+                    <span>{getDownloadUrl() ? 'Download App' : 'Install as App'}</span>
                     <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                   </>
                 )}

@@ -1,7 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { User } from '../models';
+import { Stakeholder } from '../models/stakeholders';
 import { body, validationResult } from 'express-validator';
 import crypto from 'crypto';
+import { signToken } from '../middleware/auth';
 
 const router = Router();
 
@@ -19,8 +21,7 @@ const generateSecretCode = (): string => {
 router.post(
   '/register',
   [
-    body('surveyLink').notEmpty().withMessage('Survey link is required'),
-    body('surveyLink').isURL().withMessage('Survey link must be a valid URL')
+    body('surveyLink').optional().isURL().withMessage('Survey link must be a valid URL')
   ],
   async (req: Request, res: Response) => {
     try {
@@ -61,11 +62,14 @@ router.post(
         isUsed: false
       });
 
+      const token = signToken({ id: user.id, role: 'USER', type: 'user' });
+
       res.status(201).json({
         success: true,
         message: 'User registered successfully',
         userId: user.id,
-        secretCode: user.secretCode
+        secretCode: user.secretCode,
+        token
       });
     } catch (error: any) {
       res.status(500).json({
@@ -114,13 +118,16 @@ router.post(
         lastLogin: new Date() 
       });
 
+      const token = signToken({ id: user.id, role: 'USER', type: 'user' });
+
       res.json({
         success: true,
         message: 'Login successful',
         user: {
           id: user.id,
           isVerified: user.isVerified
-        }
+        },
+        token
       });
     } catch (error: any) {
       res.status(500).json({
@@ -148,16 +155,27 @@ router.post(
 
       const { surveyLink } = req.body;
 
-      // Find user by survey link
-      const user = await User.findOne({ 
+      // Find user by survey link first
+      let account = await User.findOne({
         where: { surveyLink },
         order: [['createdAt', 'DESC']] // Get the most recent user with this survey link
       });
 
-      if (!user) {
+      let accountType = 'user';
+
+      // If no user found, check stakeholders
+      if (!account) {
+        account = await Stakeholder.findOne({
+          where: { surveyLink },
+          order: [['createdAt', 'DESC']] // Get the most recent stakeholder with this survey link
+        });
+        accountType = 'stakeholder';
+      }
+
+      if (!account) {
         return res.status(404).json({
           success: false,
-          message: 'No account found with this survey link. Please create a new account.'
+          message: 'No account found with this survey link. For anonymous users, recovery is only possible if you provided a survey link during registration.'
         });
       }
 
@@ -167,8 +185,11 @@ router.post(
       const maxAttempts = 10;
 
       while (attempts < maxAttempts) {
+        // Check both users and stakeholders for unique secret code
         const existingUser = await User.findOne({ where: { secretCode: newSecretCode } });
-        if (!existingUser) {
+        const existingStakeholder = await Stakeholder.findOne({ where: { secretCode: newSecretCode } });
+
+        if (!existingUser && !existingStakeholder) {
           break;
         }
         newSecretCode = generateSecretCode();
@@ -182,18 +203,34 @@ router.post(
         });
       }
 
-      // Update user with new code and reset usage
-      await user.update({
-        secretCode: newSecretCode,
-        isUsed: false,
-        lastLogin: null
+      // Update account with new code
+      if (accountType === 'user') {
+        await (account as any).update({
+          secretCode: newSecretCode,
+          isUsed: false,
+          lastLogin: null
+        });
+      } else {
+        // For stakeholders, just update the secret code (no isUsed field)
+        await (account as any).update({
+          secretCode: newSecretCode,
+          lastLogin: null
+        });
+      }
+
+      const token = signToken({
+        id: account.id,
+        role: accountType === 'user' ? 'USER' : (account as any).role || 'STAKEHOLDER',
+        type: accountType === 'user' ? 'user' : 'stakeholder'
       });
 
       res.json({
         success: true,
         message: 'New secret code generated successfully',
         secretCode: newSecretCode,
-        userId: user.id
+        accountId: account.id,
+        accountType,
+        token
       });
     } catch (error: any) {
       res.status(500).json({

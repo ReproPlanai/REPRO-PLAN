@@ -19,7 +19,6 @@ import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
 import EmergencyAlertSystem from '../components/EmergencyAlertSystem';
 import MapTracking from '../components/MapTracking';
 import QRVerificationManager from '../components/QRCode/QRVerificationManager';
-import { generatePoliceData } from '../utils/sampleData';
 import { dataSecurityManager } from '../utils/dataSecurity';
 import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
 import IncidentReports from './police/IncidentReports';
@@ -42,8 +41,13 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
     stakeholderId: userData?.id
   });
 
-  // Generate sample data
-  const policeData = generatePoliceData();
+  // Real police metrics from API data
+  const policeMetrics = {
+    activeAlerts: stakeholderAPI.alerts.filter(a => a.status === 'active').length,
+    totalCases: stakeholderAPI.cases.length,
+    resolvedToday: stakeholderAPI.cases.filter(c => c.status === 'resolved').length,
+    emergencyCases: stakeholderAPI.alerts.filter(a => a.priority === 'critical').length
+  };
 
   // Fetch real data from backend
   useEffect(() => {
