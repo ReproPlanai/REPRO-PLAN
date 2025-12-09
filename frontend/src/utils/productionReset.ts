@@ -3,7 +3,6 @@
 
 const PRODUCTION_VERSION = '3.0.0';
 const PRODUCTION_RESET_KEY = 'repro_plan_production_reset';
-const TEST_DATA_KEY = 'repro_plan_test_data_detected';
 
 export interface ResetResult {
   wasReset: boolean;
