@@ -61,11 +61,8 @@ const useServiceWorkerUpdate = (): ServiceWorkerUpdate => {
 
     registerServiceWorker();
 
-    // PRODUCTION: Check for updates immediately on load
-    checkForUpdates();
-
     // Check for updates on page load
-    const checkForUpdates = async () => {
+    async function checkForUpdates() {
       try {
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration) {
@@ -75,6 +72,9 @@ const useServiceWorkerUpdate = (): ServiceWorkerUpdate => {
         console.error('Failed to check for updates:', error);
       }
     };
+
+    // PRODUCTION: Check for updates immediately on load
+    checkForUpdates();
 
     // PRODUCTION: Check for updates every 5 minutes (more frequent for immediate updates)
     const updateInterval = setInterval(checkForUpdates, 5 * 60 * 1000);
