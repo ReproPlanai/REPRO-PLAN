@@ -2,6 +2,11 @@
 // Production API service - connects to backend
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://repro-plan-v3-hihzd.ondigitalocean.app/api';
+
+// Log the API URL for debugging (only in development)
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔗 API Base URL:', API_BASE_URL);
+}
 const TOKEN_STORAGE_KEY = 'repro-plan_jwt';
 
 class APIService {
