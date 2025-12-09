@@ -55,6 +55,12 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
       { month: 'Apr', capacity: 85, occupancy: 82 },
       { month: 'May', capacity: 85, occupancy: 75 },
       { month: 'Jun', capacity: 85, occupancy: 80 }
+    ],
+    resourceUsage: [
+      { resource: 'Food Supplies', used: 75, available: 25, color: '#EF4444' },
+      { resource: 'Medical Supplies', used: 45, available: 55, color: '#10B981' },
+      { resource: 'Hygiene Products', used: 60, available: 40, color: '#3B82F6' },
+      { resource: 'Bedding', used: 80, available: 20, color: '#F59E0B' }
     ]
   };
 
