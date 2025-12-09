@@ -92,7 +92,7 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
     setIsSendingOtp(true);
 
     try {
-      const { apiService } = await import('../../services/api');
+      const { apiService } = await import('../services/api');
       const response = await apiService.forgetCode(surveyLink) as { success: boolean; message?: string; secretCode?: string; accountType?: string };
 
       if (response.success && response.secretCode) {
