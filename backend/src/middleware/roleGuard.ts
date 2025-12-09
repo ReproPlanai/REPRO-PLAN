@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 
 // Simple role guard: expects role in request (e.g., decoded token or header)
 // In a real implementation, you would decode a JWT or session and attach req.user/req.stakeholder
-export const roleGuard = (allowedRoles: string[]) => {
+export const roleGuard = (allowedRoles: string[]): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction) => {
     const role =
       (req as any).user?.role ||
@@ -16,7 +16,7 @@ export const roleGuard = (allowedRoles: string[]) => {
       });
     }
 
-    next();
+    return next();
   };
 };
 

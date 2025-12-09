@@ -77,7 +77,7 @@ router.post(
 
       const token = signToken({ id: stakeholder.id, role: stakeholder.role, type: 'stakeholder' });
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'Stakeholder registered successfully',
         stakeholder: {
@@ -88,7 +88,7 @@ router.post(
         token
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error creating stakeholder',
         error: error.message
@@ -175,7 +175,7 @@ router.post(
 
       const token = signToken({ id: stakeholder.id, role: stakeholder.role, type: 'stakeholder' });
 
-      res.json({
+      return res.json({
         success: true,
         message: 'Login successful',
         stakeholder: {
@@ -188,7 +188,7 @@ router.post(
         token
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error during login',
         error: error.message
@@ -198,47 +198,50 @@ router.post(
 );
 
 // Get all emergency alerts (filtered by role permissions)
-router.get('/alerts',
+router.get(
+  '/alerts',
   authGuard,
   roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']),
   async (req: Request, res: Response) => {
-  try {
-    const { stakeholderId: _stakeholderId, status, priority } = req.query;
-    const role = (req as any).user?.role;
+    try {
+      const { stakeholderId, status, priority } = req.query;
+      const role = (req as any).user?.role;
 
-    const where: any = {};
-    if (status) where.status = status;
-    if (priority) where.priority = priority;
+      const where: any = {};
+      if (status) where.status = status;
+      if (priority) where.priority = priority;
+      if (stakeholderId) where.stakeholderId = stakeholderId;
 
-    // Role-based filtering
-    if (role === 'POLICE') {
-      // Police can see all alerts
-    } else if (role === 'MEDICAL') {
-      where.alertType = ['medical', 'gbv', 'panic'];
-    } else if (role === 'SAFEHOUSE') {
-      where.alertType = ['gbv', 'safety', 'panic'];
-    } else if (role === 'NGO') {
-      where.alertType = ['gbv', 'safety'];
+      // Role-based filtering
+      if (role === 'POLICE') {
+        // Police can see all alerts
+      } else if (role === 'MEDICAL') {
+        where.alertType = ['medical', 'gbv', 'panic'];
+      } else if (role === 'SAFEHOUSE') {
+        where.alertType = ['gbv', 'safety', 'panic'];
+      } else if (role === 'NGO') {
+        where.alertType = ['gbv', 'safety'];
+      }
+
+      const alerts = await EmergencyAlert.findAll({
+        where,
+        order: [['createdAt', 'DESC']],
+        limit: 100
+      });
+
+      return res.json({
+        success: true,
+        alerts
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error fetching alerts',
+        error: error.message
+      });
     }
-
-    const alerts = await EmergencyAlert.findAll({
-      where,
-      order: [['createdAt', 'DESC']],
-      limit: 100
-    });
-
-    res.json({
-      success: true,
-      alerts
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching alerts',
-      error: error.message
-    });
   }
-});
+);
 
 // Create emergency alert
 router.post(
@@ -273,13 +276,13 @@ router.post(
       // Notify relevant roles based on alert type
       await notifyRelevantRoles(alert);
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'Alert created successfully',
         alert
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error creating alert',
         error: error.message
@@ -309,13 +312,13 @@ router.put('/alerts/:id', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 
       responseTime: responseTime || alert.responseTime
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Alert updated successfully',
       alert
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error updating alert',
       error: error.message
@@ -326,7 +329,7 @@ router.put('/alerts/:id', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 
 // Get all cases
 router.get('/cases', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO']), async (req: Request, res: Response) => {
   try {
-    const { stakeholderId: _stakeholderId, status, priority } = req.query;
+    const { stakeholderId, status, priority } = req.query;
 
     const where: any = {};
     if (status) where.status = status;
@@ -339,12 +342,12 @@ router.get('/cases', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDI
       limit: 100
     });
 
-    res.json({
+    return res.json({
       success: true,
       cases
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error fetching cases',
       error: error.message
@@ -388,13 +391,13 @@ router.post(
         createdBy
       });
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'Case created successfully',
         case: caseRecord
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error creating case',
         error: error.message
@@ -427,13 +430,13 @@ router.put('/cases/:id', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', '
       notes: updatedNotes
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Case updated successfully',
       case: caseRecord
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error updating case',
       error: error.message
@@ -477,13 +480,13 @@ router.post(
         isRead: false
       });
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'Message sent successfully',
         messageData: message
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error sending message',
         error: error.message
@@ -508,12 +511,12 @@ router.get('/messages', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEHOUSE', 'M
       limit: 100
     });
 
-    res.json({
+    return res.json({
       success: true,
       messages
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error fetching messages',
       error: error.message
@@ -536,12 +539,12 @@ router.put('/messages/:id/read', authGuard, roleGuard(['ADMIN', 'POLICE', 'SAFEH
 
     await message.update({ isRead: true });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Message marked as read'
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error updating message',
       error: error.message

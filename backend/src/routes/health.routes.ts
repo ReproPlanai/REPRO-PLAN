@@ -18,12 +18,12 @@ router.get('/records/:userId', async (req: Request, res: Response) => {
       order: [['createdAt', 'DESC']]
     });
 
-    res.json({
+    return res.json({
       success: true,
       records
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error fetching health records',
       error: error.message
@@ -63,13 +63,13 @@ router.post(
         data
       });
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'Health record created successfully',
         record
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error creating health record',
         error: error.message

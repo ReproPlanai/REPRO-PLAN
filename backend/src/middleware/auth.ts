@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 
 const TOKEN_MAX_AGE_DAYS = 7;
@@ -18,7 +18,7 @@ export const signToken = (payload: AuthPayload) => {
   return jwt.sign(payload, secret, { expiresIn: `${TOKEN_MAX_AGE_DAYS}d` });
 };
 
-export const authGuard = (req: Request, res: Response, next: NextFunction) => {
+export const authGuard: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.toLowerCase().startsWith('bearer ')) {
@@ -50,7 +50,7 @@ export const authGuard = (req: Request, res: Response, next: NextFunction) => {
     const refreshAfterMs = issuedAtMs + (TOKEN_MAX_AGE_MS - 24 * 60 * 60 * 1000);
     res.setHeader('x-token-refresh-after', new Date(refreshAfterMs).toISOString());
 
-    next();
+    return next();
   } catch (err: any) {
     return res.status(401).json({ success: false, message: 'Invalid or expired token' });
   }

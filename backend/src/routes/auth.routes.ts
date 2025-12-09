@@ -63,7 +63,7 @@ router.post(
 
       const token = signToken({ id: user.id, role: 'USER', type: 'user' });
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'User registered successfully',
         userId: user.id,
@@ -71,7 +71,7 @@ router.post(
         token
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error creating user',
         error: error.message
@@ -119,7 +119,7 @@ router.post(
 
       const token = signToken({ id: user.id, role: 'USER', type: 'user' });
 
-      res.json({
+      return res.json({
         success: true,
         message: 'Login successful',
         user: {
@@ -129,7 +129,7 @@ router.post(
         token
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error during login',
         error: error.message
@@ -223,7 +223,7 @@ router.post(
         type: accountType === 'user' ? 'user' : 'stakeholder'
       });
 
-      res.json({
+      return res.json({
         success: true,
         message: 'New secret code generated successfully',
         secretCode: newSecretCode,
@@ -232,7 +232,7 @@ router.post(
         token
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error regenerating code',
         error: error.message

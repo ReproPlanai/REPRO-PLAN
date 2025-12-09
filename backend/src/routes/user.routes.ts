@@ -14,12 +14,12 @@ router.get('/', authGuard, roleGuard(['ADMIN']), async (_req: Request, res: Resp
       limit: 200
     });
 
-    res.json({
+    return res.json({
       success: true,
       users
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error fetching users',
       error: error.message
@@ -42,12 +42,12 @@ router.get('/:id', authGuard, async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       user
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error fetching user',
       error: error.message
@@ -73,7 +73,7 @@ router.put('/:id', authGuard, async (req: Request, res: Response) => {
       isVerified: isVerified !== undefined ? isVerified : user.isVerified
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'User updated successfully',
       user: {
@@ -82,7 +82,7 @@ router.put('/:id', authGuard, async (req: Request, res: Response) => {
       }
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error updating user',
       error: error.message
@@ -102,13 +102,13 @@ router.get('/', async (_req: Request, res: Response) => {
       limit: 100 // Limit results
     });
 
-    res.json({
+    return res.json({
       success: true,
       users,
       total: users.length
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error fetching users',
       error: error.message

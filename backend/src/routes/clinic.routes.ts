@@ -14,12 +14,12 @@ router.get('/', async (_req: Request, res: Response) => {
       order: [['name', 'ASC']]
     });
 
-    res.json({
+    return res.json({
       success: true,
       clinics
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error fetching clinics',
       error: error.message
@@ -42,12 +42,12 @@ router.get('/:id', async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       clinic
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error fetching clinic',
       error: error.message
@@ -76,13 +76,13 @@ router.post(
 
       const clinic = await Clinic.create(req.body);
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: 'Clinic created successfully',
         clinic
       });
     } catch (error: any) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Error creating clinic',
         error: error.message
@@ -106,13 +106,13 @@ router.put('/:id', authGuard, roleGuard(['ADMIN']), async (req: Request, res: Re
 
     await clinic.update(req.body);
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Clinic updated successfully',
       clinic
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error updating clinic',
       error: error.message
