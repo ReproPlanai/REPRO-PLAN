@@ -93,6 +93,15 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
     { id: 3, patient: 'Anonymous Patient C', time: '02:00 PM', type: 'Contraception Consultation', doctor: 'Dr. Brown', status: 'Scheduled' }
   ]);
 
+  // Map API alerts to display format
+  const emergencyAlerts = stakeholderAPI.alerts.map(alert => ({
+    id: alert.id,
+    type: alert.alertType,
+    message: alert.description,
+    time: new Date(alert.createdAt).toLocaleString(),
+    severity: alert.priority
+  }));
+
   // Placeholder data for secure visualizations
   const medicalData = {
     medicalMetrics: {
@@ -120,15 +129,6 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
       { id: 4, label: '45+', value: 10 }
     ]
   };
-
-  // Map API alerts to display format
-  const emergencyAlerts = stakeholderAPI.alerts.map(alert => ({
-    id: alert.id,
-    type: alert.alertType,
-    message: alert.description,
-    time: new Date(alert.createdAt).toLocaleString(),
-    severity: alert.priority
-  }));
 
   const tabs = [
     { id: 'patients', label: 'Patients', icon: Users },
