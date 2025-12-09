@@ -33,15 +33,15 @@ const Notifications: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Real notifications would come from API
-  const notifications: Notification[] = useMemo(() => {
+  const defaultNotifications: Notification[] = useMemo(() => {
     // For now, empty array - notifications would come from backend API
     // Future: fetch from /api/notifications endpoint
     return [];
   }, []);
 
   useEffect(() => {
-    setNotifications(notifications);
-  }, [notifications]);
+    setNotifications(defaultNotifications);
+  }, [defaultNotifications]);
 
   const getNotificationIcon = (type: string, category: string) => {
     if (category === 'health') return Heart;
