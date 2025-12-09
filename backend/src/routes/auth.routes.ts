@@ -104,17 +104,24 @@ router.post(
     try {
       console.log('🔐 Starting user registration...');
       // Generate unique secret code
+      console.log('🔑 Generating secret code...');
       let secretCode = generateSecretCode();
+      console.log('🔑 Generated secret code:', secretCode);
       let attempts = 0;
       const maxAttempts = 10;
 
       // Ensure code is unique
+      console.log('🔍 Checking code uniqueness...');
       while (attempts < maxAttempts) {
+        console.log('🔍 Attempt', attempts + 1, 'checking code:', secretCode);
         const existingUser = await User.findOne({ where: { secretCode } });
+        console.log('🔍 Database query result:', existingUser ? 'Found existing user' : 'Code is unique');
         if (!existingUser) {
           break;
         }
+        console.log('🔄 Code exists, generating new one...');
         secretCode = generateSecretCode();
+        console.log('🔑 New secret code:', secretCode);
         attempts++;
       }
 
