@@ -97,18 +97,18 @@ export const useAppDownloadModal = (): UseAppDownloadModalReturn => {
       console.log('Redirecting to app store:', appStoreUrl);
     } else {
       // Fallback to PWA installation
-      if ('serviceWorker' in navigator && 'PushManager' in window) {
-        const installPrompt = (window as any).deferredPrompt;
-        if (installPrompt) {
-          installPrompt.prompt();
-          installPrompt.userChoice.then((choiceResult: any) => {
-            if (choiceResult.outcome === 'accepted') {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      const installPrompt = (window as any).deferredPrompt;
+      if (installPrompt) {
+        installPrompt.prompt();
+        installPrompt.userChoice.then((choiceResult: any) => {
+          if (choiceResult.outcome === 'accepted') {
               console.log('User accepted the PWA install prompt');
-            } else {
+          } else {
               console.log('User dismissed the PWA install prompt');
-            }
-            (window as any).deferredPrompt = null;
-          });
+          }
+          (window as any).deferredPrompt = null;
+        });
         } else {
           showPWAManualInstructions();
         }
@@ -116,7 +116,7 @@ export const useAppDownloadModal = (): UseAppDownloadModalReturn => {
         showPWAManualInstructions();
       }
     }
-
+    
     setShowModal(false);
     localStorage.setItem('repro-plan-app-download-seen', 'true');
   };

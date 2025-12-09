@@ -115,19 +115,19 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
       }, 1000);
     } else {
       // Fallback to PWA installation
-      const interval = setInterval(() => {
-        setInstallProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setIsInstalling(false);
+    const interval = setInterval(() => {
+      setInstallProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsInstalling(false);
             triggerPWAInstall();
-            onDownload();
-            localStorage.setItem('repro-plan-app-download-seen', 'true');
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 200);
+          onDownload();
+          localStorage.setItem('repro-plan-app-download-seen', 'true');
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 200);
     }
   };
 
@@ -390,7 +390,7 @@ const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
                 <span className="text-sm text-gray-600">{installProgress}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
+                <div 
                   className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${installProgress}%` }}
                 ></div>

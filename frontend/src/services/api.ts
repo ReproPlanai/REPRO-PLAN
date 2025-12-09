@@ -37,7 +37,7 @@ class APIService {
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     const token = this.getToken();
-
+    
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',

@@ -314,12 +314,12 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
               </button>
               <div>
                 <p className="text-xs sm:text-sm text-gray-600 mb-1">Don't have an account?</p>
-                <button
-                  onClick={() => setCurrentStep('signup')}
-                  className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium"
-                >
-                  Create New Account
-                </button>
+              <button
+                onClick={() => setCurrentStep('signup')}
+                className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium"
+              >
+                Create New Account
+              </button>
               </div>
             </div>
           </div>

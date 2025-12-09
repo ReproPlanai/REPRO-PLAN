@@ -38,7 +38,7 @@ const UserManagement: React.FC = () => {
       if (response.success && response.users) {
         setUsers(response.users);
       } else {
-        setUsers([]);
+      setUsers([]);
       }
     } catch (error) {
       console.error('Failed to fetch users:', error);

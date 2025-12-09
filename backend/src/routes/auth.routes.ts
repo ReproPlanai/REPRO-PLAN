@@ -206,9 +206,9 @@ router.post(
       // Update account with new code
       if (accountType === 'user') {
         await (account as any).update({
-          secretCode: newSecretCode,
-          isUsed: false,
-          lastLogin: null
+        secretCode: newSecretCode,
+        isUsed: false,
+        lastLogin: null
         });
       } else {
         // For stakeholders, just update the secret code (no isUsed field)
