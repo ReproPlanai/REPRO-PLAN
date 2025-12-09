@@ -11,20 +11,20 @@ const databaseUrl = process.env.DATABASE_URL;
 let sequelize: Sequelize;
 
 if (databaseUrl) {
-  // Production database connection (DigitalOcean)
-  // DigitalOcean requires SSL for all connections
-  const isProduction = process.env.NODE_ENV === 'production';
-  const isDigitalOcean = databaseUrl.includes('digitalocean.com') || databaseUrl.includes('ondigitalocean.com');
-  
+  // Managed Postgres often uses self-signed certs; default to allowing them
+  const sslRequired = (process.env.DB_SSL ?? 'true').toLowerCase() !== 'false';
+  const rejectUnauthorized = (process.env.DB_SSL_REJECT_UNAUTHORIZED ?? 'false').toLowerCase() === 'true';
+
   sequelize = new Sequelize(databaseUrl, {
     dialect: 'postgres',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
     dialectOptions: {
-      // DigitalOcean and production environments require SSL
-      ssl: (isProduction || isDigitalOcean) ? {
-        require: true,
-        rejectUnauthorized: false
-      } : false
+      ssl: sslRequired
+        ? {
+            require: true,
+            rejectUnauthorized
+          }
+        : false
     },
     pool: {
       max: 5,
