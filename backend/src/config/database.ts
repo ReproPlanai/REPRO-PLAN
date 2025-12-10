@@ -22,6 +22,10 @@ if (databaseUrl) {
     port: parseInt(url.port),
     dialect: 'postgres',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    // Force snake_case columns so they match our migration schema
+    define: {
+      underscored: true
+    },
     dialectOptions: {
       ssl: {
         require: true,
