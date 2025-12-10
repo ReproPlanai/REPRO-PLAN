@@ -15,8 +15,7 @@ export const authLimiter = rateLimit({
   max: 20,
   standardHeaders: true,
   legacyHeaders: false,
-  message: 'Too many auth attempts, please try again later.',
-  trustProxy: true // align with app trust proxy (DigitalOcean LB)
+  message: 'Too many auth attempts, please try again later.'
 });
 
 // Stricter limiter for password/code recovery endpoints
@@ -25,7 +24,6 @@ export const recoveryLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: 'Too many recovery attempts, please try again later.',
-  trustProxy: true // align with app trust proxy (DigitalOcean LB)
+  message: 'Too many recovery attempts, please try again later.'
 });
 
