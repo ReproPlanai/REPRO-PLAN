@@ -19,6 +19,9 @@ dotenv.config();
 const app: Express = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy for DigitalOcean App Platform (fixes express-rate-limit X-Forwarded-For error)
+app.set('trust proxy', true);
+
 // Security middleware with stricter defaults for production
 app.use(helmet({
   contentSecurityPolicy: {
