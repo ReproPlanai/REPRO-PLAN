@@ -52,7 +52,7 @@ const CreateCodeForm: React.FC<CreateCodeFormProps> = ({ onBack, onCodeCreated }
     try {
       // Use API service for production user registration (survey link is auto-generated)
       const { apiService } = await import('../../services/api');
-      const response = await apiService.registerUser(demographics) as { success: boolean; message?: string; user?: any; surveyLink?: string };
+      const response = await apiService.registerUser(demographics) as { success: boolean; message?: string; user?: any; surveyLink?: string; secretCode?: string };
 
       if (!response.success) {
         throw new Error(response.message || 'Failed to create account');
@@ -66,7 +66,7 @@ const CreateCodeForm: React.FC<CreateCodeFormProps> = ({ onBack, onCodeCreated }
       secretCodeManager.storeUserDemographics(demographics);
       
       // Store the secret code and survey link from backend response
-      const code = response.user?.secretCode || secretCodeManager.generateSecretCode();
+      const code = response.secretCode || response.user?.secretCode || secretCodeManager.generateSecretCode();
       const surveyLink = response.surveyLink || response.user?.surveyLink;
 
       secretCodeManager.createSecretCodeFromBackend(code);

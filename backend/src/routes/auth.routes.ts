@@ -180,6 +180,7 @@ router.post(
         token
       });
     } catch (error: any) {
+      console.error('❌ Error creating user:', error?.message || error, error?.stack);
       return res.status(500).json({
         success: false,
         message: 'Error creating user',

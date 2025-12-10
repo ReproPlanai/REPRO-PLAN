@@ -60,7 +60,8 @@ User.init(
   {
     sequelize,
     tableName: 'users',
-    timestamps: true
+    timestamps: true,
+    underscored: true
   }
 );
 
@@ -144,7 +145,8 @@ Clinic.init(
   {
     sequelize,
     tableName: 'clinics',
-    timestamps: true
+    timestamps: true,
+    underscored: true
   }
 );
 
@@ -194,7 +196,8 @@ HealthRecord.init(
   {
     sequelize,
     tableName: 'health_records',
-    timestamps: true
+    timestamps: true,
+    underscored: true
   }
 );
 

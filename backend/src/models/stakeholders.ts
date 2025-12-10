@@ -86,7 +86,8 @@ Stakeholder.init(
   {
     sequelize,
     tableName: 'stakeholders',
-    timestamps: true
+    timestamps: true,
+    underscored: true
   }
 );
 
@@ -184,7 +185,8 @@ EmergencyAlert.init(
   {
     sequelize,
     tableName: 'emergency_alerts',
-    timestamps: true
+    timestamps: true,
+    underscored: true
   }
 );
 
@@ -281,7 +283,8 @@ Case.init(
   {
     sequelize,
     tableName: 'cases',
-    timestamps: true
+    timestamps: true,
+    underscored: true
   }
 );
 
@@ -384,7 +387,8 @@ InterRoleMessage.init(
   {
     sequelize,
     tableName: 'inter_role_messages',
-    timestamps: true
+    timestamps: true,
+    underscored: true
   }
 );
 
