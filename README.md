@@ -19,15 +19,14 @@ A comprehensive sexual and reproductive health and rights (SRHR) platform design
 
 ### System Architecture
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   React PWA     │────│   Express API   │────│ PostgreSQL DB   │
-│   Frontend      │    │   Backend       │    │                 │
-│                 │    │                 │    │                 │
-│ • Offline Mode  │    │ • JWT Auth      │    │ • User Codes     │
-│ • PWA Install   │    │ • Rate Limiting │    │ • Health Records │
-│ • Push Notifs   │    │ • Role Guards   │    │ • Clinic Data    │
-│ • Local Storage │    │ • Email Service │    │ • Audit Logs     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+┌───────────────────────────────────────────┐
+│               React PWA                  │
+│               Frontend                   │
+│                                           │
+│ • Offline Mode     • Local Storage        │
+│ • PWA Install      • Service Worker       │
+│ • Push Notifs      • Accessibility        │
+└───────────────────────────────────────────┘
 ```
 
 ### Technology Stack
@@ -39,21 +38,6 @@ A comprehensive sexual and reproductive health and rights (SRHR) platform design
 - **PWA**: Service Worker, Web App Manifest, offline support
 - **Accessibility**: WCAG 2.1 AA compliant
 - **Internationalization**: Multi-language support ready
-
-#### Backend (Express API)
-- **Runtime**: Node.js 18 with TypeScript
-- **Framework**: Express.js with security middleware
-- **Database**: PostgreSQL with Sequelize ORM
-- **Authentication**: JWT tokens (7-day expiry)
-- **Security**: Helmet, CORS, rate limiting, input validation
-- **Email**: Resend integration for notifications
-
-#### Database (PostgreSQL)
-- **Schema**: Normalized relational design
-- **Migrations**: Version-controlled schema changes
-- **Seeding**: Initial data for clinics and configurations
-- **Backup**: Automated daily backups on DigitalOcean
-- **SSL**: Always encrypted connections
 
 ## 📋 Core Features
 
@@ -84,79 +68,11 @@ A comprehensive sexual and reproductive health and rights (SRHR) platform design
 - **Notification Center**: Push notifications and alerts
 - **Audit Trail**: Complete activity logging
 
-## 🔌 API Specifications
-
-### Authentication Endpoints
-```
-POST /api/auth/register          # Generate secret code
-POST /api/auth/login            # Authenticate with code
-POST /api/auth/forget-code      # Recover lost code
-```
-
-### User Management
-```
-GET  /api/users                 # List users (admin only)
-GET  /api/users/:id             # Get user details
-PUT  /api/users/:id             # Update user data
-```
-
-### Health Records
-```
-GET  /api/health/records/:userId    # Get user health history
-POST /api/health/records            # Create health record
-```
-
-### Clinic Management
-```
-GET  /api/clinics               # List all clinics
-GET  /api/clinics/:id           # Get clinic details
-POST /api/clinics               # Create clinic (admin)
-PUT  /api/clinics/:id           # Update clinic (admin)
-```
-
-### Stakeholder Operations
-```
-POST /api/stakeholders/register     # Register stakeholder
-POST /api/stakeholders/login        # Authenticate stakeholder
-
-GET  /api/stakeholders/alerts       # Emergency alerts
-POST /api/stakeholders/alerts       # Create alert
-PUT  /api/stakeholders/alerts/:id   # Update alert
-
-GET  /api/stakeholders/cases        # Active cases
-POST /api/stakeholders/cases        # Create case
-PUT  /api/stakeholders/cases/:id    # Update case
-
-GET  /api/stakeholders/messages     # Messages
-POST /api/stakeholders/messages     # Send message
-PUT  /api/stakeholders/messages/:id/read # Mark as read
-```
-
-## 🗄️ Database Schema
-
-### Core Tables
-- **users**: Anonymous user records with secret codes
-- **stakeholders**: Multi-role system users
-- **clinics**: Healthcare facility directory
-- **health_records**: Anonymous medical history
-- **emergency_alerts**: Crisis response tracking
-- **cases**: Coordinated response management
-- **messages**: Inter-stakeholder communication
-- **audit_logs**: Security and activity tracking
-
-### Key Relationships
-- Users ↔ Health Records (1:many)
-- Stakeholders ↔ Alerts/Cases/Messages (1:many)
-- Cases ↔ Messages (1:many)
-- Alerts ↔ Cases (many:many)
-
 ## 🔒 Security & Privacy
 
 ### Authentication
-- **JWT Tokens**: 7-day expiry with automatic refresh
-- **Secret Codes**: One-time use authentication
+- **Secret Codes**: One-time use authentication (frontend-only in testing)
 - **Role-Based Access**: Granular permissions per stakeholder type
-- **Rate Limiting**: 100 requests per 15 minutes per IP
 
 ### Data Protection
 - **Zero PII**: No personal identifiable information stored
@@ -174,21 +90,14 @@ PUT  /api/stakeholders/messages/:id/read # Mark as read
 
 ### Current Status
 - **Frontend**: Netlify (Global CDN, SSL, PWA support)
-- **Backend**: DigitalOcean App Platform (Auto-scaling, managed)
-- **Database**: DigitalOcean Managed PostgreSQL (HA, backups)
-- **Email**: Resend (Transactional email service)
 
 ### Production Environment
 - **Domain**: reproplan.netlify.app (frontend)
-- **API**: your-backend.ondigitalocean.app (backend)
-- **Database**: Managed PostgreSQL cluster
 - **Monitoring**: Built-in health checks and logging
 
 ### Scalability Features
 - **CDN Distribution**: Global content delivery
-- **Auto-scaling**: Backend scales with demand
-- **Database Replication**: Read replicas for performance
-- **Caching**: Redis-ready architecture
+- **Caching**: PWA with service worker caching
 - **Offline Support**: PWA with service worker caching
 
 ## 📊 Performance & Monitoring
