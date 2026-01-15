@@ -300,27 +300,65 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                 {/* Patients List */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                   <div className="p-4 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <h3 className="text-lg font-medium text-gray-900">Patient Records</h3>
-                      <div className="flex items-center space-x-3">
-                        <div className="relative">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                        <div className="relative w-full sm:w-64">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                           <input
                             type="text"
                             placeholder="Search patients..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                           />
                         </div>
-                        <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm">
+                        <button className="w-full sm:w-auto px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm">
                           New Patient
                         </button>
                       </div>
                     </div>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
+                  {/* Mobile Card View */}
+                  <div className="block sm:hidden">
+                    <div className="p-3 space-y-3">
+                      {patients.map((patient) => (
+                        <div key={patient.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{patient.name}</p>
+                              <p className="text-xs text-gray-500">{patient.condition}</p>
+                            </div>
+                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(patient.status)}`}>
+                              {patient.status}
+                            </span>
+                          </div>
+                          <div className="text-sm text-gray-600">Age: {patient.age}</div>
+                          <div className="text-sm text-gray-600">Last visit: {patient.lastVisit}</div>
+                          <div className="flex items-center justify-between text-xs text-gray-500">
+                            <span className={`px-2 py-1 text-xs rounded-full border ${getPriorityColor(patient.priority)}`}>
+                              {patient.priority}
+                            </span>
+                            <div className="flex items-center space-x-3">
+                              <button className="text-blue-600 hover:text-blue-800">
+                                <Eye size={14} />
+                              </button>
+                              <button className="text-green-600 hover:text-green-800">
+                                <Phone size={14} />
+                              </button>
+                              <button className="text-gray-600 hover:text-gray-800">
+                                <FileText size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden sm:block overflow-x-auto">
+                    <table className="w-full min-w-[760px]">
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
@@ -416,10 +454,10 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
           {/* Appointments Tab */}
           {activeTab === 'appointments' && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">Appointment Schedule</h2>
-                <div className="flex items-center space-x-3">
-                  <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                  <button className="w-full sm:w-auto px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm">
                     New Appointment
                   </button>
                 </div>
@@ -429,8 +467,42 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                 <div className="p-4 border-b border-gray-200">
                   <h3 className="text-lg font-medium text-gray-900">Today's Appointments</h3>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
+                {/* Mobile Card View */}
+                <div className="block sm:hidden">
+                  <div className="p-3 space-y-3">
+                    {appointments.map((appointment) => (
+                      <div key={appointment.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{appointment.patient}</p>
+                            <p className="text-xs text-gray-500">{appointment.type}</p>
+                          </div>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            appointment.status === 'Scheduled' ? 'bg-blue-100 text-blue-800' :
+                            appointment.status === 'In Progress' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            {appointment.status}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-600">Time: {appointment.time}</div>
+                        <div className="text-sm text-gray-600">Doctor: {appointment.doctor}</div>
+                        <div className="flex items-center justify-end space-x-3">
+                          <button className="text-blue-600 hover:text-blue-800">
+                            <Eye size={14} />
+                          </button>
+                          <button className="text-green-600 hover:text-green-800">
+                            <CheckCircle size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full min-w-[720px]">
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>

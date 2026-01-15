@@ -291,27 +291,69 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                 {/* Programs List */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                   <div className="p-4 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <h3 className="text-lg font-medium text-gray-900">Active Programs</h3>
-                      <div className="flex items-center space-x-3">
-                        <div className="relative">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                        <div className="relative w-full sm:w-64">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                           <input
                             type="text"
                             placeholder="Search programs..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                           />
                         </div>
-                        <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm">
+                        <button className="w-full sm:w-auto px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm">
                           New Program
                         </button>
                       </div>
                     </div>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
+                  {/* Mobile Card View */}
+                  <div className="block sm:hidden">
+                    <div className="p-3 space-y-3">
+                      {programs.map((program) => (
+                        <div key={program.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{program.name}</p>
+                              <p className="text-xs text-gray-500">{program.location}</p>
+                            </div>
+                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(program.status)}`}>
+                              {program.status}
+                            </span>
+                          </div>
+                          <div className="text-sm text-gray-600">Beneficiaries: {program.beneficiaries}</div>
+                          <div className="text-sm text-gray-600">Budget: {program.budget}</div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className="bg-orange-500 h-2 rounded-full"
+                                style={{ width: `${program.progress}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-xs text-gray-600">{program.progress}%</span>
+                          </div>
+                          <div className="flex items-center justify-end space-x-3">
+                            <button className="text-blue-600 hover:text-blue-800">
+                              <Eye size={14} />
+                            </button>
+                            <button className="text-green-600 hover:text-green-800">
+                              <FileText size={14} />
+                            </button>
+                            <button className="text-gray-600 hover:text-gray-800">
+                              <TrendingUp size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden sm:block overflow-x-auto">
+                    <table className="w-full min-w-[860px]">
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Program</th>
@@ -413,10 +455,10 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
           {/* Events Tab */}
           {activeTab === 'events' && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">Upcoming Events</h2>
-                <div className="flex items-center space-x-3">
-                  <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                  <button className="w-full sm:w-auto px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm">
                     New Event
                   </button>
                 </div>
@@ -426,8 +468,40 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                 <div className="p-4 border-b border-gray-200">
                   <h3 className="text-lg font-medium text-gray-900">Event Schedule</h3>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
+                {/* Mobile Card View */}
+                <div className="block sm:hidden">
+                  <div className="p-3 space-y-3">
+                    {events.map((event) => (
+                      <div key={event.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{event.name}</p>
+                            <p className="text-xs text-gray-500">{event.location}</p>
+                          </div>
+                          <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(event.status)}`}>
+                            {event.status}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {event.date} • {event.time}
+                        </div>
+                        <div className="text-sm text-gray-600">Attendees: {event.attendees}</div>
+                        <div className="flex items-center justify-end space-x-3">
+                          <button className="text-blue-600 hover:text-blue-800">
+                            <Eye size={14} />
+                          </button>
+                          <button className="text-green-600 hover:text-green-800">
+                            <Calendar size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full min-w-[760px]">
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Event</th>

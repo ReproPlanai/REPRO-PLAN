@@ -97,20 +97,20 @@ const UserManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">User Management</h2>
           <p className="text-sm text-gray-600 mt-1">Manage and monitor all platform users</p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
           <button
             onClick={handleExport}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center space-x-2"
+            className="w-full sm:w-auto px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center justify-center space-x-2"
           >
             <Download size={16} />
             <span>Export</span>
           </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+          <button className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2">
             <Plus size={16} />
             <span>Add User</span>
           </button>
@@ -174,8 +174,72 @@ const UserManagement: React.FC = () => {
 
       {/* Users Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        {/* Mobile Card View */}
+        <div className="block sm:hidden">
+          <div className="p-3 space-y-3">
+            {loading ? (
+              <div className="text-center text-gray-500 py-6">Loading users...</div>
+            ) : filteredUsers.length === 0 ? (
+              <div className="text-center text-gray-500 py-6">No users found</div>
+            ) : (
+              filteredUsers.map((user) => (
+                <div key={user.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">#{user.id}</p>
+                      <p className="text-xs font-mono text-gray-600">{user.secretCode}</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {user.isVerified && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Verified</span>
+                      )}
+                      {user.isUsed ? (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Used</span>
+                      ) : (
+                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Unused</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-600 truncate">{user.surveyLink}</div>
+                  <div className="text-xs text-gray-500">
+                    {user.phoneNumber ? (
+                      <span className="inline-flex items-center space-x-1">
+                        <Phone size={12} />
+                        <span>{user.phoneNumber}</span>
+                      </span>
+                    ) : (
+                      '-'
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">
+                      Last login: {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : '-'}
+                    </span>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => setSelectedUser(user)}
+                        className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                        title="View Details"
+                      >
+                        <Eye size={14} />
+                      </button>
+                      <button className="p-1 text-gray-600 hover:bg-gray-50 rounded" title="Edit">
+                        <Edit size={14} />
+                      </button>
+                      <button className="p-1 text-red-600 hover:bg-red-50 rounded" title="Delete">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full min-w-[960px]">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>

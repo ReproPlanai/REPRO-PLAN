@@ -295,27 +295,60 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
                 {/* Residents List */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                   <div className="p-4 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <h3 className="text-lg font-medium text-gray-900">Current Residents</h3>
-                      <div className="flex items-center space-x-3">
-                        <div className="relative">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                        <div className="relative w-full sm:w-64">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                           <input
                             type="text"
                             placeholder="Search residents..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500"
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500"
                           />
                         </div>
-                        <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
+                        <button className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
                           New Resident
                         </button>
                       </div>
                     </div>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
+                  {/* Mobile Card View */}
+                  <div className="block sm:hidden">
+                    <div className="p-3 space-y-3">
+                      {residents.map((resident) => (
+                        <div key={resident.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{resident.name}</p>
+                              <p className="text-xs text-gray-500">{resident.room}</p>
+                            </div>
+                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(resident.status)}`}>
+                              {resident.status}
+                            </span>
+                          </div>
+                          <div className="text-sm text-gray-600">Check-in: {resident.checkIn}</div>
+                          <div className="text-sm text-gray-600">Needs: {resident.needs}</div>
+                          <div className="flex items-center justify-end space-x-3">
+                            <button className="text-blue-600 hover:text-blue-800">
+                              <Eye size={14} />
+                            </button>
+                            <button className="text-green-600 hover:text-green-800">
+                              <Phone size={14} />
+                            </button>
+                            <button className="text-gray-600 hover:text-gray-800">
+                              <FileText size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden sm:block overflow-x-auto">
+                    <table className="w-full min-w-[760px]">
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Resident</th>
@@ -446,8 +479,34 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
                 <div className="p-4 border-b border-gray-200">
                   <h3 className="text-lg font-medium text-gray-900">Recent Access Logs</h3>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
+                {/* Mobile Card View */}
+                <div className="block sm:hidden">
+                  <div className="p-3 space-y-3">
+                    {accessLogs.map((log) => (
+                      <div key={log.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{log.user}</p>
+                            <p className="text-xs text-gray-500">{log.action}</p>
+                          </div>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            log.status === 'success' ? 'bg-green-100 text-green-800' :
+                            log.status === 'failed' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {log.status}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-600">{log.location}</div>
+                        <div className="text-xs text-gray-500">{log.time}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full min-w-[640px]">
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>

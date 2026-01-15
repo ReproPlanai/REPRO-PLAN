@@ -452,20 +452,20 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
           {/* Case Management Tab */}
           {activeTab === 'cases' && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">Case Management</h2>
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                  <div className="relative w-full sm:w-64">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                     <input
                       type="text"
                       placeholder="Search cases..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                  <button className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
                     New Case
                   </button>
                 </div>
@@ -475,8 +475,44 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
                 <div className="p-4 border-b border-gray-200">
                   <h3 className="text-lg font-medium text-gray-900">Recent Cases</h3>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
+                {/* Mobile Card View */}
+                <div className="block sm:hidden">
+                  <div className="p-3 space-y-3">
+                    {recentCases.map((case_) => (
+                      <div key={case_.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{case_.caseNumber}</p>
+                            <p className="text-xs text-gray-500">{case_.type}</p>
+                          </div>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            case_.status === 'Resolved' ? 'bg-green-100 text-green-800' :
+                            case_.status === 'Under Investigation' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-blue-100 text-blue-800'
+                          }`}>
+                            {case_.status}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600">{case_.location}</p>
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>Assigned: {case_.assigned}</span>
+                          <div className="flex items-center space-x-3">
+                            <button className="text-blue-600 hover:text-blue-800">
+                              <Eye size={14} />
+                            </button>
+                            <button className="text-gray-600 hover:text-gray-800">
+                              <FileText size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full min-w-[720px]">
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Case Number</th>
