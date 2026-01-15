@@ -7,7 +7,7 @@ interface DashboardAccessProps {
 }
 
 const DashboardAccess: React.FC<DashboardAccessProps> = ({ onDashboardAccess }) => {
-  const [currentStep, setCurrentStep] = useState<'secret-code' | 'portal-login'>('secret-code');
+  const [currentStep, setCurrentStep] = useState<'role-select' | 'portal-login'>('role-select');
   const [selectedRole, setSelectedRole] = useState<string>('');
 
   const handleCodeVerified = (role: string) => {
@@ -16,7 +16,7 @@ const DashboardAccess: React.FC<DashboardAccessProps> = ({ onDashboardAccess }) 
   };
 
   const handleBackToSecretCode = () => {
-    setCurrentStep('secret-code');
+    setCurrentStep('role-select');
     setSelectedRole('');
   };
 
@@ -26,7 +26,7 @@ const DashboardAccess: React.FC<DashboardAccessProps> = ({ onDashboardAccess }) 
 
   return (
     <div className="min-h-screen">
-      {currentStep === 'secret-code' && (
+      {currentStep === 'role-select' && (
         <SecretCodeEntry onCodeVerified={handleCodeVerified} />
       )}
       

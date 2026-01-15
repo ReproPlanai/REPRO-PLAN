@@ -61,19 +61,8 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
     setIsSendingOtp(true);
 
     try {
-      // First, we need to get the secret code from SecretCodeEntry
-      // For now, we'll use a placeholder - in production, this would be passed from SecretCodeEntry
-      const secretCode = sessionStorage.getItem('stakeholder_secret_code') || '';
-      
-      if (!secretCode) {
-        setError('Please enter your secret code first.');
-        setIsSendingOtp(false);
-        return;
-      }
-
-      // Verify stakeholder exists with this phone number
-      // Note: In production, you'd verify the stakeholder exists before sending OTP
-      // For now, we'll proceed to OTP step
+      // Stakeholders do not require secret codes during testing
+      // In production, you'd verify the stakeholder before sending OTP
       if (phoneNumber) {
         setCurrentStep('otp');
       } else {
@@ -128,7 +117,6 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
       if (response.success) {
         // Store the secret code for later use
         if (response.stakeholder) {
-          sessionStorage.setItem('stakeholder_secret_code', response.stakeholder.secretCode);
           sessionStorage.setItem('stakeholder_id', response.stakeholder.id.toString());
         }
         setIsNewUser(true);
@@ -149,20 +137,11 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
     setIsVerifyingOtp(true);
 
     try {
-      // Get secret code from session storage
-      const secretCode = sessionStorage.getItem('stakeholder_secret_code') || '';
-      
-      if (!secretCode) {
-        setError('Session expired. Please start over.');
-        setIsVerifyingOtp(false);
-        return;
-      }
-
       // In production, you would verify OTP here
       // For now, we'll accept any 6-digit code and proceed to login
       if (otpCode.length === 6) {
-        // Login stakeholder with backend
-        const response = await apiService.loginStakeholder(secretCode, phoneNumber) as { success: boolean; message?: string; stakeholder?: { id: number | string; role: string; name?: string; organization?: string; permissions?: any } };
+        // Login stakeholder with backend (no secret code required)
+        const response = await apiService.loginStakeholder(undefined, phoneNumber, role) as { success: boolean; message?: string; stakeholder?: { id: number | string; role: string; name?: string; organization?: string; permissions?: any } };
         
         if (response.success && response.stakeholder) {
           const userData = {

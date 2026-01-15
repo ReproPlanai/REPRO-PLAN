@@ -7,23 +7,23 @@ This frontend-only build does not use passwords. Access is based on secret codes
 - Note: secret codes are 8 characters (letters/numbers). No phone number required.
 
 ### Stakeholder Portal Access (All Roles)
-Use these codes in the Secure Access Portal, then continue the OTP flow.
+Stakeholders do **not** need secret codes during testing. Select a role, then continue the OTP flow.
 
 - ADMIN
-  - Secret code: `REPROPLAN_ADMIN_2024`
   - Phone number (any is accepted in mock mode): `+231-000-0001`
+  - Email: `admin@test.reproplan`
 - POLICE
-  - Secret code: `REPROPLAN_POLICE_2024`
   - Phone number: `+231-000-0002`
+  - Email: `police@test.reproplan`
 - SAFEHOUSE
-  - Secret code: `REPROPLAN_SAFE_2024`
   - Phone number: `+231-000-0003`
+  - Email: `safehouse@test.reproplan`
 - MEDICAL
-  - Secret code: `REPROPLAN_MED_2024`
   - Phone number: `+231-000-0004`
+  - Email: `medical@test.reproplan`
 - NGO
-  - Secret code: `REPROPLAN_NGO_2024`
   - Phone number: `+231-000-0005`
+  - Email: `ngo@test.reproplan`
 
 ### Notes
 - These test accounts are seeded in local storage by the mock API in `frontend/src/services/api.ts`.

@@ -51,6 +51,7 @@ import QRVerification from './pages/QRVerification';
 // Utils
 import { secretCodeManager } from './utils/secretCode';
 import { smsIntegration } from './utils/smsIntegration';
+import { offlineStorage } from './utils/offlineStorage';
 import { productionResetManager } from './utils/productionReset';
 
 // Hooks
@@ -117,6 +118,9 @@ function App() {
     
     // Check initial URL
     handleStakeholderAccess();
+
+    // Seed offline mock data for feature testing
+    offlineStorage.seedMockData();
     
     return () => {
       window.removeEventListener('popstate', handleStakeholderAccess);

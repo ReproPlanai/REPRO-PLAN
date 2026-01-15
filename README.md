@@ -207,6 +207,31 @@ PUT  /api/stakeholders/messages/:id/read # Mark as read
 - **User Analytics**: Anonymous usage patterns
 - **Security Auditing**: Real-time threat detection
 
+## 🧪 Testing & Mock Data
+
+Added persistent mock data for key role workflows and modal-heavy areas by seeding offline storage at app startup.
+
+What’s now seeded for full feature/modals testing:
+- SRHR alerts (`srhr_alerts`)
+- Chatbot history (`chat_history`)
+- Quiz stats (`quiz_stats`)
+- Consent game stats (`consent_game_stats`)
+- Cycle tracker data (`cycle_data`)
+- Mentorship requests & chat (`mentorship_requests`, `chat_messages`)
+
+Additional seeded datasets for broader role coverage:
+- Safe spaces (`safe_spaces`)
+- Emergency contacts/logs (`emergency_contacts`, `emergency_logs`)
+- Inclusive services/resources/support groups (`inclusive_services`, `inclusive_resources`, `support_groups`)
+- Storytelling posts (`srhr_stories`)
+- QR verification history (`repro-plan-verification-history`)
+
+Changes:
+- `frontend/src/utils/offlineStorage.ts` now handles array storage correctly and includes `seedMockData()`.
+- `frontend/src/App.tsx` calls `offlineStorage.seedMockData()` during initialization.
+
+If you want more seeded datasets (e.g., Safe Space entries, Emergency logs, QR verification history), tell me which ones and I’ll add them.
+
 ---
 
 **REPRO PLAN v3.0** - Building a safer, more accessible future for youth sexual and reproductive health across Africa.

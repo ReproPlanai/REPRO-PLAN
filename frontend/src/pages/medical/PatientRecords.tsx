@@ -28,8 +28,14 @@ const PatientRecords: React.FC = () => {
 
   const fetchHealthRecords = async () => {
     try {
-      const userId = secretCodeManager.getUserId();
-      const numericUserId = typeof userId === 'string' ? Number(userId) : userId;
+      let userId = secretCodeManager.getUserId();
+      let numericUserId = typeof userId === 'string' ? Number(userId) : userId;
+
+      if (!numericUserId || Number.isNaN(numericUserId)) {
+        const usersResponse = await apiService.getUsers() as { success: boolean; users?: any[] };
+        const fallbackUser = usersResponse.success ? usersResponse.users?.[0] : undefined;
+        numericUserId = fallbackUser?.id;
+      }
 
       if (!numericUserId || Number.isNaN(numericUserId)) {
         console.warn('No user ID available for health records');
