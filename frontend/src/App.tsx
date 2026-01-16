@@ -111,7 +111,7 @@ function App() {
           }
           loaderTimeoutRef.current = window.setTimeout(() => {
             setShowPreAuthLoader(false);
-          }, 1600);
+          }, 5000);
         } else {
           setShowPreAuthLoader(false);
         }
