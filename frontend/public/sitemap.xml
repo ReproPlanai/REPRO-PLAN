@@ -6,163 +6,163 @@
 
   <!-- Homepage -->
   <url>
-    <loc>https://safelink.netlify.app/</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- Core Features -->
   <url>
-    <loc>https://safelink.netlify.app/chatbot</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/chatbot</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/videos</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/videos</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/articles</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/articles</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/clinics</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/clinics</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/tracker</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/tracker</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/games</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/games</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Emergency Features -->
   <url>
-    <loc>https://safelink.netlify.app/emergency</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/emergency</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/mentorship</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/mentorship</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- New Features -->
   <url>
-    <loc>https://safelink.netlify.app/medication-order</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/medication-order</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/secure-map</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/secure-map</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- QR Code Features -->
   <url>
-    <loc>https://safelink.netlify.app/qr-verification</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/qr-verification</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/qr-scanner</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/qr-scanner</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Settings and Support -->
   <url>
-    <loc>https://safelink.netlify.app/settings</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/settings</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/tutorial</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/tutorial</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <!-- Accessibility Features -->
   <url>
-    <loc>https://safelink.netlify.app/visual-accessibility</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/visual-accessibility</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/motor-accessibility</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/motor-accessibility</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/hearing-accessibility</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/hearing-accessibility</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/cognitive-accessibility</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/cognitive-accessibility</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <!-- Stakeholder Dashboards -->
   <url>
-    <loc>https://safelink.netlify.app/dashboard</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/dashboard</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- PWA Assets -->
   <url>
-    <loc>https://safelink.netlify.app/manifest.json</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/manifest.json</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://safelink.netlify.app/sw.js</loc>
-    <lastmod>2024-12-19</lastmod>
+    <loc>https://repro-plan.netlify.app/sw.js</loc>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

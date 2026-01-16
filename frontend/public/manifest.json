@@ -4,6 +4,21 @@
   "description": "REPRO PLAN v3.0 - Anonymous, Inclusive & Scalable SRHR Platform for Youth across Africa. Starting in Ghana, expanding to West Africa, and serving all of Africa. Get safe access to sexual and reproductive health information, education, and support.",
   "icons": [
     {
+      "src": "favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"

@@ -121,61 +121,23 @@ function App() {
 
     // Seed offline mock data for feature testing
     offlineStorage.seedMockData();
-    
-    return () => {
-      window.removeEventListener('popstate', handleStakeholderAccess);
-    };
 
     // Initialize SMS integration
-    // eslint-disable-next-line no-unreachable
     smsIntegration.processOfflineQueue();
 
     // Initialize cache manager with new features
     cacheManager.initializeCache().then(() => {
       console.log('Cache manager initialized with new features');
-      
+
       // Check if cache needs update
       if (cacheManager.needsCacheUpdate()) {
         console.log('Cache update available - new features ready');
       }
     });
 
-    // Register service worker for PWA functionality
-    // eslint-disable-next-line no-unreachable
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          console.log('Service Worker registered:', registration);
-          
-          // Listen for service worker updates
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            if (newWorker) {
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('New service worker installed with updates');
-                  // Force cache refresh for new features
-                  cacheManager.forceCacheRefresh();
-                }
-              });
-            }
-          });
-        })
-        .catch((error) => {
-          console.error('Service Worker registration failed:', error);
-        });
-    }
-
-    // Listen for service worker messages
-    // eslint-disable-next-line no-unreachable
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data.type === 'SW_UPDATE') {
-          console.log('Service Worker update received:', event.data);
-          // Handle new features notification
-        }
-      });
-    }
+    return () => {
+      window.removeEventListener('popstate', handleStakeholderAccess);
+    };
   }, []);
 
   const handleLogin = async (code: string) => {

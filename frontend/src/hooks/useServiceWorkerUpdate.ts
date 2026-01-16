@@ -50,7 +50,10 @@ const useServiceWorkerUpdate = (): ServiceWorkerUpdate => {
 
         // Listen for controller change (when new service worker takes control)
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-          // Reload the page to get the new version
+          // Ask the new service worker to clear any old caches, then reload.
+          if (navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHES' });
+          }
           window.location.reload();
         });
 

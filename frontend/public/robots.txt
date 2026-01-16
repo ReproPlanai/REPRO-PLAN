@@ -1,4 +1,4 @@
-# SafeLink - Anonymous SRHR Platform for Youth
+# REPRO PLAN - Anonymous SRHR Platform for Youth
 # SEO-optimized robots.txt for comprehensive search engine indexing
 
 User-agent: *
@@ -41,6 +41,9 @@ Allow: /icons/
 Allow: /manifest.json
 Allow: /sw.js
 Allow: /favicon.ico
+Allow: /favicon.png
+Allow: /favicon-32x32.png
+Allow: /favicon-16x16.png
 Allow: /logo192.png
 Allow: /logo512.png
 
@@ -50,7 +53,7 @@ Disallow: /admin/private/
 Disallow: /user-data/
 
 # Sitemap location
-Sitemap: https://safelink.netlify.app/sitemap.xml
+Sitemap: https://repro-plan.netlify.app/sitemap.xml
 
 # Crawl delay for respectful crawling
 Crawl-delay: 1

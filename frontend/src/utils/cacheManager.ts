@@ -1,13 +1,13 @@
 // Cache Manager for REPRO PLAN - Comprehensive caching strategy
 export class CacheManager {
   private static instance: CacheManager;
-  private cacheVersion = '2.0';
+  private cacheVersion = '3.0.1';
   private cacheNames = {
-    static: 'repro-plan-static-v2.0',
-    dynamic: 'repro-plan-dynamic-v2.0',
-    qr: 'repro-plan-qr-v2.0',
-    components: 'repro-plan-components-v2.0',
-    api: 'repro-plan-api-v2.0'
+    static: `repro-plan-static-v${this.cacheVersion}`,
+    dynamic: `repro-plan-dynamic-v${this.cacheVersion}`,
+    qr: `repro-plan-qr-v${this.cacheVersion}`,
+    components: `repro-plan-components-v${this.cacheVersion}`,
+    api: `repro-plan-api-v${this.cacheVersion}`
   };
 
   private constructor() {}
@@ -48,7 +48,7 @@ export class CacheManager {
     ];
 
     const cache = await caches.open(this.cacheNames.components);
-    await cache.addAll(newFeatures);
+    await Promise.allSettled(newFeatures.map((feature) => cache.add(feature)));
   }
 
   // Setup cache strategies for different content types
@@ -61,7 +61,7 @@ export class CacheManager {
     ];
     
     const qrCache = await caches.open(this.cacheNames.qr);
-    await qrCache.addAll(qrAssets);
+    await Promise.allSettled(qrAssets.map((asset) => qrCache.add(asset)));
 
     // Cache API endpoints
     const apiEndpoints = [
@@ -73,7 +73,7 @@ export class CacheManager {
     ];
 
     const apiCache = await caches.open(this.cacheNames.api);
-    await apiCache.addAll(apiEndpoints);
+    await Promise.allSettled(apiEndpoints.map((endpoint) => apiCache.add(endpoint)));
   }
 
   // Cache QR code data
@@ -177,8 +177,8 @@ export class CacheManager {
   public async clearOldCaches(): Promise<void> {
     try {
       const cacheNames = await caches.keys();
-      const oldCaches = cacheNames.filter(name => 
-        name.includes('repro-plan-') && !name.includes('v2.0')
+      const oldCaches = cacheNames.filter(name =>
+        name.includes('repro-plan-') && !name.includes(`v${this.cacheVersion}`)
       );
       
       await Promise.all(
