@@ -4,6 +4,8 @@ import {
   Shield, 
   BarChart3, 
   Settings, 
+  Menu,
+  X,
   Bell, 
   Search,
   Download,
@@ -23,6 +25,7 @@ import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging';
 import UserManagement from './admin/UserManagement';
 import SystemSettings from './admin/SystemSettings';
 import { apiService } from '../services/api';
+import SecurityPreferences from '../components/Settings/SecurityPreferences';
 
 interface AdminDashboardProps {
   userData: any;
@@ -32,6 +35,7 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dashboardMetrics, setDashboardMetrics] = useState({
     totalAlerts: 0,
     totalCases: 0,
@@ -161,6 +165,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
             </div>
             
             <div className="flex items-center space-x-2 sm:space-x-4">
+              <button
+                onClick={() => setIsMenuOpen(true)}
+                className="lg:hidden p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                aria-label="Open menu"
+              >
+                <Menu size={18} />
+              </button>
               <button className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 relative">
                 <Bell size={18} className="sm:w-5 sm:h-5" />
                 {recentAlerts.filter(alert => alert.status === 'active').length > 0 && (
@@ -180,28 +191,50 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
       </div>
 
       <div className="flex flex-col lg:flex-row">
-        {/* Mobile Tab Navigation */}
-        <div className="lg:hidden bg-white border-b border-gray-200">
-          <div className="flex overflow-x-auto scrollbar-hide">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
+        {/* Mobile Menu Drawer */}
+        {isMenuOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <button
+              className="absolute inset-0 bg-black/40"
+              onClick={() => setIsMenuOpen(false)}
+              aria-label="Close menu"
+            />
+            <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl p-4">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-base font-semibold text-gray-900">Menu</span>
                 <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex-shrink-0 flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-700 bg-blue-50'
-                      : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                  aria-label="Close menu"
                 >
-                  <Icon size={16} />
-                  <span className="whitespace-nowrap">{tab.label}</span>
+                  <X size={18} />
                 </button>
-              );
-            })}
+              </div>
+              <nav className="space-y-2">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setIsMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        activeTab === tab.id
+                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      }`}
+                    >
+                      <Icon size={18} />
+                      <span>{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Desktop Sidebar */}
         <div className="hidden lg:block w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
@@ -478,6 +511,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
           {activeTab === 'settings' && (
             <div className="space-y-4 sm:space-y-6">
               <SystemSettings />
+              <SecurityPreferences role="ADMIN" />
             </div>
           )}
         </div>

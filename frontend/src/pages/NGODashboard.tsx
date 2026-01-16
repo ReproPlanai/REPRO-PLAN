@@ -10,7 +10,10 @@ import {
   Globe,
   Bell,
   Target,
-  MessageSquare
+  MessageSquare,
+  Menu,
+  X,
+  Settings
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
@@ -18,6 +21,7 @@ import { dataSecurityManager } from '../utils/dataSecurity';
 import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
 // import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging'; // Reserved for future use
 import ProgramDetails from './ngo/ProgramDetails';
+import SecurityPreferences from '../components/Settings/SecurityPreferences';
 
 interface NGODashboardProps {
   userData: any;
@@ -27,6 +31,7 @@ interface NGODashboardProps {
 const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
   const [activeTab, setActiveTab] = useState('programs');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Connect to backend API
   const stakeholderAPI = useStakeholderAPI({
@@ -161,7 +166,8 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
     { id: 'events', label: 'Events', icon: Calendar },
     { id: 'impact', label: 'Impact', icon: TrendingUp },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
-    { id: 'resources', label: 'Resources', icon: FileText }
+    { id: 'resources', label: 'Resources', icon: FileText },
+    { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
   const getStatusColor = (status: string) => {
@@ -199,6 +205,13 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
             </div>
             
             <div className="flex items-center space-x-2 sm:space-x-4">
+              <button
+                onClick={() => setIsMenuOpen(true)}
+                className="lg:hidden p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                aria-label="Open menu"
+              >
+                <Menu size={18} />
+              </button>
               <button className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 relative">
                 <Bell size={18} className="sm:w-5 sm:h-5" />
                 <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-orange-500 rounded-full"></span>
@@ -216,28 +229,50 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
       </div>
 
       <div className="flex flex-col lg:flex-row">
-        {/* Mobile Tab Navigation */}
-        <div className="lg:hidden bg-white border-b border-gray-200">
-          <div className="flex overflow-x-auto scrollbar-hide">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
+        {/* Mobile Menu Drawer */}
+        {isMenuOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <button
+              className="absolute inset-0 bg-black/40"
+              onClick={() => setIsMenuOpen(false)}
+              aria-label="Close menu"
+            />
+            <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl p-4">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-base font-semibold text-gray-900">Menu</span>
                 <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex-shrink-0 flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
-                    activeTab === tab.id
-                      ? 'border-orange-500 text-orange-700 bg-orange-50'
-                      : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                  aria-label="Close menu"
                 >
-                  <Icon size={16} />
-                  <span className="whitespace-nowrap">{tab.label}</span>
+                  <X size={18} />
                 </button>
-              );
-            })}
+              </div>
+              <nav className="space-y-2">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setIsMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        activeTab === tab.id
+                          ? 'bg-orange-50 text-orange-700 border border-orange-200'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      }`}
+                    >
+                      <Icon size={18} />
+                      <span>{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Desktop Sidebar */}
         <div className="hidden lg:block w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
@@ -611,6 +646,14 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                 <p className="text-gray-600">Resource management and distribution tracking features will be implemented here.</p>
               </div>
+            </div>
+          )}
+
+          {/* Settings Tab */}
+          {activeTab === 'settings' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Settings</h2>
+              <SecurityPreferences role="NGO" />
             </div>
           )}
         </div>

@@ -17,6 +17,7 @@ import {
 import { offlineStorage } from '../utils/offlineStorage';
 import { secretCodeManager } from '../utils/secretCode';
 import QRCodeGenerator from '../components/QRCode/QRCodeGenerator';
+import SecurityPreferences from '../components/Settings/SecurityPreferences';
 
 interface SettingsProps {
   onLogout: () => void;
@@ -254,6 +255,11 @@ const Settings: React.FC<SettingsProps> = ({ onLogout }) => {
                         </div>
                       </div>
                     </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Security Preferences</h3>
+                    <SecurityPreferences role="USER" />
                   </div>
                 </div>
               )}
