@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './i18n';
 import './styles/accessibility.css';
@@ -12,6 +12,7 @@ import BottomNavigation from './components/Layout/BottomNavigation';
 import LoginForm from './components/Auth/LoginForm';
 import CreateCodeForm from './components/Auth/CreateCodeForm';
 import ForgetCodeForm from './components/Auth/ForgetCodeForm';
+import PreAuthLoader from './components/Auth/PreAuthLoader';
 import SRHRAlerts from './components/SMS/SRHRAlerts';
 import StorytellingPlatform from './components/Storytelling/StorytellingPlatform';
 import SafeSpaceLocator from './components/SafeSpace/SafeSpaceLocator';
@@ -70,14 +71,24 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showCreateCode, setShowCreateCode] = useState(false);
   const [showForgetCode, setShowForgetCode] = useState(false);
+  const [showPreAuthLoader, setShowPreAuthLoader] = useState(false);
   const { isUpdateAvailable, updateServiceWorker, dismissUpdate } = useServiceWorkerUpdate();
   const [isLoading, setIsLoading] = useState(true);
+  const loaderTimeoutRef = useRef<number | undefined>(undefined);
   
   // App download modal
   const { showModal, closeModal, handleDownload, openModal } = useAppDownloadModal();
 
   useEffect(() => {
     // Check for production reset first
+    const isStakeholderUrl = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const role = urlParams.get('role');
+      const validStakeholderRoles = ['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO'];
+
+      return Boolean(role && validStakeholderRoles.includes(role) && window.location.pathname === '/dashboard');
+    };
+
     const initializeApp = async () => {
       try {
         const resetResult = await productionResetManager.checkAndResetForProduction();
@@ -92,6 +103,18 @@ function App() {
         const hasValidCode = secretCodeManager.hasValidSecretCode();
         setIsAuthenticated(hasValidCode);
         setIsLoading(false);
+
+        if (!hasValidCode && !isStakeholderUrl()) {
+          setShowPreAuthLoader(true);
+          if (loaderTimeoutRef.current) {
+            window.clearTimeout(loaderTimeoutRef.current);
+          }
+          loaderTimeoutRef.current = window.setTimeout(() => {
+            setShowPreAuthLoader(false);
+          }, 1600);
+        } else {
+          setShowPreAuthLoader(false);
+        }
       } catch (error) {
         console.error('App initialization failed:', error);
         setIsLoading(false);
@@ -137,6 +160,9 @@ function App() {
 
     return () => {
       window.removeEventListener('popstate', handleStakeholderAccess);
+      if (loaderTimeoutRef.current) {
+        window.clearTimeout(loaderTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -194,6 +220,9 @@ function App() {
   const isStakeholderAccess = role && validStakeholderRoles.includes(role) && window.location.pathname === '/dashboard';
   
   if (!isAuthenticated && !isStakeholderAccess) {
+    if (showPreAuthLoader && !showCreateCode && !showForgetCode) {
+      return <PreAuthLoader />;
+    }
     // Regular users need authentication
     console.log('🔍 Regular user - Showing login form');
     if (showForgetCode) {
