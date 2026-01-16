@@ -33,7 +33,7 @@ const QRVerification: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between h-auto sm:h-16">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigate(-1)}
@@ -58,7 +58,7 @@ const QRVerification: React.FC = () => {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <div className="bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-6 sm:p-8 mb-8">
-          <div className="flex items-start space-x-4">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-4">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <Shield className="w-6 h-6 text-white" />
             </div>
@@ -132,7 +132,7 @@ const QRVerification: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8">
           <h3 className="text-xl font-semibold text-gray-900 mb-6">How It Works</h3>
           <div className="space-y-6">
-            <div className="flex items-start space-x-4">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-4">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-blue-600 font-semibold text-sm">1</span>
               </div>
@@ -144,7 +144,7 @@ const QRVerification: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-start space-x-4">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-4">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-green-600 font-semibold text-sm">2</span>
               </div>
@@ -156,7 +156,7 @@ const QRVerification: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-start space-x-4">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-4">
               <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-purple-600 font-semibold text-sm">3</span>
               </div>
@@ -172,7 +172,7 @@ const QRVerification: React.FC = () => {
 
         {/* Security Notice */}
         <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-          <div className="flex items-start space-x-3">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-3">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-medium text-yellow-800 mb-2">Security Notice</h4>
@@ -190,7 +190,7 @@ const QRVerification: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col">
             <div className="p-4 sm:p-6 flex-shrink-0">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">QR Code Generator</h3>
                 <button
                   onClick={() => setShowQRGenerator(false)}

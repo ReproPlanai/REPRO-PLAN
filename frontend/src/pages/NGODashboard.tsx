@@ -86,20 +86,45 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
       status: 'Completing',
       budget: '$12,000',
       progress: 85
+    },
+    {
+      id: 4,
+      name: 'Mobile Outreach Clinics',
+      location: 'Rural Districts',
+      beneficiaries: 260,
+      startDate: '2024-01-10',
+      endDate: '2024-07-15',
+      status: 'Active',
+      budget: '$20,000',
+      progress: 50
+    },
+    {
+      id: 5,
+      name: 'Peer Educator Training',
+      location: 'Monrovia + Ganta',
+      beneficiaries: 90,
+      startDate: '2024-02-05',
+      endDate: '2024-05-30',
+      status: 'Planning',
+      budget: '$8,500',
+      progress: 20
     }
   ]);
 
   const [events] = useState([
     { id: 1, name: 'SRHR Workshop - Monrovia', date: '2024-01-25', time: '10:00 AM', location: 'Community Center', attendees: 45, status: 'Scheduled' },
     { id: 2, name: 'Youth Health Fair - Gbarnga', date: '2024-01-28', time: '09:00 AM', location: 'Town Hall', attendees: 120, status: 'Scheduled' },
-    { id: 3, name: 'Counselor Training - Buchanan', date: '2024-02-02', time: '08:30 AM', location: 'Training Center', attendees: 25, status: 'Scheduled' }
+    { id: 3, name: 'Counselor Training - Buchanan', date: '2024-02-02', time: '08:30 AM', location: 'Training Center', attendees: 25, status: 'Scheduled' },
+    { id: 4, name: 'Peer Educator Meetup - Ganta', date: '2024-02-10', time: '02:00 PM', location: 'Youth Center', attendees: 60, status: 'Scheduled' },
+    { id: 5, name: 'Community Dialogue - Caldwell', date: '2024-02-15', time: '11:00 AM', location: 'Community Hall', attendees: 80, status: 'Scheduled' }
   ]);
 
   const [impactMetrics] = useState([
     { id: 1, metric: 'Youth Reached', value: '2,847', change: '+12%', trend: 'up' },
     { id: 2, metric: 'Communities Served', value: '45', change: '+8%', trend: 'up' },
     { id: 3, metric: 'Programs Completed', value: '45', change: '+15%', trend: 'up' },
-    { id: 4, metric: 'Partner Organizations', value: '12', change: '+2', trend: 'up' }
+    { id: 4, metric: 'Partner Organizations', value: '12', change: '+2', trend: 'up' },
+    { id: 5, metric: 'Workshops Hosted', value: '68', change: '+9%', trend: 'up' }
   ]);
 
   // Placeholder metrics for dashboard visualizations
@@ -248,7 +273,7 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Total Beneficiaries</p>
                         <p className="text-lg sm:text-2xl font-semibold text-gray-900">{ngoData.ngoMetrics.totalBeneficiaries.toLocaleString()}</p>
@@ -258,7 +283,7 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Active Programs</p>
                         <p className="text-lg sm:text-2xl font-semibold text-green-600">{ngoData.ngoMetrics.activePrograms}</p>
@@ -268,7 +293,7 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Completed Programs</p>
                         <p className="text-lg sm:text-2xl font-semibold text-blue-600">{ngoData.ngoMetrics.completedPrograms}</p>
@@ -278,7 +303,7 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Community Reach</p>
                         <p className="text-lg sm:text-2xl font-semibold text-orange-600">{ngoData.ngoMetrics.communityReach.toLocaleString()}</p>
@@ -554,7 +579,7 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {impactMetrics.map((metric) => (
                   <div key={metric.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <p className="text-sm text-gray-600">{metric.metric}</p>
                         <p className="text-2xl font-semibold text-gray-900">{metric.value}</p>

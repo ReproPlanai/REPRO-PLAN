@@ -423,12 +423,12 @@ const OfflineMode: React.FC = () => {
 
                     {/* Content Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-2">
                         <div className="flex-1 min-w-0">
                           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 truncate">
                             {item.title}
                           </h3>
-                          <div className="flex items-center space-x-3 text-xs sm:text-sm text-gray-500">
+                          <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-500">
                             <span className={`px-2 py-1 rounded-full ${getTypeColor(item.type)}`}>
                               {item.type}
                             </span>
@@ -445,8 +445,8 @@ const OfflineMode: React.FC = () => {
                       </div>
 
                       {/* Metadata */}
-                      <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500">
-                        <div className="flex items-center space-x-4">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs sm:text-sm text-gray-500">
+                        <div className="flex flex-wrap items-center gap-2">
                           <div className="flex items-center space-x-1">
                             <Download className="w-3 h-3" />
                             <span>Downloaded: {formatDate(item.downloadedAt)}</span>

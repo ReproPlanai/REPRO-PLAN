@@ -305,6 +305,15 @@ export class OfflineStorage {
           createdAt: now - 1000 * 60 * 60 * 24,
           scheduledAt: now + 1000 * 60 * 60 * 2,
           notes: 'Call scheduled for tomorrow.'
+        },
+        {
+          id: 'req-3',
+          mentorId: '3',
+          menteeId: 'current_user',
+          topic: 'Consent and boundaries',
+          message: 'Need advice on setting healthy boundaries in relationships.',
+          status: 'pending',
+          createdAt: now - 1000 * 60 * 60 * 8
         }
       ],
       chat_messages: [
@@ -323,6 +332,14 @@ export class OfflineStorage {
           message: 'Thanks! I would like to know about long-term options.',
           timestamp: now - 1000 * 60 * 15,
           isRead: true
+        },
+        {
+          id: 'chat-3',
+          senderId: 'current_user',
+          receiverId: '2',
+          message: 'Is there a group session this week?',
+          timestamp: now - 1000 * 60 * 60 * 3,
+          isRead: false
         }
       ],
       safe_spaces: [
@@ -385,6 +402,26 @@ export class OfflineStorage {
           description: 'Legal support and survivor advocacy services.',
           isVerified: true,
           lastUpdated: new Date(now - 1000 * 60 * 60 * 48).toISOString()
+        },
+        {
+          id: 'ss-4',
+          name: 'Ganta Youth Resource Point',
+          type: 'resource_center',
+          address: 'Ganta City, Nimba',
+          phone: '+231-77-555-1004',
+          hours: 'Mon - Sat: 9:00 AM - 6:00 PM',
+          services: ['SRHR Education', 'Referrals', 'Peer Support'],
+          rating: 4.2,
+          distance: 6.1,
+          coordinates: { lat: 7.2314, lng: -8.9728 },
+          isOpen: true,
+          isAnonymous: true,
+          is24Hours: false,
+          languages: ['English', 'Gio'],
+          specialFeatures: ['Youth Friendly', 'Walk-in Support'],
+          description: 'Local youth support and referral services.',
+          isVerified: true,
+          lastUpdated: new Date(now - 1000 * 60 * 60 * 8).toISOString()
         }
       ],
       emergency_contacts: [
@@ -426,6 +463,14 @@ export class OfflineStorage {
           action: 'Location shared with medical services',
           location: { lat: 6.3221, lng: -10.7832 },
           notes: 'Follow-up care requested'
+        },
+        {
+          id: 'log-3',
+          timestamp: now - 1000 * 60 * 60 * 6,
+          type: 'safehouse',
+          action: 'Safehouse referral created',
+          location: { lat: 6.2881, lng: -10.7475 },
+          notes: 'Transportation arranged for intake'
         }
       ],
       inclusive_services: [
@@ -511,6 +556,19 @@ export class OfflineStorage {
           focus: ['Mental Health', 'Coping Skills'],
           contact: 'support@example.org',
           isActive: true
+        },
+        {
+          id: 'sg-3',
+          name: 'Peer Mentor Meetups',
+          description: 'Monthly in-person mentoring and skills workshop.',
+          meetingSchedule: 'First Friday, 4PM-6PM',
+          location: 'Bensonville Youth Clinic',
+          isOnline: false,
+          isAnonymous: true,
+          ageGroup: '18-24',
+          focus: ['Mentorship', 'Skill Building'],
+          contact: '+231-555-0412',
+          isActive: true
         }
       ],
       srhr_stories: [
@@ -543,6 +601,21 @@ export class OfflineStorage {
           location: 'Paynesville',
           likes: 8,
           createdAt: now - 1000 * 60 * 60 * 24 * 5
+        },
+        {
+          id: 'story-3',
+          title: 'Learning Together',
+          content: 'Joining a support group helped me feel less alone.',
+          type: 'text',
+          category: 'community',
+          author: 'Anonymous',
+          isAnonymous: true,
+          tags: ['community', 'support'],
+          language: 'English',
+          ageGroup: '18-24',
+          location: 'Gbarnga',
+          likes: 5,
+          createdAt: now - 1000 * 60 * 60 * 24 * 2
         }
       ]
     };

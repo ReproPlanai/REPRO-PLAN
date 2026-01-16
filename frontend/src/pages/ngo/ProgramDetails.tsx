@@ -45,21 +45,21 @@ const ProgramDetails: React.FC<{ programId?: number }> = ({ programId }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">{program.name}</h2>
           <p className="text-sm text-gray-600 mt-1">Program details and management</p>
         </div>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+        <button className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2">
           <Edit size={16} />
           <span>Edit Program</span>
         </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-600">Beneficiaries</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">{program.beneficiaries}</p>
@@ -68,7 +68,7 @@ const ProgramDetails: React.FC<{ programId?: number }> = ({ programId }) => {
           </div>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-600">Budget</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">{program.budget}</p>
@@ -77,7 +77,7 @@ const ProgramDetails: React.FC<{ programId?: number }> = ({ programId }) => {
           </div>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-600">Progress</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">{program.progress}%</p>
@@ -86,7 +86,7 @@ const ProgramDetails: React.FC<{ programId?: number }> = ({ programId }) => {
           </div>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-600">Status</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">{program.status}</p>
@@ -153,7 +153,7 @@ const ProgramDetails: React.FC<{ programId?: number }> = ({ programId }) => {
 
       {/* Progress Bar */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-2">
           <h3 className="text-lg font-semibold text-gray-900">Program Progress</h3>
           <span className="text-sm font-medium text-gray-600">{program.progress}%</span>
         </div>

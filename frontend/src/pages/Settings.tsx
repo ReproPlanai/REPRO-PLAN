@@ -161,21 +161,21 @@ const Settings: React.FC<SettingsProps> = ({ onLogout }) => {
                   <div>
                     <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Notifications</h3>
                     <div className="space-y-3 sm:space-y-4">
-                      <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-lg">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 rounded-lg">
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-gray-900 text-sm sm:text-base">Health Reminders</p>
                           <p className="text-xs sm:text-sm text-gray-600">Get reminders for health tracking</p>
                         </div>
                         <input type="checkbox" className="w-4 h-4 sm:w-5 sm:h-5 rounded text-blue-600 focus:ring-blue-500" defaultChecked />
                       </div>
-                      <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-lg">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 rounded-lg">
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-gray-900 text-sm sm:text-base">Emergency Alerts</p>
                           <p className="text-xs sm:text-sm text-gray-600">Receive emergency notifications</p>
                         </div>
                         <input type="checkbox" className="w-4 h-4 sm:w-5 sm:h-5 rounded text-blue-600 focus:ring-blue-500" defaultChecked />
                       </div>
-                      <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-lg">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-gray-50 rounded-lg">
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-gray-900 text-sm sm:text-base">Mentorship Updates</p>
                           <p className="text-xs sm:text-sm text-gray-600">Get notified about mentorship messages</p>
@@ -263,7 +263,7 @@ const Settings: React.FC<SettingsProps> = ({ onLogout }) => {
                   <div>
                     <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Storage Information</h3>
                     <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
-                      <div className="flex items-center justify-between mb-2 sm:mb-3">
+                      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-2 sm:mb-3">
                         <span className="text-xs sm:text-sm font-medium text-gray-700">Storage Used</span>
                         <span className="text-xs sm:text-sm text-gray-600">
                           {formatBytes(storageInfo.used)} / {formatBytes(storageInfo.available)}
@@ -402,7 +402,7 @@ const Settings: React.FC<SettingsProps> = ({ onLogout }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">QR Code Generator</h3>
                 <button
                   onClick={() => setShowQRGenerator(false)}

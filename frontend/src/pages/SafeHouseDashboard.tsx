@@ -110,13 +110,33 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
       room: 'Room 103',
       needs: 'Immediate support',
       emergencyContact: '+231-XXX-XXXX'
+    },
+    {
+      id: 4,
+      name: 'Anonymous Resident D',
+      checkIn: '2024-01-15',
+      status: 'Monitoring',
+      room: 'Room 104',
+      needs: 'Legal assistance',
+      emergencyContact: '+231-XXX-XXXX'
+    },
+    {
+      id: 5,
+      name: 'Anonymous Resident E',
+      checkIn: '2024-01-16',
+      status: 'Safe',
+      room: 'Room 105',
+      needs: 'Counseling follow-up',
+      emergencyContact: '+231-XXX-XXXX'
     }
   ]);
 
   const [accessLogs] = useState([
     { id: 1, user: 'Anonymous User', action: 'OTP Access Granted', time: '2 min ago', location: 'Main Entrance', status: 'success' },
     { id: 2, user: 'Anonymous User', action: 'Failed OTP Attempt', time: '15 min ago', location: 'Side Door', status: 'failed' },
-    { id: 3, user: 'Anonymous User', action: 'Emergency Access', time: '1 hour ago', location: 'Emergency Exit', status: 'emergency' }
+    { id: 3, user: 'Anonymous User', action: 'Emergency Access', time: '1 hour ago', location: 'Emergency Exit', status: 'emergency' },
+    { id: 4, user: 'Anonymous User', action: 'Visitor Check-In', time: '2 hours ago', location: 'Main Entrance', status: 'success' },
+    { id: 5, user: 'Anonymous User', action: 'Access Denied', time: '4 hours ago', location: 'Storage Wing', status: 'failed' }
   ]);
 
   // Map API alerts to display format
@@ -252,7 +272,7 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Total Capacity</p>
                         <p className="text-lg sm:text-2xl font-semibold text-gray-900">{houseData.totalCapacity}</p>
@@ -262,7 +282,7 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Current Occupants</p>
                         <p className="text-lg sm:text-2xl font-semibold text-green-600">{houseData.currentOccupants}</p>
@@ -272,7 +292,7 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Available Beds</p>
                         <p className="text-lg sm:text-2xl font-semibold text-blue-600">{houseData.availableBeds}</p>
@@ -282,7 +302,7 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Security Level</p>
                         <p className="text-lg sm:text-2xl font-semibold text-green-600">{houseData.securityLevel}</p>
@@ -448,7 +468,7 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
                 <div className="p-4">
                   <div className="space-y-3">
                     {securityAlerts.map((alert) => (
-                      <div key={alert.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={alert.id} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center space-x-3">
                           <div className={`w-2 h-2 rounded-full ${
                             alert.severity === 'high' ? 'bg-red-500' : 

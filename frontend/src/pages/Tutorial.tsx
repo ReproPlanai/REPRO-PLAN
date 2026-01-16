@@ -333,21 +333,21 @@ const Tutorial: React.FC = () => {
             )}
 
             {/* Navigation Buttons */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <button
                 onClick={handlePrevious}
                 disabled={currentStep === 0}
-                className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto"
               >
                 <SkipBack className="w-4 h-4" />
                 <span>Previous</span>
               </button>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-end">
                 {currentStep < tutorialSteps.length - 1 ? (
                   <button
                     onClick={handleNext}
-                    className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-200"
+                    className="flex items-center justify-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-200 w-full sm:w-auto"
                   >
                     <span>Next</span>
                     <SkipForward className="w-4 h-4" />
@@ -358,7 +358,7 @@ const Tutorial: React.FC = () => {
                       handleStepComplete(currentStep);
                       navigate('/');
                     }}
-                    className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-xl hover:from-green-600 hover:to-blue-600 transition-all duration-200"
+                    className="flex items-center justify-center space-x-2 px-6 py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-xl hover:from-green-600 hover:to-blue-600 transition-all duration-200 w-full sm:w-auto"
                   >
                     <CheckCircle className="w-4 h-4" />
                     <span>Complete Tutorial</span>

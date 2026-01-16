@@ -458,7 +458,7 @@ const SecureMap: React.FC = () => {
           {isNavigating && selectedSafeHouse && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
               <div className="bg-white rounded-2xl p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4">
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900 line-clamp-1">Navigation to {selectedSafeHouse.name}</h3>
                   <button
                     onClick={() => {

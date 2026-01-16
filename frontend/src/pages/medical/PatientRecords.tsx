@@ -75,12 +75,12 @@ const PatientRecords: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">Patient Records</h2>
           <p className="text-sm text-gray-600 mt-1">Manage and view patient medical records</p>
         </div>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+        <button className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2">
           <Plus size={16} />
           <span>New Record</span>
         </button>
@@ -145,7 +145,7 @@ const PatientRecords: React.FC = () => {
       {selectedRecord && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Patient Record Details</h3>
               <button
                 onClick={() => setSelectedRecord(null)}

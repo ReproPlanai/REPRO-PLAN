@@ -62,7 +62,7 @@ const SystemSettings: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">System Settings</h2>
           <p className="text-sm text-gray-600 mt-1">Configure system-wide settings and preferences</p>
@@ -70,7 +70,7 @@ const SystemSettings: React.FC = () => {
         <button
           onClick={handleSave}
           disabled={saving}
-          className={`px-4 py-2 rounded-lg flex items-center space-x-2 ${
+          className={`w-full sm:w-auto px-4 py-2 rounded-lg flex items-center justify-center space-x-2 ${
             saved
               ? 'bg-green-600 text-white'
               : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -88,7 +88,7 @@ const SystemSettings: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
         </div>
         <div className="space-y-4">
-          <label className="flex items-center justify-between">
+          <label className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm text-gray-700">Email Alerts</span>
             <input
               type="checkbox"
@@ -97,7 +97,7 @@ const SystemSettings: React.FC = () => {
               className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
             />
           </label>
-          <label className="flex items-center justify-between">
+          <label className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm text-gray-700">SMS Alerts</span>
             <input
               type="checkbox"
@@ -106,7 +106,7 @@ const SystemSettings: React.FC = () => {
               className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
             />
           </label>
-          <label className="flex items-center justify-between">
+          <label className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm text-gray-700">Push Notifications</span>
             <input
               type="checkbox"
@@ -115,7 +115,7 @@ const SystemSettings: React.FC = () => {
               className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
             />
           </label>
-          <label className="flex items-center justify-between">
+          <label className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm text-gray-700">Emergency Alerts</span>
             <input
               type="checkbox"
@@ -134,7 +134,7 @@ const SystemSettings: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900">Security</h3>
         </div>
         <div className="space-y-4">
-          <label className="flex items-center justify-between">
+          <label className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm text-gray-700">Two-Factor Authentication</span>
             <input
               type="checkbox"
@@ -164,7 +164,7 @@ const SystemSettings: React.FC = () => {
               <option value="strong">Strong</option>
             </select>
           </div>
-          <label className="flex items-center justify-between">
+          <label className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm text-gray-700">IP Whitelist</span>
             <input
               type="checkbox"
@@ -204,7 +204,7 @@ const SystemSettings: React.FC = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <label className="flex items-center justify-between">
+          <label className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm text-gray-700">Auto Backup</span>
             <input
               type="checkbox"
@@ -241,7 +241,7 @@ const SystemSettings: React.FC = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <label className="flex items-center justify-between">
+          <label className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm text-gray-700">CORS Enabled</span>
             <input
               type="checkbox"

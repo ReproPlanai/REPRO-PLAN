@@ -108,7 +108,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
   const [userActivity] = useState([
     { id: 1, user: 'Anonymous User', action: 'Accessed chatbot', time: '5 min ago', location: 'Accra' },
     { id: 2, user: 'Anonymous User', action: 'Downloaded resource', time: '12 min ago', location: 'Kumasi' },
-    { id: 3, user: 'Anonymous User', action: 'Used emergency feature', time: '18 min ago', location: 'Tamale' }
+    { id: 3, user: 'Anonymous User', action: 'Used emergency feature', time: '18 min ago', location: 'Tamale' },
+    { id: 4, user: 'Anonymous User', action: 'Submitted mentorship request', time: '22 min ago', location: 'Monrovia' },
+    { id: 5, user: 'Anonymous User', action: 'Completed SRHR quiz', time: '30 min ago', location: 'Buchanan' },
+    { id: 6, user: 'Anonymous User', action: 'Generated QR verification', time: '45 min ago', location: 'Ganta' }
   ]);
 
   // Placeholder data for secure visualizations
@@ -234,7 +237,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                 {/* Stats Cards - Mobile Responsive */}
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Total Users</p>
                         <p className="text-lg sm:text-2xl font-semibold text-gray-900">{dashboardData.totalUsers.toLocaleString()}</p>
@@ -244,7 +247,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Active Users</p>
                         <p className="text-lg sm:text-2xl font-semibold text-gray-900">{dashboardData.activeUsers.toLocaleString()}</p>
@@ -254,7 +257,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Emergency Alerts</p>
                         <p className="text-lg sm:text-2xl font-semibold text-gray-900">{dashboardData.emergencyAlerts}</p>
@@ -264,7 +267,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">System Health</p>
                         <p className="text-lg sm:text-2xl font-semibold text-gray-900">{dashboardData.systemHealth}%</p>
@@ -376,7 +379,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                   <div className="p-3 space-y-3">
                     {userActivity.map((activity) => (
                       <div key={activity.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                           <span className="text-sm font-medium text-gray-900">{activity.user}</span>
                           <span className="text-xs text-gray-500">{activity.time}</span>
                         </div>

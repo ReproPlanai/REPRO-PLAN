@@ -55,6 +55,11 @@ A comprehensive sexual and reproductive health and rights (SRHR) platform design
 - **MEDICAL**: Healthcare and clinic management
 - **NGO**: Community outreach and support
 
+### 🔳 QR Code Verification
+- **User QR Codes**: Users generate time-limited QR codes for anonymous verification
+- **Stakeholder Scans**: Police/Medical/NGO roles scan to verify access without revealing identity
+- **Security**: QR codes expire automatically and are safe to share only with authorized staff
+
 ### 🏥 Health & Clinic Management
 - **Clinic Directory**: Location-based service finder
 - **Health Records**: Anonymous medical history tracking
@@ -134,6 +139,10 @@ Additional seeded datasets for broader role coverage:
 - Inclusive services/resources/support groups (`inclusive_services`, `inclusive_resources`, `support_groups`)
 - Storytelling posts (`srhr_stories`)
 - QR verification history (`repro-plan-verification-history`)
+
+QR verification testing:
+- Generate codes in `QR Verification` (`/qr-verification`)
+- Stakeholders can scan and review verification history
 
 Changes:
 - `frontend/src/utils/offlineStorage.ts` now handles array storage correctly and includes `seedMockData()`.

@@ -254,7 +254,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Active Alerts</p>
                         <p className="text-lg sm:text-2xl font-semibold text-red-600">{emergencyData.activeAlerts}</p>
@@ -264,7 +264,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Resolved Today</p>
                         <p className="text-lg sm:text-2xl font-semibold text-green-600">{emergencyData.resolvedToday}</p>
@@ -274,7 +274,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Avg Response Time</p>
                         <p className="text-lg sm:text-2xl font-semibold text-blue-600">{emergencyData.averageResponseTime}m</p>
@@ -284,7 +284,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Total Cases</p>
                         <p className="text-lg sm:text-2xl font-semibold text-gray-900">{emergencyData.totalCases}</p>
@@ -480,7 +480,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
                   <div className="p-3 space-y-3">
                     {recentCases.map((case_) => (
                       <div key={case_.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
-                        <div className="flex items-start justify-between">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-900">{case_.caseNumber}</p>
                             <p className="text-xs text-gray-500">{case_.type}</p>
@@ -494,7 +494,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
                           </span>
                         </div>
                         <p className="text-sm text-gray-600">{case_.location}</p>
-                        <div className="flex items-center justify-between text-xs text-gray-500">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs text-gray-500">
                           <span>Assigned: {case_.assigned}</span>
                           <div className="flex items-center space-x-3">
                             <button className="text-blue-600 hover:text-blue-800">

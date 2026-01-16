@@ -284,7 +284,7 @@ const CognitiveAccessibility: React.FC = () => {
                         : 'bg-gray-50 border-gray-200'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-2">
                       <div className="flex items-center space-x-3">
                         <Icon className={`w-5 h-5 ${feature.isEnabled ? 'text-yellow-600' : 'text-gray-500'}`} />
                         <h3 className="font-semibold text-gray-900">{feature.title}</h3>

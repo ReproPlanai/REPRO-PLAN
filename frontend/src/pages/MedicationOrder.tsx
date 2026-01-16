@@ -374,7 +374,7 @@ const MedicationOrder: React.FC = () => {
 
                       {/* Medication Info */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between mb-2">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-2">
                           <div className="flex-1 min-w-0">
                             <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
                               {medication.name}
@@ -393,7 +393,7 @@ const MedicationOrder: React.FC = () => {
                               )}
                             </div>
                           </div>
-                          <div className="text-right">
+                          <div className="text-left sm:text-right">
                             <p className="text-lg font-bold text-gray-900">${medication.price}</p>
                           </div>
                         </div>
@@ -402,8 +402,8 @@ const MedicationOrder: React.FC = () => {
                           {medication.description}
                         </p>
 
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="flex flex-wrap items-center gap-2">
                             {medication.requiresPrescription && (
                               <button
                                 onClick={() => {/* Handle prescription upload */}}
@@ -444,11 +444,11 @@ const MedicationOrder: React.FC = () => {
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <div className="flex items-start justify-between">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex-1 min-w-0">
                           <h4 className="font-semibold text-gray-900 mb-1">{pharmacy.name}</h4>
                           <p className="text-sm text-gray-600 mb-1">{pharmacy.address}</p>
-                          <div className="flex items-center space-x-3 text-xs text-gray-500">
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
                             <span>{pharmacy.distance} km away</span>
                             <span>•</span>
                             <span className={pharmacy.isOpen ? 'text-green-600' : 'text-red-600'}>
@@ -457,7 +457,7 @@ const MedicationOrder: React.FC = () => {
                           </div>
                         </div>
                         {pharmacy.deliveryAvailable && (
-                          <div className="text-right">
+                          <div className="text-left sm:text-right">
                             <p className="text-sm font-semibold text-gray-900">${pharmacy.deliveryFee} delivery</p>
                             <p className="text-xs text-gray-500">{pharmacy.deliveryTime}</p>
                           </div>
@@ -474,7 +474,7 @@ const MedicationOrder: React.FC = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">Your Cart</h3>
                   <div className="space-y-3">
                     {cart.map(item => (
-                      <div key={item.medication.id} className="flex items-center justify-between">
+                      <div key={item.medication.id} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">
                             {item.medication.name}
@@ -498,7 +498,7 @@ const MedicationOrder: React.FC = () => {
                             +
                           </button>
                         </div>
-                        <div className="text-right">
+                        <div className="text-left sm:text-right">
                           <p className="text-sm font-semibold text-gray-900">${item.price.toFixed(2)}</p>
                         </div>
                       </div>

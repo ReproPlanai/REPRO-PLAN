@@ -17,7 +17,8 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [error, setError] = useState('');
   const [isNewUser, setIsNewUser] = useState(false);
-  const [currentStep, setCurrentStep] = useState<'login' | 'signup' | 'otp' | 'forget-code'>('login');
+  const [currentStep, setCurrentStep] = useState<'login' | 'signup' | 'otp' | 'forgot-details'>('login');
+  const [forgotSent, setForgotSent] = useState(false);
 
   // Role-specific configurations
   const roleConfig = {
@@ -61,7 +62,7 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
     setIsSendingOtp(true);
 
     try {
-      // Stakeholders do not require secret codes during testing
+      // Stakeholders authenticate with role + phone/email during testing
       // In production, you'd verify the stakeholder before sending OTP
       if (phoneNumber) {
         setCurrentStep('otp');
@@ -75,25 +76,21 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
     }
   };
 
-  const handleForgetCodeSubmit = async (e: React.FormEvent) => {
+  const handleForgotDetailsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsSendingOtp(true);
 
     try {
-      const { apiService } = await import('../services/api');
-      const response = await apiService.forgetCode(surveyLink) as { success: boolean; message?: string; secretCode?: string; accountType?: string };
-
-      if (response.success && response.secretCode) {
-        // Show success message with new code
-        alert(`Your new secret code is: ${response.secretCode}\n\nPlease save this code securely. You can use it to sign in to your ${response.accountType} account.`);
-        setCurrentStep('login');
-        setSurveyLink('');
-      } else {
-        setError(response.message || 'Failed to recover code. Please check your survey link.');
+      if (!phoneNumber.trim() && !email.trim()) {
+        setError('Please provide a phone number or email address.');
+        return;
       }
+
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      setForgotSent(true);
     } catch (error: any) {
-      setError(error.message || 'Failed to recover code. Please try again.');
+      setError(error.message || 'Failed to submit request. Please try again.');
     } finally {
       setIsSendingOtp(false);
     }
@@ -112,10 +109,9 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
         email,
         surveyLink: surveyLink.trim() || undefined, // Optional for anonymity
         name: email.split('@')[0] // Use email prefix as name
-      }) as { success: boolean; message?: string; stakeholder?: { id: number | string; secretCode: string; role: string; name?: string; organization?: string; permissions?: any } };
+      }) as { success: boolean; message?: string; stakeholder?: { id: number | string; role: string; name?: string; organization?: string; permissions?: any } };
 
       if (response.success) {
-        // Store the secret code for later use
         if (response.stakeholder) {
           sessionStorage.setItem('stakeholder_id', response.stakeholder.id.toString());
         }
@@ -140,7 +136,7 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
       // In production, you would verify OTP here
       // For now, we'll accept any 6-digit code and proceed to login
       if (otpCode.length === 6) {
-        // Login stakeholder with backend (no secret code required)
+      // Login stakeholder with backend
         const response = await apiService.loginStakeholder(undefined, phoneNumber, role) as { success: boolean; message?: string; stakeholder?: { id: number | string; role: string; name?: string; organization?: string; permissions?: any } };
         
         if (response.success && response.stakeholder) {
@@ -286,10 +282,13 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
 
             <div className="text-center space-y-2">
               <button
-                onClick={() => setCurrentStep('forget-code')}
+                onClick={() => {
+                  setForgotSent(false);
+                  setCurrentStep('forgot-details');
+                }}
                 className="text-gray-600 hover:text-gray-800 text-xs sm:text-sm"
               >
-                Forgot your secret code?
+                Forgot access details?
               </button>
               <div>
                 <p className="text-xs sm:text-sm text-gray-600 mb-1">Don't have an account?</p>
@@ -300,6 +299,85 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
                 Create New Account
               </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Forgot Details Form */}
+        {currentStep === 'forgot-details' && (
+          <div className="space-y-4">
+            <div className="text-center mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">Recover Access</h2>
+              <p className="text-sm text-gray-600">
+                Provide your phone number or email and we will send recovery instructions.
+              </p>
+            </div>
+
+            {forgotSent ? (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                <p className="text-sm text-green-700">
+                  Recovery instructions sent. Please check your phone or email.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotDetailsSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="forgotPhone" className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    id="forgotPhone"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="Enter your phone number"
+                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                    disabled={isSendingOtp}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="forgotEmail" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="forgotEmail"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                    disabled={isSendingOtp}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSendingOtp}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2 text-sm"
+                >
+                  {isSendingOtp ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw size={16} />
+                      <span>Send Recovery Info</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+
+            <div className="text-center">
+              <button
+                onClick={() => setCurrentStep('login')}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              >
+                Back to Sign In
+              </button>
             </div>
           </div>
         )}
@@ -359,7 +437,7 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
                   disabled={isSendingOtp}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Optional: Provide a survey link to enable account recovery. Without it, you'll remain fully anonymous.
+                  Optional: Provide a survey link for follow-up context. Leave blank to stay fully anonymous.
                 </p>
               </div>
 
@@ -394,63 +472,6 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
           </div>
         )}
 
-        {/* Forget Code Form */}
-        {currentStep === 'forget-code' && (
-          <div className="space-y-4">
-            <div className="text-center mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">Recover Your Secret Code</h2>
-              <p className="text-sm text-gray-600">Enter your survey link to get a new secret code</p>
-            </div>
-
-            <form onSubmit={handleForgetCodeSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="surveyLink" className="block text-sm font-medium text-gray-700 mb-2">
-                  Survey Link
-                </label>
-                <input
-                  type="url"
-                  id="surveyLink"
-                  value={surveyLink}
-                  onChange={(e) => setSurveyLink(e.target.value)}
-                  placeholder="https://example.com/survey/..."
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
-                  required
-                  disabled={isSendingOtp}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Enter the survey link you provided during registration
-                </p>
-              </div>
-
-              <button
-                type="submit"
-                disabled={!surveyLink.trim() || isSendingOtp}
-                className="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
-              >
-                {isSendingOtp ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    <span>Recovering Code...</span>
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw size={18} />
-                    <span>Recover Secret Code</span>
-                  </>
-                )}
-              </button>
-            </form>
-
-            <div className="text-center">
-              <button
-                onClick={() => setCurrentStep('login')}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-              >
-                Back to Sign In
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* OTP Verification */}
         {currentStep === 'otp' && (

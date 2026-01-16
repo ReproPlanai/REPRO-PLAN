@@ -526,8 +526,8 @@ const Videos: React.FC = () => {
                     </div>
 
                     {/* Stats - Simplified */}
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center space-x-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm text-gray-500">
+                      <div className="flex flex-wrap items-center gap-4">
                         <div className="flex items-center space-x-1">
                           <Eye className="w-4 h-4" />
                           <span>{formatViews(video.views)} views</span>
@@ -622,7 +622,7 @@ const Videos: React.FC = () => {
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
             {/* Modal Header */}
             <div className="bg-gradient-to-r from-blue-500 to-green-500 text-white p-4 sm:p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center space-x-3">
                   <BookOpen className="w-6 h-6" />
                   <h3 className="text-lg sm:text-xl font-semibold">Video Description</h3>
@@ -644,7 +644,7 @@ const Videos: React.FC = () => {
               </h4>
 
               {/* Video Stats */}
-              <div className="flex items-center space-x-4 mb-4 text-sm text-gray-600">
+              <div className="flex flex-wrap items-center gap-3 mb-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-1">
                   <Eye className="w-4 h-4" />
                   <span>{formatViews(selectedVideo.views)} views</span>
@@ -656,7 +656,7 @@ const Videos: React.FC = () => {
               </div>
 
               {/* Category and Difficulty */}
-              <div className="flex items-center space-x-3 mb-4">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
                 <div className="flex items-center space-x-2">
                   {(() => {
                     const CategoryIcon = getCategoryIcon(selectedVideo.category);
@@ -709,7 +709,7 @@ const Videos: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-gray-50 px-4 sm:px-6 py-4 flex justify-end space-x-3">
+            <div className="bg-gray-50 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:justify-end gap-2 sm:gap-3">
               <button
                 onClick={closeDescriptionModal}
                 className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"

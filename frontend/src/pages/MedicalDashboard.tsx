@@ -78,13 +78,35 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
       nextAppointment: '2024-01-20',
       status: 'Active',
       priority: 'Normal'
+    },
+    {
+      id: 4,
+      name: 'Anonymous Patient D',
+      age: 28,
+      condition: 'Post-incident Care',
+      lastVisit: '2024-01-12',
+      nextAppointment: '2024-01-19',
+      status: 'Follow-up',
+      priority: 'High'
+    },
+    {
+      id: 5,
+      name: 'Anonymous Patient E',
+      age: 31,
+      condition: 'General SRHR Consultation',
+      lastVisit: '2024-01-11',
+      nextAppointment: '2024-01-18',
+      status: 'Active',
+      priority: 'Medium'
     }
   ]);
 
   const [appointments] = useState([
     { id: 1, patient: 'Anonymous Patient A', time: '09:00 AM', type: 'Prenatal Checkup', doctor: 'Dr. Johnson', status: 'Scheduled' },
     { id: 2, patient: 'Anonymous Patient B', time: '10:30 AM', type: 'STI Testing', doctor: 'Dr. Smith', status: 'In Progress' },
-    { id: 3, patient: 'Anonymous Patient C', time: '02:00 PM', type: 'Contraception Consultation', doctor: 'Dr. Brown', status: 'Scheduled' }
+    { id: 3, patient: 'Anonymous Patient C', time: '02:00 PM', type: 'Contraception Consultation', doctor: 'Dr. Brown', status: 'Scheduled' },
+    { id: 4, patient: 'Anonymous Patient D', time: '03:30 PM', type: 'Follow-up Care', doctor: 'Dr. Kromah', status: 'Scheduled' },
+    { id: 5, patient: 'Anonymous Patient E', time: '04:30 PM', type: 'SRHR Counseling', doctor: 'Dr. Doe', status: 'Scheduled' }
   ]);
 
   // Map API alerts to display format
@@ -258,7 +280,7 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Total Patients</p>
                         <p className="text-lg sm:text-2xl font-semibold text-gray-900">{medicalData.medicalMetrics.totalPatients.toLocaleString()}</p>
@@ -268,7 +290,7 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Active Patients</p>
                         <p className="text-lg sm:text-2xl font-semibold text-green-600">{medicalData.medicalMetrics.activePatients.toLocaleString()}</p>
@@ -278,7 +300,7 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Appointments Today</p>
                         <p className="text-lg sm:text-2xl font-semibold text-blue-600">{medicalData.medicalMetrics.appointmentsToday}</p>
@@ -288,7 +310,7 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                   </div>
                   
                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 truncate">Emergency Cases</p>
                         <p className="text-lg sm:text-2xl font-semibold text-red-600">{medicalData.medicalMetrics.emergencyCases}</p>
@@ -336,7 +358,7 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                           </div>
                           <div className="text-sm text-gray-600">Age: {patient.age}</div>
                           <div className="text-sm text-gray-600">Last visit: {patient.lastVisit}</div>
-                          <div className="flex items-center justify-between text-xs text-gray-500">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs text-gray-500">
                             <span className={`px-2 py-1 text-xs rounded-full border ${getPriorityColor(patient.priority)}`}>
                               {patient.priority}
                             </span>
@@ -559,7 +581,7 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                 <div className="p-4">
                   <div className="space-y-3">
                     {emergencyAlerts.map((alert) => (
-                      <div key={alert.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={alert.id} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center space-x-3">
                           <div className={`w-2 h-2 rounded-full ${
                             alert.severity === 'high' ? 'bg-red-500' : 

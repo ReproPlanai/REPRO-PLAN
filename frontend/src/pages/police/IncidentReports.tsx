@@ -52,14 +52,14 @@ const IncidentReports: React.FC<{ userData: any }> = ({ userData }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">Incident Reports</h2>
           <p className="text-sm text-gray-600 mt-1">View and manage all incident reports</p>
         </div>
         <button
           onClick={() => setShowNewReport(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+          className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2"
         >
           <Plus size={16} />
           <span>New Report</span>
@@ -94,8 +94,55 @@ const IncidentReports: React.FC<{ userData: any }> = ({ userData }) => {
 
       {/* Reports List */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        {/* Mobile Card View */}
+        <div className="block sm:hidden">
+          <div className="p-3 space-y-3">
+            {filteredReports.map((report) => (
+              <div key={report.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{report.caseNumber}</p>
+                    <p className="text-xs text-gray-500">{report.type}</p>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    report.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                    report.status === 'investigating' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-blue-100 text-blue-800'
+                  }`}>
+                    {report.status}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-600 flex items-center space-x-1">
+                  <MapPin size={14} />
+                  <span className="truncate">{report.location}</span>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs text-gray-500">
+                  <div className="flex items-center space-x-1">
+                    <Clock size={14} />
+                    <span>{new Date(report.reportedAt).toLocaleDateString()}</span>
+                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    report.priority === 'critical' ? 'bg-red-100 text-red-800' :
+                    report.priority === 'high' ? 'bg-orange-100 text-orange-800' :
+                    report.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {report.priority}
+                  </span>
+                </div>
+                <div className="flex justify-end">
+                  <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
+                    <Eye size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full min-w-[760px]">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Case #</th>

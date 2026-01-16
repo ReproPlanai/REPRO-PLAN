@@ -21,7 +21,6 @@ type MockUser = {
 
 type MockStakeholder = {
   id: number;
-  secretCode: string;
   role: string;
   phoneNumber: string;
   name?: string;
@@ -202,13 +201,54 @@ const DEFAULT_USERS: MockUser[] = [
     lastLogin: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 96).toISOString(),
     updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
+  },
+  {
+    id: 5,
+    secretCode: 'QRST5678',
+    surveyLink: 'https://repro-plan.local/survey/5',
+    demographics: {
+      gender: 'Female',
+      ageRange: '15-17',
+      county: 'Grand Bassa',
+      education: 'Secondary',
+      relationshipStatus: 'Single',
+      primaryLanguage: 'English',
+      hasChildren: 'No',
+      srhrExperience: 'Neutral'
+    },
+    phoneNumber: '+231-555-0105',
+    isVerified: true,
+    isUsed: true,
+    lastLogin: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 120).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString()
+  },
+  {
+    id: 6,
+    secretCode: 'UVWX1122',
+    surveyLink: 'https://repro-plan.local/survey/6',
+    demographics: {
+      gender: 'Male',
+      ageRange: '45-54',
+      county: 'Bomi',
+      education: 'Primary',
+      relationshipStatus: 'Married',
+      primaryLanguage: 'Bassa',
+      hasChildren: 'Yes',
+      srhrExperience: 'Prefer not to say'
+    },
+    phoneNumber: '+231-555-0106',
+    isVerified: true,
+    isUsed: true,
+    lastLogin: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 150).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString()
   }
 ];
 
 const DEFAULT_STAKEHOLDERS: MockStakeholder[] = [
   {
     id: 1,
-    secretCode: 'REPROPLAN_ADMIN_2024',
     role: 'ADMIN',
     phoneNumber: '+231-000-0001',
     name: 'Admin Tester',
@@ -220,7 +260,17 @@ const DEFAULT_STAKEHOLDERS: MockStakeholder[] = [
   },
   {
     id: 2,
-    secretCode: 'REPROPLAN_POLICE_2024',
+    role: 'ADMIN',
+    phoneNumber: '+231-000-0006',
+    name: 'Operations Lead',
+    organization: 'REPRO PLAN',
+    email: 'ops.admin@test.reproplan',
+    permissions: ['system_access', 'user_management', 'analytics'],
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 30).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString()
+  },
+  {
+    id: 3,
     role: 'POLICE',
     phoneNumber: '+231-000-0002',
     name: 'Police Tester',
@@ -231,8 +281,18 @@ const DEFAULT_STAKEHOLDERS: MockStakeholder[] = [
     updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString()
   },
   {
-    id: 3,
-    secretCode: 'REPROPLAN_SAFE_2024',
+    id: 4,
+    role: 'POLICE',
+    phoneNumber: '+231-000-0007',
+    name: 'Unit Supervisor',
+    organization: 'Liberia Police',
+    email: 'supervisor.police@test.reproplan',
+    permissions: ['emergency_alerts', 'case_management', 'reports'],
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString()
+  },
+  {
+    id: 5,
     role: 'SAFEHOUSE',
     phoneNumber: '+231-000-0003',
     name: 'Safehouse Tester',
@@ -243,8 +303,18 @@ const DEFAULT_STAKEHOLDERS: MockStakeholder[] = [
     updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString()
   },
   {
-    id: 4,
-    secretCode: 'REPROPLAN_MED_2024',
+    id: 6,
+    role: 'SAFEHOUSE',
+    phoneNumber: '+231-000-0008',
+    name: 'Shelter Manager',
+    organization: 'Hope Safe House',
+    email: 'manager.safehouse@test.reproplan',
+    permissions: ['resident_management', 'access_control', 'resources'],
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 7).toISOString()
+  },
+  {
+    id: 7,
     role: 'MEDICAL',
     phoneNumber: '+231-000-0004',
     name: 'Medical Tester',
@@ -255,8 +325,18 @@ const DEFAULT_STAKEHOLDERS: MockStakeholder[] = [
     updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString()
   },
   {
-    id: 5,
-    secretCode: 'REPROPLAN_NGO_2024',
+    id: 8,
+    role: 'MEDICAL',
+    phoneNumber: '+231-000-0009',
+    name: 'Clinic Supervisor',
+    organization: 'Monrovia Women Wellness Clinic',
+    email: 'clinic.supervisor@test.reproplan',
+    permissions: ['patient_records', 'appointments', 'medical_resources'],
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 28).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 10).toISOString()
+  },
+  {
+    id: 9,
     role: 'NGO',
     phoneNumber: '+231-000-0005',
     name: 'NGO Tester',
@@ -265,6 +345,17 @@ const DEFAULT_STAKEHOLDERS: MockStakeholder[] = [
     permissions: ['program_management', 'community_outreach', 'resource_distribution', 'impact_tracking'],
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 16).toISOString(),
     updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString()
+  },
+  {
+    id: 10,
+    role: 'NGO',
+    phoneNumber: '+231-000-0010',
+    name: 'Outreach Coordinator',
+    organization: 'Youth Outreach NGO',
+    email: 'outreach.ngo@test.reproplan',
+    permissions: ['program_management', 'community_outreach', 'impact_tracking'],
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString()
   }
 ];
 
@@ -328,6 +419,26 @@ const DEFAULT_CLINICS: MockClinic[] = [
     services: ['Emergency Care', 'First Aid', 'GBV Support'],
     coordinates: { lat: 6.3361, lng: -10.8309 },
     type: 'emergency'
+  },
+  {
+    id: 7,
+    name: 'Ganta Regional Health Center',
+    address: 'Ganta City, Nimba',
+    phone: '+231-77-630-9988',
+    hours: 'Mon - Fri: 8:00 AM - 5:00 PM',
+    services: ['Maternal Health', 'HIV Testing', 'Counseling'],
+    coordinates: { lat: 7.2314, lng: -8.9728 },
+    type: 'hospital'
+  },
+  {
+    id: 8,
+    name: 'Bensonville Youth Clinic',
+    address: 'Bensonville, Montserrado',
+    phone: '+231-88-455-2211',
+    hours: 'Mon - Sat: 9:00 AM - 6:00 PM',
+    services: ['Youth SRHR', 'Mental Health', 'Contraception'],
+    coordinates: { lat: 6.4481, lng: -10.6114 },
+    type: 'clinic'
   }
 ];
 
@@ -399,6 +510,41 @@ const DEFAULT_HEALTH_RECORDS: MockHealthRecord[] = [
       notes: 'Results to be shared via secure code'
     },
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString()
+  },
+  {
+    id: 7,
+    userId: 5,
+    recordType: 'contraception',
+    data: {
+      method: 'Injectable',
+      startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 90).toISOString(),
+      nextDose: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
+      notes: 'Follow-up reminder set'
+    },
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 20).toISOString()
+  },
+  {
+    id: 8,
+    userId: 6,
+    recordType: 'vaccination',
+    data: {
+      vaccine: 'HPV',
+      dose: '2 of 3',
+      facility: 'Bensonville Youth Clinic',
+      nextDose: new Date(Date.now() + 1000 * 60 * 60 * 24 * 60).toISOString()
+    },
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12).toISOString()
+  },
+  {
+    id: 9,
+    userId: 2,
+    recordType: 'mental_health',
+    data: {
+      counselor: 'Anonymous Counselor',
+      focus: 'Anxiety management',
+      followUp: true
+    },
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString()
   }
 ];
 
@@ -493,6 +639,68 @@ const DEFAULT_ALERTS: MockAlert[] = [
     assignedRole: 'ADMIN',
     createdAt: new Date(Date.now() - 1000 * 60 * 75).toISOString(),
     updatedAt: new Date(Date.now() - 1000 * 60 * 45).toISOString()
+  },
+  {
+    id: 7,
+    alertType: 'gbv',
+    priority: 'critical',
+    status: 'responding',
+    description: 'High-risk GBV alert reported near school zone.',
+    location: {
+      address: 'Duala Market',
+      city: 'Monrovia',
+      coordinates: { lat: 6.2876, lng: -10.7562 }
+    },
+    assignedRole: 'POLICE',
+    responseTime: 12,
+    createdAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 8).toISOString()
+  },
+  {
+    id: 8,
+    alertType: 'medical',
+    priority: 'medium',
+    status: 'active',
+    description: 'Clinic follow-up requested for medication refill.',
+    location: {
+      address: 'Paynesville Red Light',
+      city: 'Monrovia',
+      coordinates: { lat: 6.2895, lng: -10.7453 }
+    },
+    assignedRole: 'MEDICAL',
+    createdAt: new Date(Date.now() - 1000 * 60 * 140).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 90).toISOString()
+  },
+  {
+    id: 9,
+    alertType: 'safety',
+    priority: 'high',
+    status: 'active',
+    description: 'Safe house transport needed for new intake.',
+    location: {
+      address: 'ELWA Junction',
+      city: 'Monrovia',
+      coordinates: { lat: 6.2813, lng: -10.7708 }
+    },
+    assignedRole: 'SAFEHOUSE',
+    createdAt: new Date(Date.now() - 1000 * 60 * 55).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString()
+  },
+  {
+    id: 10,
+    alertType: 'community',
+    priority: 'low',
+    status: 'resolved',
+    description: 'NGO outreach follow-up completed for youth forum.',
+    location: {
+      address: 'Caldwell',
+      city: 'Monrovia',
+      coordinates: { lat: 6.3462, lng: -10.7591 }
+    },
+    assignedRole: 'NGO',
+    responseTime: 45,
+    createdAt: new Date(Date.now() - 1000 * 60 * 240).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 180).toISOString()
   }
 ];
 
@@ -608,6 +816,91 @@ const DEFAULT_CASES: MockCase[] = [
     assignedRole: 'ADMIN',
     createdAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
     updatedAt: new Date(Date.now() - 1000 * 60 * 120).toISOString()
+  },
+  {
+    id: 8,
+    caseNumber: 'CASE-0008',
+    caseType: 'gbv_response',
+    description: 'Police response and survivor safety planning.',
+    location: {
+      address: 'Duala Market',
+      city: 'Monrovia',
+      coordinates: { lat: 6.2876, lng: -10.7562 }
+    },
+    priority: 'critical',
+    status: 'in_progress',
+    assignedRole: 'POLICE',
+    relatedAlerts: [7],
+    createdAt: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 40).toISOString()
+  },
+  {
+    id: 9,
+    caseNumber: 'CASE-0009',
+    caseType: 'medical_referral',
+    description: 'Referral for emergency treatment and follow-up.',
+    location: {
+      address: 'Redemption Hospital',
+      city: 'Monrovia',
+      coordinates: { lat: 6.3221, lng: -10.7832 }
+    },
+    priority: 'high',
+    status: 'open',
+    assignedRole: 'MEDICAL',
+    relatedAlerts: [2, 8],
+    createdAt: new Date(Date.now() - 1000 * 60 * 210).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 150).toISOString()
+  },
+  {
+    id: 10,
+    caseNumber: 'CASE-0010',
+    caseType: 'shelter_transport',
+    description: 'Transport and safety handoff to safehouse.',
+    location: {
+      address: 'ELWA Junction',
+      city: 'Monrovia',
+      coordinates: { lat: 6.2813, lng: -10.7708 }
+    },
+    priority: 'high',
+    status: 'open',
+    assignedRole: 'SAFEHOUSE',
+    relatedAlerts: [9],
+    createdAt: new Date(Date.now() - 1000 * 60 * 75).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 50).toISOString()
+  },
+  {
+    id: 11,
+    caseNumber: 'CASE-0011',
+    caseType: 'community_outreach',
+    description: 'Community forum planning for SRHR awareness.',
+    location: {
+      address: 'Caldwell',
+      city: 'Monrovia',
+      coordinates: { lat: 6.3462, lng: -10.7591 }
+    },
+    priority: 'low',
+    status: 'resolved',
+    assignedRole: 'NGO',
+    relatedAlerts: [10],
+    createdAt: new Date(Date.now() - 1000 * 60 * 560).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 480).toISOString()
+  },
+  {
+    id: 12,
+    caseNumber: 'CASE-0012',
+    caseType: 'admin_review',
+    description: 'Post-incident review and reporting.',
+    location: {
+      address: 'Operations Center',
+      city: 'Monrovia',
+      coordinates: { lat: 6.3103, lng: -10.8006 }
+    },
+    priority: 'medium',
+    status: 'in_progress',
+    assignedRole: 'ADMIN',
+    relatedAlerts: [5],
+    createdAt: new Date(Date.now() - 1000 * 60 * 300).toISOString(),
+    updatedAt: new Date(Date.now() - 1000 * 60 * 220).toISOString()
   }
 ];
 
@@ -671,6 +964,69 @@ const DEFAULT_MESSAGES: MockMessage[] = [
     priority: 'medium',
     isRead: false,
     createdAt: new Date(Date.now() - 1000 * 60 * 300).toISOString()
+  },
+  {
+    id: 6,
+    fromRole: 'SAFEHOUSE',
+    fromStakeholderId: 5,
+    toRole: 'POLICE',
+    messageType: 'alert',
+    subject: 'Transport needed',
+    content: 'Requesting secure transport for new intake CASE-0010.',
+    priority: 'high',
+    isRead: false,
+    relatedCaseId: 10,
+    createdAt: new Date(Date.now() - 1000 * 60 * 95).toISOString()
+  },
+  {
+    id: 7,
+    fromRole: 'MEDICAL',
+    fromStakeholderId: 7,
+    toRole: 'SAFEHOUSE',
+    messageType: 'request',
+    subject: 'Post-visit safe housing',
+    content: 'Patient needs safe housing after emergency care.',
+    priority: 'high',
+    isRead: false,
+    relatedAlertId: 9,
+    createdAt: new Date(Date.now() - 1000 * 60 * 130).toISOString()
+  },
+  {
+    id: 8,
+    fromRole: 'ADMIN',
+    fromStakeholderId: 1,
+    toRole: 'MEDICAL',
+    messageType: 'notification',
+    subject: 'QA review',
+    content: 'Please verify emergency workflow logs for this week.',
+    priority: 'low',
+    isRead: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 420).toISOString()
+  },
+  {
+    id: 9,
+    fromRole: 'NGO',
+    fromStakeholderId: 9,
+    toRole: 'ADMIN',
+    messageType: 'update',
+    subject: 'Program milestone reached',
+    content: 'Youth forum attendance exceeded targets. Updating impact report.',
+    priority: 'medium',
+    isRead: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 520).toISOString()
+  },
+  {
+    id: 10,
+    fromRole: 'POLICE',
+    fromStakeholderId: 3,
+    toRole: 'ADMIN',
+    messageType: 'report',
+    subject: 'Incident summary',
+    content: 'Summary report for CASE-0008 is ready for review.',
+    priority: 'medium',
+    isRead: false,
+    relatedCaseId: 8,
+    createdAt: new Date(Date.now() - 1000 * 60 * 75).toISOString()
   }
 ];
 
@@ -707,10 +1063,14 @@ const ensureSeedData = (db: MockDb) => {
     }
   });
 
-  const hasStakeholder = (code: string) =>
-    db.stakeholders.some((stakeholder) => stakeholder.secretCode === code);
+  const hasStakeholder = (role: string, phoneNumber: string, email?: string) =>
+    db.stakeholders.some(
+      (stakeholder) =>
+        stakeholder.role === role &&
+        (stakeholder.phoneNumber === phoneNumber || (!!email && stakeholder.email === email))
+    );
   DEFAULT_STAKEHOLDERS.forEach((stakeholder) => {
-    if (!hasStakeholder(stakeholder.secretCode)) {
+    if (!hasStakeholder(stakeholder.role, stakeholder.phoneNumber, stakeholder.email)) {
       db.stakeholders.push({ ...stakeholder, createdAt: nowIso(), updatedAt: nowIso() });
     }
   });
@@ -814,23 +1174,6 @@ const nextId = (db: MockDb, key: keyof MockDb['idCounters']) => {
 
 const buildSurveyLink = (userId: number) => `https://repro-plan.local/survey/${userId}`;
 
-const generateStakeholderCode = () => `REPROPLAN_${secretCodeManager.generateSecretCode()}`;
-
-const getRoleFromStakeholderCode = (code: string) => {
-  if (!code.startsWith('REPROPLAN_')) return undefined;
-  const roleMatch = code.match(/REPROPLAN_(\w{4})_/);
-  if (!roleMatch) return undefined;
-  const roleCode = roleMatch[1];
-  const roleMap: { [key: string]: string } = {
-    ADMI: 'ADMIN',
-    POLI: 'POLICE',
-    SAFE: 'SAFEHOUSE',
-    MEDI: 'MEDICAL',
-    NGO_: 'NGO'
-  };
-  return roleMap[roleCode];
-};
-
 const defaultPermissions: Record<string, string[]> = {
   ADMIN: ['system_access', 'user_management', 'analytics', 'content_management'],
   POLICE: ['emergency_alerts', 'case_management', 'location_access', 'reports'],
@@ -929,10 +1272,8 @@ class APIService {
   }) {
     const db = loadDb();
     const id = nextId(db, 'stakeholder');
-    const secretCode = generateStakeholderCode();
     const stakeholder: MockStakeholder = {
       id,
-      secretCode,
       role: data.role,
       phoneNumber: data.phoneNumber,
       name: data.name,
@@ -952,23 +1293,19 @@ class APIService {
     const db = loadDb();
     let stakeholder: MockStakeholder | undefined;
 
-    if (secretCode) {
-      stakeholder = db.stakeholders.find(
-        (s) => s.secretCode.toUpperCase() === secretCode.toUpperCase()
-      );
-    }
-
-    if (!stakeholder && role && phoneNumber) {
+    if (role && phoneNumber) {
       stakeholder = db.stakeholders.find(
         (s) => s.role === role && s.phoneNumber === phoneNumber
       );
     }
+    if (!stakeholder && phoneNumber) {
+      stakeholder = db.stakeholders.find((s) => s.phoneNumber === phoneNumber);
+    }
     if (!stakeholder) {
       const id = nextId(db, 'stakeholder');
-      const derivedRole = role || (secretCode ? getRoleFromStakeholderCode(secretCode) : undefined) || 'NGO';
+      const derivedRole = role || 'NGO';
       stakeholder = {
         id,
-        secretCode: secretCode || generateStakeholderCode(),
         role: derivedRole,
         phoneNumber,
         permissions: defaultPermissions[derivedRole] || [],
