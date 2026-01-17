@@ -14,7 +14,30 @@ import {
   MessageSquare,
   Menu,
   X,
-  Settings
+  Settings,
+  ClipboardList,
+  BookOpen,
+  LifeBuoy,
+  Calendar,
+  TrendingUp,
+  Users as UsersIcon,
+  Globe2,
+  Map,
+  Package,
+  DollarSign,
+  AlertCircle,
+  Share2,
+  Truck,
+  FileText as FileTextIcon,
+  FileSignature,
+  Radio,
+  BarChart4,
+  UserPlus,
+  BellRing,
+  Users,
+  BookOpen,
+  MessageSquarePlus,
+  Book
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
@@ -23,6 +46,37 @@ import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
 // import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging'; // Reserved for future use
 import PatientRecords from './medical/PatientRecords';
 import SecurityPreferences from '../components/Settings/SecurityPreferences';
+import RoleSettingsPanel from '../components/Settings/RoleSettingsPanel';
+import RoleOperationsPanel from '../components/Settings/RoleOperationsPanel';
+import RoleCollaborationPanel from '../components/Settings/RoleCollaborationPanel';
+import RoleQuickActionsPanel from '../components/Settings/RoleQuickActionsPanel';
+import RoleTrainingPanel from '../components/Settings/RoleTrainingPanel';
+import RoleCompliancePanel from '../components/Settings/RoleCompliancePanel';
+import RoleResourcesPanel from '../components/Settings/RoleResourcesPanel';
+import RoleAuditPanel from '../components/Settings/RoleAuditPanel';
+import RoleSupportPanel from '../components/Settings/RoleSupportPanel';
+import RolePartnerDirectoryPanel from '../components/Settings/RolePartnerDirectoryPanel';
+import RoleSchedulingPanel from '../components/Settings/RoleSchedulingPanel';
+import RoleImpactPanel from '../components/Settings/RoleImpactPanel';
+import RoleGeoIntelPanel from '../components/Settings/RoleGeoIntelPanel';
+import RoleFieldOpsPanel from '../components/Settings/RoleFieldOpsPanel';
+import RoleInventoryPanel from '../components/Settings/RoleInventoryPanel';
+import RoleFundingPanel from '../components/Settings/RoleFundingPanel';
+import RoleRiskPanel from '../components/Settings/RoleRiskPanel';
+import RoleDataSharingPanel from '../components/Settings/RoleDataSharingPanel';
+import RoleTransportPanel from '../components/Settings/RoleTransportPanel';
+import RoleCaseQualityPanel from '../components/Settings/RoleCaseQualityPanel';
+import RoleGrantReportingPanel from '../components/Settings/RoleGrantReportingPanel';
+import RoleDataGovernancePanel from '../components/Settings/RoleDataGovernancePanel';
+import RolePartnerContractsPanel from '../components/Settings/RolePartnerContractsPanel';
+import RoleCrisisCommsPanel from '../components/Settings/RoleCrisisCommsPanel';
+import RoleRegionalInsightsPanel from '../components/Settings/RoleRegionalInsightsPanel';
+import RoleVolunteerPanel from '../components/Settings/RoleVolunteerPanel';
+import RolePolicyUpdatesPanel from '../components/Settings/RolePolicyUpdatesPanel';
+import RoleStakeholderDirectoryPanel from '../components/Settings/RoleStakeholderDirectoryPanel';
+import RolePlaybooksPanel from '../components/Settings/RolePlaybooksPanel';
+import RoleKnowledgeBasePanel from '../components/Settings/RoleKnowledgeBasePanel';
+import RoleFeedbackPanel from '../components/Settings/RoleFeedbackPanel';
 
 interface MedicalDashboardProps {
   userData: any;
@@ -158,6 +212,35 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
     { id: 'emergency', label: 'Emergency', icon: AlertTriangle },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'resources', label: 'Resources', icon: Pill },
+    { id: 'operations', label: 'Operations', icon: ClipboardList },
+    { id: 'training', label: 'Training', icon: CheckCircle },
+    { id: 'compliance', label: 'Compliance', icon: Shield },
+    { id: 'resources', label: 'Resources', icon: BookOpen },
+    { id: 'audits', label: 'Audit Logs', icon: ClipboardList },
+    { id: 'support', label: 'Support', icon: LifeBuoy },
+    { id: 'partners', label: 'Partners', icon: UsersIcon },
+    { id: 'scheduling', label: 'Scheduling', icon: Calendar },
+    { id: 'impact', label: 'Impact', icon: TrendingUp },
+    { id: 'geointel', label: 'Geo Intel', icon: Globe2 },
+    { id: 'fieldops', label: 'Field Ops', icon: Map },
+    { id: 'inventory', label: 'Inventory', icon: Package },
+    { id: 'funding', label: 'Funding', icon: DollarSign },
+    { id: 'risk', label: 'Risk', icon: AlertCircle },
+    { id: 'sharing', label: 'Data Sharing', icon: Share2 },
+    { id: 'transport', label: 'Transport', icon: Truck },
+    { id: 'quality', label: 'Case QA', icon: CheckCircle },
+    { id: 'grant-reports', label: 'Grant Reports', icon: FileTextIcon },
+    { id: 'governance', label: 'Governance', icon: Shield },
+    { id: 'contracts', label: 'Contracts', icon: FileSignature },
+    { id: 'crisis-comms', label: 'Crisis Comms', icon: Radio },
+    { id: 'regional', label: 'Regional', icon: BarChart4 },
+    { id: 'volunteers', label: 'Volunteers', icon: UserPlus },
+    { id: 'policy', label: 'Policy Updates', icon: BellRing },
+    { id: 'directory', label: 'Stakeholder Directory', icon: Users },
+    { id: 'playbooks', label: 'Playbooks', icon: BookOpen },
+    { id: 'knowledge', label: 'Knowledge', icon: Book },
+    { id: 'feedback', label: 'Feedback', icon: MessageSquarePlus },
+    { id: 'collaboration', label: 'Collaboration', icon: MessageSquare },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -223,13 +306,6 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                   <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse"></span>
                 )}
               </button>
-              <button
-                onClick={onLogout}
-                className="px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                <span className="hidden sm:inline">Logout</span>
-                <span className="sm:hidden">Exit</span>
-              </button>
             </div>
           </div>
         </div>
@@ -277,6 +353,14 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                   );
                 })}
               </nav>
+              <div className="mt-4 border-t border-gray-200 pt-4">
+                <button
+                  onClick={onLogout}
+                  className="w-full px-3 py-2 rounded-lg text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50"
+                >
+                  Exit Dashboard
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -648,9 +732,442 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
             </div>
           )}
 
+          {activeTab === 'operations' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Operations Center</h2>
+              <RoleQuickActionsPanel role="MEDICAL" />
+              <RoleOperationsPanel
+                role="MEDICAL"
+                title="Clinical Operations"
+                focusAreas={[
+                  'Emergency triage prioritization',
+                  'Patient follow-up coordination',
+                  'Medication stock oversight',
+                  'Referral partner collaboration'
+                ]}
+                escalationTips={[
+                  'Verify triage level and update care pathway.',
+                  'Escalate critical cases to on-call specialists.',
+                  'Coordinate transport for urgent referrals.',
+                  'Log treatment summaries within 60 minutes.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'collaboration' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Collaboration</h2>
+              <RoleCollaborationPanel
+                role="MEDICAL"
+                partnerTeams={[
+                  'Emergency Dispatch',
+                  'Police Response Unit',
+                  'NGO Health Programs',
+                  'Safe House Coordinators'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'training' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Training</h2>
+              <RoleTrainingPanel
+                role="MEDICAL"
+                modules={[
+                  { title: 'Emergency Triage Standards', status: 'Completed', duration: '40 min' },
+                  { title: 'Confidentiality Refresh', status: 'In Progress', duration: '30 min' },
+                  { title: 'Referral Coordination', status: 'Assigned', duration: '20 min' },
+                  { title: 'Trauma-Informed Care', status: 'Assigned', duration: '35 min' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'compliance' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Compliance</h2>
+              <RoleCompliancePanel
+                role="MEDICAL"
+                checklist={[
+                  'Confirm patient consent records.',
+                  'Review access log anomalies.',
+                  'Verify secure referrals.',
+                  'Submit monthly clinical compliance summary.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'resources' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Resources</h2>
+              <RoleResourcesPanel
+                role="MEDICAL"
+                resources={[
+                  { title: 'Clinical Response Protocols', type: 'PDF', updated: 'Jan 2026' },
+                  { title: 'Referral Coordination Guide', type: 'DOCX', updated: 'Dec 2025' },
+                  { title: 'Medication Stock Sheet', type: 'XLSX', updated: 'Dec 2025' },
+                  { title: 'Trauma Care Checklist', type: 'PDF', updated: 'Nov 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'audits' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Audit Logs</h2>
+              <RoleAuditPanel
+                role="MEDICAL"
+                recentAudits={[
+                  { title: 'Patient Data Review', status: 'Completed', date: 'Jan 06, 2026' },
+                  { title: 'Referral Compliance Check', status: 'In Review', date: 'Dec 18, 2025' },
+                  { title: 'Pharmacy Access Audit', status: 'Scheduled', date: 'Dec 12, 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'support' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Support</h2>
+              <RoleSupportPanel
+                role="MEDICAL"
+                contacts={[
+                  'Clinical Operations Desk',
+                  'Pharmacy Support',
+                  'Referral Network Lead',
+                  'Emergency Liaison'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'partners' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Partner Directory</h2>
+              <RolePartnerDirectoryPanel
+                role="MEDICAL"
+                partners={[
+                  { name: 'Emergency Dispatch', contact: 'dispatch@reproplan.org', focus: 'Critical routing' },
+                  { name: 'Police Response Unit', contact: 'police@reproplan.org', focus: 'Safety coordination' },
+                  { name: 'Safe House Network', contact: 'safehouses@reproplan.org', focus: 'Shelter referral' },
+                  { name: 'NGO Health Programs', contact: 'ngo@reproplan.org', focus: 'Community care' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'scheduling' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Scheduling</h2>
+              <RoleSchedulingPanel
+                role="MEDICAL"
+                upcoming={[
+                  { title: 'Case Review Round', date: 'Jan 20, 2026', time: '08:30 AM' },
+                  { title: 'Referral Partner Sync', date: 'Jan 23, 2026', time: '01:00 PM' },
+                  { title: 'Clinical Readiness Drill', date: 'Jan 27, 2026', time: '04:00 PM' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'impact' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Impact</h2>
+              <RoleImpactPanel
+                role="MEDICAL"
+                highlights={[
+                  { label: 'Patients Served', value: '1,248', change: '+9%' },
+                  { label: 'Critical Referrals', value: '112', change: '+5%' },
+                  { label: 'Avg Triage Time', value: '14m', change: '-7%' },
+                  { label: 'Follow-ups Completed', value: '386', change: '+11%' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'geointel' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Geo Intelligence</h2>
+              <RoleGeoIntelPanel
+                role="MEDICAL"
+                hotspots={[
+                  { label: 'High Demand Area', region: 'Accra', status: 'High' },
+                  { label: 'Clinic Surge', region: 'Kumasi', status: 'Elevated' },
+                  { label: 'Referral Watch', region: 'Tamale', status: 'Moderate' },
+                  { label: 'Mobile Clinic Need', region: 'Monrovia', status: 'Stable' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'fieldops' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Field Operations</h2>
+              <RoleFieldOpsPanel
+                role="MEDICAL"
+                missions={[
+                  { title: 'Mobile Clinic Deployment', region: 'Greater Accra', status: 'Active' },
+                  { title: 'Referral Partner Visit', region: 'Ashanti', status: 'Planned' },
+                  { title: 'Triage Support Team', region: 'Northern Region', status: 'In Progress' },
+                  { title: 'Community Health Day', region: 'Liberia', status: 'Planned' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'inventory' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Inventory</h2>
+              <RoleInventoryPanel
+                role="MEDICAL"
+                items={[
+                  { name: 'Medical Kits', level: '96 units', status: 'Healthy' },
+                  { name: 'Medication Stock', level: '32 crates', status: 'Monitor' },
+                  { name: 'First Aid Supplies', level: '14 kits', status: 'Low' },
+                  { name: 'Referral Forms', level: '420 units', status: 'Healthy' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'funding' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Funding</h2>
+              <RoleFundingPanel
+                role="MEDICAL"
+                grants={[
+                  { name: 'Clinical Capacity Grant', amount: '$64,000', status: 'Active' },
+                  { name: 'Mobile Health Units', amount: '$48,000', status: 'Pending' },
+                  { name: 'Medication Support Fund', amount: '$36,000', status: 'Approved' },
+                  { name: 'Referral Network Boost', amount: '$27,000', status: 'Active' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'risk' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Risk Intelligence</h2>
+              <RoleRiskPanel
+                role="MEDICAL"
+                risks={[
+                  { label: 'Critical Supply Shortage', region: 'Accra', level: 'High' },
+                  { label: 'Delayed Referral Trend', region: 'Kumasi', level: 'Moderate' },
+                  { label: 'Staff Capacity Strain', region: 'Tamale', level: 'Elevated' },
+                  { label: 'Patient Follow-up Risk', region: 'Monrovia', level: 'Moderate' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'sharing' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Data Sharing</h2>
+              <RoleDataSharingPanel
+                role="MEDICAL"
+                policies={[
+                  'Share only anonymized clinical summaries.',
+                  'Require consent confirmation for referrals.',
+                  'Log all clinical data exports.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'transport' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Transport Logistics</h2>
+              <RoleTransportPanel
+                role="MEDICAL"
+                routes={[
+                  { name: 'Referral Transfer Route A', eta: 'ETA 40m', status: 'Active' },
+                  { name: 'Mobile Clinic Route B', eta: 'ETA 1h', status: 'Planned' },
+                  { name: 'Emergency Transport Route C', eta: 'ETA 90m', status: 'In Progress' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'quality' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Case QA</h2>
+              <RoleCaseQualityPanel
+                role="MEDICAL"
+                reviews={[
+                  { title: 'Clinical Case Audit', status: 'In Progress', reviewer: 'QA Lead' },
+                  { title: 'Referral Outcome Review', status: 'Assigned', reviewer: 'Compliance' },
+                  { title: 'Patient Safety Sampling', status: 'Completed', reviewer: 'Supervisor' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'grant-reports' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Grant Reports</h2>
+              <RoleGrantReportingPanel
+                role="MEDICAL"
+                reports={[
+                  { title: 'Clinical Support Grant', status: 'Due Soon', due: 'Jan 29, 2026' },
+                  { title: 'Mobile Health Grant', status: 'Draft', due: 'Feb 06, 2026' },
+                  { title: 'Medication Access Grant', status: 'Submitted', due: 'Jan 12, 2026' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'governance' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Governance</h2>
+              <RoleDataGovernancePanel
+                role="MEDICAL"
+                policies={[
+                  'Retain clinical records per policy.',
+                  'Restrict access to sensitive patient data.',
+                  'Monthly audit of referral access.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'contracts' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Partner Contracts</h2>
+              <RolePartnerContractsPanel
+                role="MEDICAL"
+                contracts={[
+                  { name: 'Referral Network MoU', status: 'Active', renewal: 'Mar 2026' },
+                  { name: 'Emergency Support Agreement', status: 'Active', renewal: 'Apr 2026' },
+                  { name: 'Lab Services Contract', status: 'Review', renewal: 'Feb 2026' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'crisis-comms' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Crisis Communications</h2>
+              <RoleCrisisCommsPanel
+                role="MEDICAL"
+                bulletins={[
+                  { title: 'Critical Care Alert', status: 'Sent', time: '2 hours ago' },
+                  { title: 'Clinic Capacity Notice', status: 'Draft', time: 'Today' },
+                  { title: 'Referral Update', status: 'Scheduled', time: 'Tomorrow' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'regional' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Regional Insights</h2>
+              <RoleRegionalInsightsPanel
+                role="MEDICAL"
+                insights={[
+                  { region: 'Greater Accra', summary: 'High triage volume.', trend: 'Upward' },
+                  { region: 'Ashanti', summary: 'Referral network stable.', trend: 'Stable' },
+                  { region: 'Northern Region', summary: 'Resource demand rising.', trend: 'Upward' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'volunteers' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Volunteers</h2>
+              <RoleVolunteerPanel
+                role="MEDICAL"
+                volunteers={[
+                  { name: 'Clinical Volunteer', status: 'Active', skill: 'Triage' },
+                  { name: 'Support Nurse', status: 'Active', skill: 'Care' },
+                  { name: 'Referral Assistant', status: 'Onboarding', skill: 'Coordination' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'policy' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Policy Updates</h2>
+              <RolePolicyUpdatesPanel
+                role="MEDICAL"
+                updates={[
+                  { title: 'Clinical Privacy Update', date: 'Jan 16, 2026', status: 'Pending' },
+                  { title: 'Referral Data Policy', date: 'Jan 05, 2026', status: 'Acknowledged' },
+                  { title: 'Emergency Triage Standard', date: 'Dec 22, 2025', status: 'Acknowledged' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'directory' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Stakeholder Directory</h2>
+              <RoleStakeholderDirectoryPanel
+                role="MEDICAL"
+                stakeholders={[
+                  { name: 'Emergency Dispatch', focus: 'Critical routing', contact: 'dispatch@reproplan.org' },
+                  { name: 'Police Response Unit', focus: 'Safety coordination', contact: 'police@reproplan.org' },
+                  { name: 'Safe House Network', focus: 'Shelter referral', contact: 'safehouses@reproplan.org' },
+                  { name: 'NGO Health Programs', focus: 'Community care', contact: 'ngo@reproplan.org' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'playbooks' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Playbooks</h2>
+              <RolePlaybooksPanel
+                role="MEDICAL"
+                playbooks={[
+                  { title: 'Emergency Triage Playbook', status: 'Active', updated: 'Jan 2026' },
+                  { title: 'Referral Coordination Guide', status: 'Active', updated: 'Dec 2025' },
+                  { title: 'Clinical Safety Drill', status: 'Active', updated: 'Dec 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'knowledge' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Knowledge</h2>
+              <RoleKnowledgeBasePanel
+                role="MEDICAL"
+                articles={[
+                  { title: 'Clinical Privacy FAQ', category: 'Compliance', updated: 'Jan 2026' },
+                  { title: 'Emergency Triage Notes', category: 'Operations', updated: 'Dec 2025' },
+                  { title: 'Referral Best Practices', category: 'Care', updated: 'Dec 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'feedback' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Feedback</h2>
+              <RoleFeedbackPanel
+                role="MEDICAL"
+                highlights={[
+                  { title: 'Triage Workflow Notes', status: 'Open', date: 'Jan 16, 2026' },
+                  { title: 'Referral Routing Feedback', status: 'In Review', date: 'Jan 08, 2026' },
+                  { title: 'Medication Stock UI', status: 'Closed', date: 'Dec 26, 2025' }
+                ]}
+              />
+            </div>
+          )}
+
           {activeTab === 'settings' && (
             <div className="space-y-6">
               <h2 className="text-xl font-semibold text-gray-900">Settings</h2>
+              <RoleSettingsPanel
+                role="MEDICAL"
+                title="Medical Role Settings"
+                subtitle="Configure patient data access, alerts, and compliance."
+              />
               <SecurityPreferences role="MEDICAL" />
             </div>
           )}

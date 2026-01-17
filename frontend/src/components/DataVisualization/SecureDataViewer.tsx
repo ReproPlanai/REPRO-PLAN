@@ -46,6 +46,7 @@ const SecureDataViewer: React.FC<SecureDataViewerProps> = ({
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState('');
   const [ndaAccepted, setNdaAccepted] = useState(false);
+  const [ndaEnabled, setNdaEnabled] = useState(false);
   const [accessAttempts, setAccessAttempts] = useState(0);
 
   // NDA Content
@@ -123,18 +124,39 @@ const SecureDataViewer: React.FC<SecureDataViewerProps> = ({
     URL.revokeObjectURL(url);
   };
 
+  // Sync NDA preference from settings
+  useEffect(() => {
+    const storageKey = `repro-plan_security_prefs_${userRole}`;
+    const stored = localStorage.getItem(storageKey);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as { enableNda?: boolean };
+        const enabled = Boolean(parsed.enableNda);
+        setNdaEnabled(enabled);
+        setNdaAccepted(!enabled);
+        return;
+      } catch {
+        // Ignore invalid stored prefs
+      }
+    }
+    setNdaEnabled(false);
+    setNdaAccepted(true);
+  }, [userRole]);
+
   // Reset authentication after 30 minutes
   useEffect(() => {
     if (isAuthenticated) {
       const timer = setTimeout(() => {
         setIsAuthenticated(false);
-        setNdaAccepted(false);
+        if (ndaEnabled) {
+          setNdaAccepted(false);
+        }
         setOtpCode('');
       }, 30 * 60 * 1000); // 30 minutes
 
       return () => clearTimeout(timer);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, ndaEnabled]);
 
   // If not authenticated, show security gate
   if (!isAuthenticated) {
@@ -148,7 +170,7 @@ const SecureDataViewer: React.FC<SecureDataViewerProps> = ({
           <p className="text-sm text-gray-600">{description}</p>
         </div>
 
-        {!ndaAccepted ? (
+        {ndaEnabled && !ndaAccepted ? (
           <div className="space-y-4">
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">

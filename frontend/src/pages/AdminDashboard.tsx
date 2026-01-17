@@ -15,7 +15,30 @@ import {
   TrendingUp,
   Activity,
   MessageSquare,
-  FileText
+  FileText,
+  ClipboardList,
+  BookOpen,
+  LifeBuoy,
+  Calendar,
+  TrendingUp,
+  Users as UsersIcon,
+  Globe2,
+  Map,
+  Package,
+  DollarSign,
+  AlertCircle,
+  Share2,
+  Truck,
+  FileText as FileTextIcon,
+  FileSignature,
+  Radio,
+  BarChart4,
+  UserPlus,
+  BellRing,
+  Users,
+  BookOpen,
+  MessageSquarePlus,
+  Book
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
@@ -26,6 +49,37 @@ import UserManagement from './admin/UserManagement';
 import SystemSettings from './admin/SystemSettings';
 import { apiService } from '../services/api';
 import SecurityPreferences from '../components/Settings/SecurityPreferences';
+import RoleSettingsPanel from '../components/Settings/RoleSettingsPanel';
+import RoleOperationsPanel from '../components/Settings/RoleOperationsPanel';
+import RoleCollaborationPanel from '../components/Settings/RoleCollaborationPanel';
+import RoleQuickActionsPanel from '../components/Settings/RoleQuickActionsPanel';
+import RoleTrainingPanel from '../components/Settings/RoleTrainingPanel';
+import RoleCompliancePanel from '../components/Settings/RoleCompliancePanel';
+import RoleResourcesPanel from '../components/Settings/RoleResourcesPanel';
+import RoleAuditPanel from '../components/Settings/RoleAuditPanel';
+import RoleSupportPanel from '../components/Settings/RoleSupportPanel';
+import RolePartnerDirectoryPanel from '../components/Settings/RolePartnerDirectoryPanel';
+import RoleSchedulingPanel from '../components/Settings/RoleSchedulingPanel';
+import RoleImpactPanel from '../components/Settings/RoleImpactPanel';
+import RoleGeoIntelPanel from '../components/Settings/RoleGeoIntelPanel';
+import RoleFieldOpsPanel from '../components/Settings/RoleFieldOpsPanel';
+import RoleInventoryPanel from '../components/Settings/RoleInventoryPanel';
+import RoleFundingPanel from '../components/Settings/RoleFundingPanel';
+import RoleRiskPanel from '../components/Settings/RoleRiskPanel';
+import RoleDataSharingPanel from '../components/Settings/RoleDataSharingPanel';
+import RoleTransportPanel from '../components/Settings/RoleTransportPanel';
+import RoleCaseQualityPanel from '../components/Settings/RoleCaseQualityPanel';
+import RoleGrantReportingPanel from '../components/Settings/RoleGrantReportingPanel';
+import RoleDataGovernancePanel from '../components/Settings/RoleDataGovernancePanel';
+import RolePartnerContractsPanel from '../components/Settings/RolePartnerContractsPanel';
+import RoleCrisisCommsPanel from '../components/Settings/RoleCrisisCommsPanel';
+import RoleRegionalInsightsPanel from '../components/Settings/RoleRegionalInsightsPanel';
+import RoleVolunteerPanel from '../components/Settings/RoleVolunteerPanel';
+import RolePolicyUpdatesPanel from '../components/Settings/RolePolicyUpdatesPanel';
+import RoleStakeholderDirectoryPanel from '../components/Settings/RoleStakeholderDirectoryPanel';
+import RolePlaybooksPanel from '../components/Settings/RolePlaybooksPanel';
+import RoleKnowledgeBasePanel from '../components/Settings/RoleKnowledgeBasePanel';
+import RoleFeedbackPanel from '../components/Settings/RoleFeedbackPanel';
 
 interface AdminDashboardProps {
   userData: any;
@@ -141,6 +195,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+    { id: 'operations', label: 'Operations', icon: ClipboardList },
+    { id: 'training', label: 'Training', icon: CheckCircle },
+    { id: 'compliance', label: 'Compliance', icon: Shield },
+    { id: 'resources', label: 'Resources', icon: BookOpen },
+    { id: 'audits', label: 'Audit Logs', icon: ClipboardList },
+    { id: 'support', label: 'Support', icon: LifeBuoy },
+    { id: 'partners', label: 'Partners', icon: UsersIcon },
+    { id: 'scheduling', label: 'Scheduling', icon: Calendar },
+    { id: 'impact', label: 'Impact', icon: TrendingUp },
+    { id: 'geointel', label: 'Geo Intel', icon: Globe2 },
+    { id: 'fieldops', label: 'Field Ops', icon: Map },
+    { id: 'inventory', label: 'Inventory', icon: Package },
+    { id: 'funding', label: 'Funding', icon: DollarSign },
+    { id: 'risk', label: 'Risk', icon: AlertCircle },
+    { id: 'sharing', label: 'Data Sharing', icon: Share2 },
+    { id: 'transport', label: 'Transport', icon: Truck },
+    { id: 'quality', label: 'Case QA', icon: CheckCircle },
+    { id: 'grant-reports', label: 'Grant Reports', icon: FileTextIcon },
+    { id: 'governance', label: 'Governance', icon: Shield },
+    { id: 'contracts', label: 'Contracts', icon: FileSignature },
+    { id: 'crisis-comms', label: 'Crisis Comms', icon: Radio },
+    { id: 'regional', label: 'Regional', icon: BarChart4 },
+    { id: 'volunteers', label: 'Volunteers', icon: UserPlus },
+    { id: 'policy', label: 'Policy Updates', icon: BellRing },
+    { id: 'directory', label: 'Stakeholder Directory', icon: Users },
+    { id: 'playbooks', label: 'Playbooks', icon: BookOpen },
+    { id: 'knowledge', label: 'Knowledge', icon: Book },
+    { id: 'feedback', label: 'Feedback', icon: MessageSquarePlus },
+    { id: 'collaboration', label: 'Collaboration', icon: MessageSquare },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -177,13 +260,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                 {recentAlerts.filter(alert => alert.status === 'active').length > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full"></span>
                 )}
-              </button>
-              <button
-                onClick={onLogout}
-                className="px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                <span className="hidden sm:inline">Logout</span>
-                <span className="sm:hidden">Exit</span>
               </button>
             </div>
           </div>
@@ -232,6 +308,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                   );
                 })}
               </nav>
+              <div className="mt-4 border-t border-gray-200 pt-4">
+                <button
+                  onClick={onLogout}
+                  className="w-full px-3 py-2 rounded-lg text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50"
+                >
+                  Exit Dashboard
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -507,9 +591,442 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
             </div>
           )}
 
+          {activeTab === 'operations' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Operations Center</h2>
+              <RoleQuickActionsPanel role="ADMIN" />
+              <RoleOperationsPanel
+                role="ADMIN"
+                title="System Operations"
+                focusAreas={[
+                  'User escalation workflows',
+                  'Cross-role incident triage',
+                  'Platform compliance monitoring',
+                  'High-risk case routing'
+                ]}
+                escalationTips={[
+                  'Validate incident severity and assign a lead responder.',
+                  'Notify partner stakeholders within agreed SLAs.',
+                  'Log audit trails for every sensitive data access.',
+                  'Schedule post-incident review within 24 hours.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'collaboration' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Collaboration</h2>
+              <RoleCollaborationPanel
+                role="ADMIN"
+                partnerTeams={[
+                  'Police Response Unit',
+                  'Medical Response Team',
+                  'NGO Program Leads',
+                  'Safe House Coordinators'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'training' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Training</h2>
+              <RoleTrainingPanel
+                role="ADMIN"
+                modules={[
+                  { title: 'System Security Briefing', status: 'Completed', duration: '45 min' },
+                  { title: 'Incident Escalation Protocols', status: 'In Progress', duration: '30 min' },
+                  { title: 'Compliance Update', status: 'Assigned', duration: '25 min' },
+                  { title: 'Cross-Role Collaboration', status: 'Assigned', duration: '20 min' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'compliance' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Compliance</h2>
+              <RoleCompliancePanel
+                role="ADMIN"
+                checklist={[
+                  'Review access logs and sensitive data exports.',
+                  'Confirm NDA confirmations remain active.',
+                  'Validate emergency response audits.',
+                  'Export monthly compliance summary.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'resources' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Resources</h2>
+              <RoleResourcesPanel
+                role="ADMIN"
+                resources={[
+                  { title: 'Incident Response Handbook', type: 'PDF', updated: 'Jan 2026' },
+                  { title: 'Stakeholder SOPs', type: 'DOCX', updated: 'Dec 2025' },
+                  { title: 'Data Governance Guide', type: 'PDF', updated: 'Dec 2025' },
+                  { title: 'Monthly Reporting Template', type: 'XLSX', updated: 'Nov 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'audits' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Audit Logs</h2>
+              <RoleAuditPanel
+                role="ADMIN"
+                recentAudits={[
+                  { title: 'Quarterly Data Access Review', status: 'Completed', date: 'Jan 05, 2026' },
+                  { title: 'Emergency Response Audit', status: 'In Review', date: 'Dec 22, 2025' },
+                  { title: 'Stakeholder Access Check', status: 'Scheduled', date: 'Dec 10, 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'support' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Support</h2>
+              <RoleSupportPanel
+                role="ADMIN"
+                contacts={[
+                  'Platform Operations Desk',
+                  'Data Privacy Officer',
+                  'Security Engineering Team',
+                  'Stakeholder Success Lead'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'partners' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Partner Directory</h2>
+              <RolePartnerDirectoryPanel
+                role="ADMIN"
+                partners={[
+                  { name: 'National Emergency Dispatch', contact: 'dispatch@reproplan.org', focus: 'Emergency routing' },
+                  { name: 'Regional Medical Network', contact: 'medical@reproplan.org', focus: 'Clinical escalation' },
+                  { name: 'Safe House Alliance', contact: 'safehouses@reproplan.org', focus: 'Shelter coordination' },
+                  { name: 'Youth Outreach Coalition', contact: 'outreach@reproplan.org', focus: 'Community programs' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'scheduling' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Scheduling</h2>
+              <RoleSchedulingPanel
+                role="ADMIN"
+                upcoming={[
+                  { title: 'Stakeholder Coordination Call', date: 'Jan 20, 2026', time: '09:00 AM' },
+                  { title: 'Monthly Compliance Review', date: 'Jan 24, 2026', time: '02:00 PM' },
+                  { title: 'Incident Response Drill', date: 'Jan 28, 2026', time: '11:00 AM' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'impact' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Impact</h2>
+              <RoleImpactPanel
+                role="ADMIN"
+                highlights={[
+                  { label: 'Incidents Resolved', value: '312', change: '+8%' },
+                  { label: 'Stakeholder Coverage', value: '92%', change: '+3%' },
+                  { label: 'Avg Response Time', value: '18m', change: '-6%' },
+                  { label: 'Community Reach', value: '28k', change: '+12%' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'geointel' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Geo Intelligence</h2>
+              <RoleGeoIntelPanel
+                role="ADMIN"
+                hotspots={[
+                  { label: 'Hotspot Alpha', region: 'Accra', status: 'High' },
+                  { label: 'Hotspot Bravo', region: 'Kumasi', status: 'Moderate' },
+                  { label: 'Hotspot Delta', region: 'Tamale', status: 'Elevated' },
+                  { label: 'Hotspot Echo', region: 'Monrovia', status: 'Stable' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'fieldops' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Field Operations</h2>
+              <RoleFieldOpsPanel
+                role="ADMIN"
+                missions={[
+                  { title: 'Incident Assessment Team', region: 'Greater Accra', status: 'Active' },
+                  { title: 'Stakeholder Field Visit', region: 'Ashanti', status: 'Planned' },
+                  { title: 'Community Safety Audit', region: 'Northern Region', status: 'In Progress' },
+                  { title: 'Partnership Outreach', region: 'Liberia', status: 'Planned' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'inventory' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Inventory</h2>
+              <RoleInventoryPanel
+                role="ADMIN"
+                items={[
+                  { name: 'Emergency Kits', level: '142 units', status: 'Healthy' },
+                  { name: 'Mobile Devices', level: '58 units', status: 'Monitor' },
+                  { name: 'Safety Gear', level: '37 units', status: 'Low' },
+                  { name: 'Printed Materials', level: '620 units', status: 'Healthy' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'funding' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Funding</h2>
+              <RoleFundingPanel
+                role="ADMIN"
+                grants={[
+                  { name: 'Youth Safety Expansion', amount: '$120,000', status: 'Active' },
+                  { name: 'Emergency Response Fund', amount: '$75,000', status: 'Pending' },
+                  { name: 'Data Security Upgrade', amount: '$42,000', status: 'Approved' },
+                  { name: 'Regional Partner Grants', amount: '$55,000', status: 'Active' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'risk' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Risk Intelligence</h2>
+              <RoleRiskPanel
+                role="ADMIN"
+                risks={[
+                  { label: 'Data Access Anomaly', region: 'Accra', level: 'High' },
+                  { label: 'Delayed Response Trend', region: 'Kumasi', level: 'Moderate' },
+                  { label: 'Partner Capacity Strain', region: 'Tamale', level: 'Elevated' },
+                  { label: 'Funding Gap Risk', region: 'Monrovia', level: 'Moderate' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'sharing' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Data Sharing</h2>
+              <RoleDataSharingPanel
+                role="ADMIN"
+                policies={[
+                  'Share only anonymized reports with partners.',
+                  'Require NDA confirmation for sensitive data.',
+                  'Log all exports with audit trails.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'transport' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Transport Logistics</h2>
+              <RoleTransportPanel
+                role="ADMIN"
+                routes={[
+                  { name: 'Emergency Support Route A', eta: 'ETA 45m', status: 'Active' },
+                  { name: 'Partner Delivery Route B', eta: 'ETA 2h', status: 'Planned' },
+                  { name: 'Regional Transfer Route C', eta: 'ETA 3h', status: 'In Progress' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'quality' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Case QA</h2>
+              <RoleCaseQualityPanel
+                role="ADMIN"
+                reviews={[
+                  { title: 'Emergency Case Review', status: 'In Progress', reviewer: 'QA Lead' },
+                  { title: 'Partner Escalation Audit', status: 'Assigned', reviewer: 'Compliance' },
+                  { title: 'Stakeholder Case Sampling', status: 'Completed', reviewer: 'Admin' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'grant-reports' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Grant Reports</h2>
+              <RoleGrantReportingPanel
+                role="ADMIN"
+                reports={[
+                  { title: 'Emergency Response Grant', status: 'Due Soon', due: 'Jan 30, 2026' },
+                  { title: 'Regional Growth Fund', status: 'Draft', due: 'Feb 10, 2026' },
+                  { title: 'Security Upgrade Grant', status: 'Submitted', due: 'Jan 12, 2026' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'governance' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Governance</h2>
+              <RoleDataGovernancePanel
+                role="ADMIN"
+                policies={[
+                  'Enforce 90-day retention for operational logs.',
+                  'Require NDA confirmation for sensitive exports.',
+                  'Quarterly access reviews for all stakeholders.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'contracts' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Partner Contracts</h2>
+              <RolePartnerContractsPanel
+                role="ADMIN"
+                contracts={[
+                  { name: 'Emergency Dispatch MoU', status: 'Active', renewal: 'Mar 2026' },
+                  { name: 'Safe House Alliance MoU', status: 'Active', renewal: 'Apr 2026' },
+                  { name: 'Medical Network Agreement', status: 'Review', renewal: 'Feb 2026' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'crisis-comms' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Crisis Communications</h2>
+              <RoleCrisisCommsPanel
+                role="ADMIN"
+                bulletins={[
+                  { title: 'Rapid Response Advisory', status: 'Sent', time: '2 hours ago' },
+                  { title: 'Partner Safety Update', status: 'Draft', time: 'Today' },
+                  { title: 'Coverage Notice', status: 'Scheduled', time: 'Tomorrow' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'regional' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Regional Insights</h2>
+              <RoleRegionalInsightsPanel
+                role="ADMIN"
+                insights={[
+                  { region: 'Greater Accra', summary: 'Alert volume rising by 12%.', trend: 'Upward' },
+                  { region: 'Ashanti', summary: 'Partner coverage steady with new outreach.', trend: 'Stable' },
+                  { region: 'Northern Region', summary: 'Referral demand increasing.', trend: 'Upward' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'volunteers' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Volunteers</h2>
+              <RoleVolunteerPanel
+                role="ADMIN"
+                volunteers={[
+                  { name: 'Volunteer Coordinator', status: 'Active', skill: 'Operations' },
+                  { name: 'Outreach Lead', status: 'Active', skill: 'Community' },
+                  { name: 'Data Support', status: 'Onboarding', skill: 'Analytics' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'policy' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Policy Updates</h2>
+              <RolePolicyUpdatesPanel
+                role="ADMIN"
+                updates={[
+                  { title: 'Data Handling Update', date: 'Jan 15, 2026', status: 'Pending' },
+                  { title: 'Incident Reporting Standard', date: 'Jan 10, 2026', status: 'Acknowledged' },
+                  { title: 'Partner Access Policy', date: 'Dec 28, 2025', status: 'Acknowledged' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'directory' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Stakeholder Directory</h2>
+              <RoleStakeholderDirectoryPanel
+                role="ADMIN"
+                stakeholders={[
+                  { name: 'Police Response Unit', focus: 'Emergency response', contact: 'police@reproplan.org' },
+                  { name: 'Medical Response Team', focus: 'Clinical triage', contact: 'medical@reproplan.org' },
+                  { name: 'Safe House Coordinators', focus: 'Shelter support', contact: 'safehouses@reproplan.org' },
+                  { name: 'NGO Program Leads', focus: 'Community outreach', contact: 'ngo@reproplan.org' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'playbooks' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Playbooks</h2>
+              <RolePlaybooksPanel
+                role="ADMIN"
+                playbooks={[
+                  { title: 'Emergency Response Playbook', status: 'Active', updated: 'Jan 2026' },
+                  { title: 'Partner Escalation Guide', status: 'Active', updated: 'Dec 2025' },
+                  { title: 'Data Breach Response', status: 'Active', updated: 'Dec 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'knowledge' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Knowledge</h2>
+              <RoleKnowledgeBasePanel
+                role="ADMIN"
+                articles={[
+                  { title: 'Stakeholder Governance FAQ', category: 'Governance', updated: 'Jan 2026' },
+                  { title: 'Incident Escalation Guide', category: 'Operations', updated: 'Dec 2025' },
+                  { title: 'Data Security Checklist', category: 'Security', updated: 'Dec 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'feedback' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Feedback</h2>
+              <RoleFeedbackPanel
+                role="ADMIN"
+                highlights={[
+                  { title: 'Dashboard UI Update', status: 'Open', date: 'Jan 18, 2026' },
+                  { title: 'Report Export Request', status: 'In Review', date: 'Jan 12, 2026' },
+                  { title: 'Access Controls Feedback', status: 'Closed', date: 'Dec 28, 2025' }
+                ]}
+              />
+            </div>
+          )}
+
           {/* Settings Tab */}
           {activeTab === 'settings' && (
             <div className="space-y-4 sm:space-y-6">
+              <RoleSettingsPanel
+                role="ADMIN"
+                title="Administrator Settings"
+                subtitle="Configure access controls, reporting, and compliance preferences."
+              />
               <SystemSettings />
               <SecurityPreferences role="ADMIN" />
             </div>

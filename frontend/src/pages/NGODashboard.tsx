@@ -13,7 +13,30 @@ import {
   MessageSquare,
   Menu,
   X,
-  Settings
+  Settings,
+  ClipboardList,
+  BookOpen,
+  LifeBuoy,
+  Calendar,
+  TrendingUp,
+  Users as UsersIcon,
+  Globe2,
+  Map,
+  Package,
+  DollarSign,
+  AlertCircle,
+  Share2,
+  Truck,
+  FileText as FileTextIcon,
+  FileSignature,
+  Radio,
+  BarChart4,
+  UserPlus,
+  BellRing,
+  Users,
+  BookOpen,
+  MessageSquarePlus,
+  Book
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
@@ -22,6 +45,37 @@ import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
 // import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging'; // Reserved for future use
 import ProgramDetails from './ngo/ProgramDetails';
 import SecurityPreferences from '../components/Settings/SecurityPreferences';
+import RoleSettingsPanel from '../components/Settings/RoleSettingsPanel';
+import RoleOperationsPanel from '../components/Settings/RoleOperationsPanel';
+import RoleCollaborationPanel from '../components/Settings/RoleCollaborationPanel';
+import RoleQuickActionsPanel from '../components/Settings/RoleQuickActionsPanel';
+import RoleTrainingPanel from '../components/Settings/RoleTrainingPanel';
+import RoleCompliancePanel from '../components/Settings/RoleCompliancePanel';
+import RoleResourcesPanel from '../components/Settings/RoleResourcesPanel';
+import RoleAuditPanel from '../components/Settings/RoleAuditPanel';
+import RoleSupportPanel from '../components/Settings/RoleSupportPanel';
+import RolePartnerDirectoryPanel from '../components/Settings/RolePartnerDirectoryPanel';
+import RoleSchedulingPanel from '../components/Settings/RoleSchedulingPanel';
+import RoleImpactPanel from '../components/Settings/RoleImpactPanel';
+import RoleGeoIntelPanel from '../components/Settings/RoleGeoIntelPanel';
+import RoleFieldOpsPanel from '../components/Settings/RoleFieldOpsPanel';
+import RoleInventoryPanel from '../components/Settings/RoleInventoryPanel';
+import RoleFundingPanel from '../components/Settings/RoleFundingPanel';
+import RoleRiskPanel from '../components/Settings/RoleRiskPanel';
+import RoleDataSharingPanel from '../components/Settings/RoleDataSharingPanel';
+import RoleTransportPanel from '../components/Settings/RoleTransportPanel';
+import RoleCaseQualityPanel from '../components/Settings/RoleCaseQualityPanel';
+import RoleGrantReportingPanel from '../components/Settings/RoleGrantReportingPanel';
+import RoleDataGovernancePanel from '../components/Settings/RoleDataGovernancePanel';
+import RolePartnerContractsPanel from '../components/Settings/RolePartnerContractsPanel';
+import RoleCrisisCommsPanel from '../components/Settings/RoleCrisisCommsPanel';
+import RoleRegionalInsightsPanel from '../components/Settings/RoleRegionalInsightsPanel';
+import RoleVolunteerPanel from '../components/Settings/RoleVolunteerPanel';
+import RolePolicyUpdatesPanel from '../components/Settings/RolePolicyUpdatesPanel';
+import RoleStakeholderDirectoryPanel from '../components/Settings/RoleStakeholderDirectoryPanel';
+import RolePlaybooksPanel from '../components/Settings/RolePlaybooksPanel';
+import RoleKnowledgeBasePanel from '../components/Settings/RoleKnowledgeBasePanel';
+import RoleFeedbackPanel from '../components/Settings/RoleFeedbackPanel';
 
 interface NGODashboardProps {
   userData: any;
@@ -167,6 +221,35 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
     { id: 'impact', label: 'Impact', icon: TrendingUp },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'resources', label: 'Resources', icon: FileText },
+    { id: 'operations', label: 'Operations', icon: ClipboardList },
+    { id: 'training', label: 'Training', icon: CheckCircle },
+    { id: 'compliance', label: 'Compliance', icon: Shield },
+    { id: 'resources', label: 'Resources', icon: BookOpen },
+    { id: 'audits', label: 'Audit Logs', icon: ClipboardList },
+    { id: 'support', label: 'Support', icon: LifeBuoy },
+    { id: 'partners', label: 'Partners', icon: UsersIcon },
+    { id: 'scheduling', label: 'Scheduling', icon: Calendar },
+    { id: 'impact', label: 'Impact', icon: TrendingUp },
+    { id: 'geointel', label: 'Geo Intel', icon: Globe2 },
+    { id: 'fieldops', label: 'Field Ops', icon: Map },
+    { id: 'inventory', label: 'Inventory', icon: Package },
+    { id: 'funding', label: 'Funding', icon: DollarSign },
+    { id: 'risk', label: 'Risk', icon: AlertCircle },
+    { id: 'sharing', label: 'Data Sharing', icon: Share2 },
+    { id: 'transport', label: 'Transport', icon: Truck },
+    { id: 'quality', label: 'Case QA', icon: CheckCircle },
+    { id: 'grant-reports', label: 'Grant Reports', icon: FileTextIcon },
+    { id: 'governance', label: 'Governance', icon: Shield },
+    { id: 'contracts', label: 'Contracts', icon: FileSignature },
+    { id: 'crisis-comms', label: 'Crisis Comms', icon: Radio },
+    { id: 'regional', label: 'Regional', icon: BarChart4 },
+    { id: 'volunteers', label: 'Volunteers', icon: UserPlus },
+    { id: 'policy', label: 'Policy Updates', icon: BellRing },
+    { id: 'directory', label: 'Stakeholder Directory', icon: Users },
+    { id: 'playbooks', label: 'Playbooks', icon: BookOpen },
+    { id: 'knowledge', label: 'Knowledge', icon: Book },
+    { id: 'feedback', label: 'Feedback', icon: MessageSquarePlus },
+    { id: 'collaboration', label: 'Collaboration', icon: MessageSquare },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -216,13 +299,6 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                 <Bell size={18} className="sm:w-5 sm:h-5" />
                 <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-orange-500 rounded-full"></span>
               </button>
-              <button
-                onClick={onLogout}
-                className="px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                <span className="hidden sm:inline">Logout</span>
-                <span className="sm:hidden">Exit</span>
-              </button>
             </div>
           </div>
         </div>
@@ -270,6 +346,14 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                   );
                 })}
               </nav>
+              <div className="mt-4 border-t border-gray-200 pt-4">
+                <button
+                  onClick={onLogout}
+                  className="w-full px-3 py-2 rounded-lg text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50"
+                >
+                  Exit Dashboard
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -649,10 +733,443 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
             </div>
           )}
 
+          {activeTab === 'operations' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Operations Center</h2>
+              <RoleQuickActionsPanel role="NGO" />
+              <RoleOperationsPanel
+                role="NGO"
+                title="Program Operations"
+                focusAreas={[
+                  'Community outreach coordination',
+                  'Partner reporting schedules',
+                  'Resource allocation planning',
+                  'Impact narrative preparation'
+                ]}
+                escalationTips={[
+                  'Identify communities needing urgent support.',
+                  'Notify partners of program changes within 24 hours.',
+                  'Document beneficiary safety concerns.',
+                  'Schedule follow-up assessments after escalations.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'collaboration' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Collaboration</h2>
+              <RoleCollaborationPanel
+                role="NGO"
+                partnerTeams={[
+                  'Community Health Clinics',
+                  'Safe House Coordinators',
+                  'Police Response Unit',
+                  'Medical Response Team'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'training' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Training</h2>
+              <RoleTrainingPanel
+                role="NGO"
+                modules={[
+                  { title: 'Community Outreach Essentials', status: 'Completed', duration: '30 min' },
+                  { title: 'Safeguarding & Ethics', status: 'In Progress', duration: '35 min' },
+                  { title: 'Impact Reporting', status: 'Assigned', duration: '25 min' },
+                  { title: 'Partner Coordination', status: 'Assigned', duration: '20 min' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'compliance' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Compliance</h2>
+              <RoleCompliancePanel
+                role="NGO"
+                checklist={[
+                  'Validate beneficiary consent records.',
+                  'Confirm funding compliance requirements.',
+                  'Review partner MoUs for updates.',
+                  'Prepare quarterly impact compliance note.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'resources' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Resources</h2>
+              <RoleResourcesPanel
+                role="NGO"
+                resources={[
+                  { title: 'Community Outreach Kit', type: 'PDF', updated: 'Jan 2026' },
+                  { title: 'Program Budget Template', type: 'XLSX', updated: 'Dec 2025' },
+                  { title: 'Safeguarding Checklist', type: 'DOCX', updated: 'Dec 2025' },
+                  { title: 'Impact Story Guide', type: 'PDF', updated: 'Nov 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'audits' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Audit Logs</h2>
+              <RoleAuditPanel
+                role="NGO"
+                recentAudits={[
+                  { title: 'Beneficiary Data Review', status: 'Completed', date: 'Jan 07, 2026' },
+                  { title: 'Program Compliance Audit', status: 'In Review', date: 'Dec 19, 2025' },
+                  { title: 'Partner Access Check', status: 'Scheduled', date: 'Dec 11, 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'support' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Support</h2>
+              <RoleSupportPanel
+                role="NGO"
+                contacts={[
+                  'Program Operations Desk',
+                  'Community Liaison',
+                  'Funding Compliance Support',
+                  'Partner Success Lead'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'partners' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Partner Directory</h2>
+              <RolePartnerDirectoryPanel
+                role="NGO"
+                partners={[
+                  { name: 'Community Clinics Network', contact: 'clinics@reproplan.org', focus: 'Health delivery' },
+                  { name: 'Safe House Alliance', contact: 'safehouses@reproplan.org', focus: 'Shelter support' },
+                  { name: 'Police Response Unit', contact: 'police@reproplan.org', focus: 'Safety escalation' },
+                  { name: 'Medical Response Team', contact: 'medical@reproplan.org', focus: 'Clinical coordination' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'scheduling' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Scheduling</h2>
+              <RoleSchedulingPanel
+                role="NGO"
+                upcoming={[
+                  { title: 'Community Outreach Sprint', date: 'Jan 21, 2026', time: '09:30 AM' },
+                  { title: 'Partner Impact Review', date: 'Jan 25, 2026', time: '12:00 PM' },
+                  { title: 'Volunteer Training', date: 'Jan 29, 2026', time: '03:30 PM' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'impact' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Impact</h2>
+              <RoleImpactPanel
+                role="NGO"
+                highlights={[
+                  { label: 'Youth Reached', value: '3,420', change: '+13%' },
+                  { label: 'Workshops Delivered', value: '68', change: '+7%' },
+                  { label: 'Active Programs', value: '14', change: '+4%' },
+                  { label: 'Partner Engagements', value: '92', change: '+10%' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'geointel' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Geo Intelligence</h2>
+              <RoleGeoIntelPanel
+                role="NGO"
+                hotspots={[
+                  { label: 'Outreach Cluster', region: 'Accra', status: 'High' },
+                  { label: 'Youth Support Need', region: 'Kumasi', status: 'Elevated' },
+                  { label: 'Program Expansion', region: 'Tamale', status: 'Moderate' },
+                  { label: 'Partner Opportunity', region: 'Monrovia', status: 'Stable' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'fieldops' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Field Operations</h2>
+              <RoleFieldOpsPanel
+                role="NGO"
+                missions={[
+                  { title: 'Community Outreach Drive', region: 'Greater Accra', status: 'Active' },
+                  { title: 'Youth Workshop Series', region: 'Ashanti', status: 'Planned' },
+                  { title: 'Safe Space Activation', region: 'Northern Region', status: 'In Progress' },
+                  { title: 'Partner Field Visit', region: 'Liberia', status: 'Planned' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'inventory' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Inventory</h2>
+              <RoleInventoryPanel
+                role="NGO"
+                items={[
+                  { name: 'Education Kits', level: '110 units', status: 'Healthy' },
+                  { name: 'Workshop Materials', level: '46 bundles', status: 'Monitor' },
+                  { name: 'Awareness Flyers', level: '980 units', status: 'Healthy' },
+                  { name: 'Hygiene Supplies', level: '28 kits', status: 'Low' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'funding' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Funding</h2>
+              <RoleFundingPanel
+                role="NGO"
+                grants={[
+                  { name: 'Community Outreach Grant', amount: '$52,000', status: 'Active' },
+                  { name: 'Youth Wellness Fund', amount: '$39,000', status: 'Pending' },
+                  { name: 'Education Materials Support', amount: '$22,000', status: 'Approved' },
+                  { name: 'Partner Expansion Fund', amount: '$33,000', status: 'Active' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'risk' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Risk Intelligence</h2>
+              <RoleRiskPanel
+                role="NGO"
+                risks={[
+                  { label: 'Program Capacity Risk', region: 'Accra', level: 'High' },
+                  { label: 'Volunteer Availability', region: 'Kumasi', level: 'Moderate' },
+                  { label: 'Partner Coverage Gap', region: 'Tamale', level: 'Elevated' },
+                  { label: 'Funding Continuity', region: 'Monrovia', level: 'Moderate' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'sharing' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Data Sharing</h2>
+              <RoleDataSharingPanel
+                role="NGO"
+                policies={[
+                  'Share anonymized program outcomes only.',
+                  'Remove beneficiary identifiers.',
+                  'Maintain partner consent records.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'transport' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Transport Logistics</h2>
+              <RoleTransportPanel
+                role="NGO"
+                routes={[
+                  { name: 'Outreach Route A', eta: 'ETA 50m', status: 'Active' },
+                  { name: 'Workshop Delivery Route B', eta: 'ETA 1h', status: 'Planned' },
+                  { name: 'Partner Support Route C', eta: 'ETA 2h', status: 'In Progress' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'quality' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Case QA</h2>
+              <RoleCaseQualityPanel
+                role="NGO"
+                reviews={[
+                  { title: 'Program Impact Review', status: 'In Progress', reviewer: 'QA Lead' },
+                  { title: 'Beneficiary Feedback Audit', status: 'Assigned', reviewer: 'Compliance' },
+                  { title: 'Partner Delivery Check', status: 'Completed', reviewer: 'Supervisor' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'grant-reports' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Grant Reports</h2>
+              <RoleGrantReportingPanel
+                role="NGO"
+                reports={[
+                  { title: 'Outreach Grant Report', status: 'Due Soon', due: 'Jan 27, 2026' },
+                  { title: 'Youth Wellness Grant', status: 'Draft', due: 'Feb 08, 2026' },
+                  { title: 'Partner Growth Grant', status: 'Submitted', due: 'Jan 12, 2026' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'governance' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Governance</h2>
+              <RoleDataGovernancePanel
+                role="NGO"
+                policies={[
+                  'Retain program records for 180 days.',
+                  'Restrict beneficiary data exports.',
+                  'Quarterly data access review.'
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'contracts' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Partner Contracts</h2>
+              <RolePartnerContractsPanel
+                role="NGO"
+                contracts={[
+                  { name: 'Community Outreach MoU', status: 'Active', renewal: 'Mar 2026' },
+                  { name: 'Safe House Alliance MoU', status: 'Active', renewal: 'Apr 2026' },
+                  { name: 'Clinic Support Agreement', status: 'Review', renewal: 'Feb 2026' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'crisis-comms' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Crisis Communications</h2>
+              <RoleCrisisCommsPanel
+                role="NGO"
+                bulletins={[
+                  { title: 'Community Support Alert', status: 'Sent', time: '3 hours ago' },
+                  { title: 'Volunteer Mobilization', status: 'Draft', time: 'Today' },
+                  { title: 'Partner Update', status: 'Scheduled', time: 'Tomorrow' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'regional' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Regional Insights</h2>
+              <RoleRegionalInsightsPanel
+                role="NGO"
+                insights={[
+                  { region: 'Greater Accra', summary: 'Outreach engagement up.', trend: 'Upward' },
+                  { region: 'Ashanti', summary: 'Program coverage stable.', trend: 'Stable' },
+                  { region: 'Northern Region', summary: 'Volunteer need rising.', trend: 'Upward' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'volunteers' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Volunteers</h2>
+              <RoleVolunteerPanel
+                role="NGO"
+                volunteers={[
+                  { name: 'Community Facilitator', status: 'Active', skill: 'Outreach' },
+                  { name: 'Workshop Lead', status: 'Active', skill: 'Training' },
+                  { name: 'Program Assistant', status: 'Onboarding', skill: 'Coordination' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'policy' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Policy Updates</h2>
+              <RolePolicyUpdatesPanel
+                role="NGO"
+                updates={[
+                  { title: 'Beneficiary Safeguarding', date: 'Jan 13, 2026', status: 'Pending' },
+                  { title: 'Partner Data Policy', date: 'Jan 03, 2026', status: 'Acknowledged' },
+                  { title: 'Community Outreach SOP', date: 'Dec 18, 2025', status: 'Acknowledged' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'directory' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Stakeholder Directory</h2>
+              <RoleStakeholderDirectoryPanel
+                role="NGO"
+                stakeholders={[
+                  { name: 'Community Clinics Network', focus: 'Health delivery', contact: 'clinics@reproplan.org' },
+                  { name: 'Safe House Alliance', focus: 'Shelter support', contact: 'safehouses@reproplan.org' },
+                  { name: 'Police Response Unit', focus: 'Safety escalation', contact: 'police@reproplan.org' },
+                  { name: 'Medical Response Team', focus: 'Clinical coordination', contact: 'medical@reproplan.org' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'playbooks' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Playbooks</h2>
+              <RolePlaybooksPanel
+                role="NGO"
+                playbooks={[
+                  { title: 'Outreach Activation Playbook', status: 'Active', updated: 'Jan 2026' },
+                  { title: 'Partner Escalation Guide', status: 'Active', updated: 'Dec 2025' },
+                  { title: 'Volunteer Mobilization Drill', status: 'Active', updated: 'Dec 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'knowledge' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Knowledge</h2>
+              <RoleKnowledgeBasePanel
+                role="NGO"
+                articles={[
+                  { title: 'Community Outreach FAQ', category: 'Outreach', updated: 'Jan 2026' },
+                  { title: 'Program Planning Notes', category: 'Programs', updated: 'Dec 2025' },
+                  { title: 'Partner Coordination Guide', category: 'Collaboration', updated: 'Dec 2025' }
+                ]}
+              />
+            </div>
+          )}
+
+          {activeTab === 'feedback' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Feedback</h2>
+              <RoleFeedbackPanel
+                role="NGO"
+                highlights={[
+                  { title: 'Outreach Journey Notes', status: 'Open', date: 'Jan 15, 2026' },
+                  { title: 'Impact Reporting Feedback', status: 'In Review', date: 'Jan 07, 2026' },
+                  { title: 'Volunteer Scheduling UI', status: 'Closed', date: 'Dec 25, 2025' }
+                ]}
+              />
+            </div>
+          )}
+
           {/* Settings Tab */}
           {activeTab === 'settings' && (
             <div className="space-y-6">
               <h2 className="text-xl font-semibold text-gray-900">Settings</h2>
+              <RoleSettingsPanel
+                role="NGO"
+                title="NGO Role Settings"
+                subtitle="Manage program notifications, reporting, and data policies."
+              />
               <SecurityPreferences role="NGO" />
             </div>
           )}

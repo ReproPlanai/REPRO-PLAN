@@ -18,6 +18,30 @@ System administration and oversight for the entire platform.
 - **Messages**: inter-role communications and announcements
 - **Security**: security monitoring and posture checks
 - **Analytics**: dashboards and trends (charts/visuals)
+- **Operations**: quick actions and system operations toolkit
+- **Training**: learning modules and training requests
+- **Compliance**: compliance checklist and review actions
+- **Resources**: resource library and download bundle
+- **Audit Logs**: audit history and incident reporting
+- **Support**: support contacts and ticket creation
+- **Partners**: partner directory and call requests
+- **Scheduling**: event scheduling and upcoming calendar
+- **Impact**: impact highlights and report generation
+- **Geo Intel**: hotspot monitoring and geo updates
+- **Field Ops**: deployments and mission launches
+- **Inventory**: supplies monitoring and restock requests
+- **Funding**: funding tracker and requests
+- **Risk**: risk intelligence and mitigation plans
+- **Data Sharing**: secure data sharing policies and packs
+- **Transport**: transport logistics and dispatch
+- **Case QA**: case quality reviews
+- **Grant Reports**: grant reporting and submissions
+- **Governance**: data governance policies
+- **Contracts**: partner contract tracking
+- **Crisis Comms**: crisis bulletin coordination
+- **Regional**: regional insight tracking
+- **Volunteers**: volunteer management
+- **Collaboration**: partner coordination hub
 - **Settings**: system configuration and admin controls
 
 ### POLICE
@@ -35,6 +59,31 @@ Emergency response and field coordination.
 - **Messages**: inter-role messaging
 - **Patrol Routes**: patrol planning (placeholder)
 - **Reports**: analytics/reporting (placeholder)
+- **Operations**: quick actions and incident operations toolkit
+- **Training**: training modules and requests
+- **Compliance**: compliance checklist and review actions
+- **Resources**: resource library and download bundle
+- **Audit Logs**: audit history and incident reporting
+- **Support**: support contacts and ticket creation
+- **Partners**: partner directory and call requests
+- **Scheduling**: event scheduling and upcoming calendar
+- **Impact**: impact highlights and report generation
+- **Geo Intel**: hotspot monitoring and geo updates
+- **Field Ops**: deployments and mission launches
+- **Inventory**: supplies monitoring and restock requests
+- **Funding**: funding tracker and requests
+- **Risk**: risk intelligence and mitigation plans
+- **Data Sharing**: secure data sharing policies and packs
+- **Transport**: transport logistics and dispatch
+- **Case QA**: case quality reviews
+- **Grant Reports**: grant reporting and submissions
+- **Governance**: data governance policies
+- **Contracts**: partner contract tracking
+- **Crisis Comms**: crisis bulletin coordination
+- **Regional**: regional insight tracking
+- **Volunteers**: volunteer management
+- **Collaboration**: partner coordination hub
+- **Settings**: role settings and security preferences
 
 ### SAFEHOUSE
 Resident intake, protection, and security monitoring.
@@ -48,7 +97,31 @@ Resident intake, protection, and security monitoring.
 - **Security**: security alerts and severity tracking
 - **Access Control**: access logs and status
 - **Messages**: inter-role messaging
-- **Resources**: internal resources (placeholder)
+- **Resources**: internal resources and reference materials
+- **Operations**: quick actions and safe house operations toolkit
+- **Training**: training modules and requests
+- **Compliance**: compliance checklist and review actions
+- **Audit Logs**: audit history and incident reporting
+- **Support**: support contacts and ticket creation
+- **Partners**: partner directory and call requests
+- **Scheduling**: event scheduling and upcoming calendar
+- **Impact**: impact highlights and report generation
+- **Geo Intel**: hotspot monitoring and geo updates
+- **Field Ops**: deployments and mission launches
+- **Inventory**: supplies monitoring and restock requests
+- **Funding**: funding tracker and requests
+- **Risk**: risk intelligence and mitigation plans
+- **Data Sharing**: secure data sharing policies and packs
+- **Transport**: transport logistics and dispatch
+- **Case QA**: case quality reviews
+- **Grant Reports**: grant reporting and submissions
+- **Governance**: data governance policies
+- **Contracts**: partner contract tracking
+- **Crisis Comms**: crisis bulletin coordination
+- **Regional**: regional insight tracking
+- **Volunteers**: volunteer management
+- **Collaboration**: partner coordination hub
+- **Settings**: role settings and security preferences
 
 ### MEDICAL
 Clinical care, records, and emergency response.
@@ -62,7 +135,31 @@ Clinical care, records, and emergency response.
 - **Appointments**: schedule and appointment status
 - **Emergency**: medical alerts and triage view
 - **Messages**: inter-role messaging
-- **Resources**: medical resources (placeholder)
+- **Resources**: medical resources and reference materials
+- **Operations**: quick actions and clinical operations toolkit
+- **Training**: training modules and requests
+- **Compliance**: compliance checklist and review actions
+- **Audit Logs**: audit history and incident reporting
+- **Support**: support contacts and ticket creation
+- **Partners**: partner directory and call requests
+- **Scheduling**: event scheduling and upcoming calendar
+- **Impact**: impact highlights and report generation
+- **Geo Intel**: hotspot monitoring and geo updates
+- **Field Ops**: deployments and mission launches
+- **Inventory**: supplies monitoring and restock requests
+- **Funding**: funding tracker and requests
+- **Risk**: risk intelligence and mitigation plans
+- **Data Sharing**: secure data sharing policies and packs
+- **Transport**: transport logistics and dispatch
+- **Case QA**: case quality reviews
+- **Grant Reports**: grant reporting and submissions
+- **Governance**: data governance policies
+- **Contracts**: partner contract tracking
+- **Crisis Comms**: crisis bulletin coordination
+- **Regional**: regional insight tracking
+- **Volunteers**: volunteer management
+- **Collaboration**: partner coordination hub
+- **Settings**: role settings and security preferences
 
 ### NGO
 Community outreach, programs, and impact tracking.
@@ -74,9 +171,32 @@ Community outreach, programs, and impact tracking.
 - **Programs**: active program list and progress
 - **Program Details**: drill-down view for programs
 - **Events**: event schedules and timelines
-- **Impact**: impact metrics and trends
+- **Impact**: impact metrics, highlights, and reporting
 - **Messages**: inter-role messaging
-- **Resources**: NGO resources (placeholder)
+- **Resources**: NGO resources and reference materials
+- **Operations**: quick actions and program operations toolkit
+- **Training**: training modules and requests
+- **Compliance**: compliance checklist and review actions
+- **Audit Logs**: audit history and incident reporting
+- **Support**: support contacts and ticket creation
+- **Partners**: partner directory and call requests
+- **Scheduling**: event scheduling and upcoming calendar
+- **Geo Intel**: hotspot monitoring and geo updates
+- **Field Ops**: deployments and mission launches
+- **Inventory**: supplies monitoring and restock requests
+- **Funding**: funding tracker and requests
+- **Risk**: risk intelligence and mitigation plans
+- **Data Sharing**: secure data sharing policies and packs
+- **Transport**: transport logistics and dispatch
+- **Case QA**: case quality reviews
+- **Grant Reports**: grant reporting and submissions
+- **Governance**: data governance policies
+- **Contracts**: partner contract tracking
+- **Crisis Comms**: crisis bulletin coordination
+- **Regional**: regional insight tracking
+- **Volunteers**: volunteer management
+- **Collaboration**: partner coordination hub
+- **Settings**: role settings and security preferences
 
 ## Main Pages (All Users)
 
