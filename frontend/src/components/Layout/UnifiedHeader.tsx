@@ -2,12 +2,6 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import {
-  LogOut,
-  Home,
-  MessageCircle,
-  MapPin,
-  Calendar,
-  Gamepad2,
   Shield,
   Users,
   Settings,
@@ -18,15 +12,17 @@ import {
   Lock,
   ChevronDown,
   GraduationCap,
-  Eye,
-  MousePointer,
-  Volume2,
-  Brain,
   Menu,
   X,
   Pill,
   Navigation,
-  QrCode
+  QrCode,
+  Gamepad2,
+  MapPin,
+  Calendar,
+  MessageCircle,
+  Home,
+  LogOut
 } from 'lucide-react';
 import { LogoCircular } from '../../assets';
 import NotificationSystem from '../UI/NotificationSystem';
@@ -91,10 +87,8 @@ const UnifiedHeader: React.FC = () => {
         { path: '/notifications', icon: Bell, label: 'Notifications' },
         { path: '/tutorial', icon: GraduationCap, label: 'Tutorial' },
         { path: '/qr-verification', icon: QrCode, label: 'QR Code Verification' },
-        { path: '/visual-accessibility', icon: Eye, label: 'Visual Accessibility' },
-        { path: '/motor-accessibility', icon: MousePointer, label: 'Motor Accessibility' },
-        { path: '/hearing-accessibility', icon: Volume2, label: 'Hearing Accessibility' },
-        { path: '/cognitive-accessibility', icon: Brain, label: 'Easy to Use' },
+        { path: '/system-health', icon: Settings, label: 'System Health' },
+        { path: '/accessibility', icon: Settings, label: 'Accessibility' },
         { path: '/settings', icon: Settings, label: t('navigation.settings') },
       ]
     }

@@ -640,6 +640,74 @@ class RealAPIService {
     return apiRequest('/api/safety-checks/history');
   }
 
+  // Crime Reporting
+  async submitCrimeReport(reportData: {
+    type: string;
+    description: string;
+    location?: string;
+    date?: string;
+    isAnonymous: boolean;
+    contactInfo?: string;
+    consentToShare?: boolean;
+    wantsCallback?: boolean;
+  }) {
+    return apiRequest('/api/reports', {
+      method: 'POST',
+      body: JSON.stringify(reportData)
+    });
+  }
+
+  async getReports(params?: { status?: string; type?: string; limit?: number }) {
+    const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+    return apiRequest(`/api/reports${queryParams}`);
+  }
+
+  async updateReportStatus(reportId: string, status: string, notes?: string) {
+    return apiRequest(`/api/reports/${reportId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, notes })
+    });
+  }
+
+  // Ecommerce - Pharmacies
+  async getPharmacies(params?: { location?: string; deliveryAvailable?: boolean }) {
+    const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+    return apiRequest(`/api/pharmacies${queryParams}`);
+  }
+
+  // Accessibility Settings
+  async getAccessibilitySettings() {
+    return apiRequest('/api/accessibility/settings');
+  }
+
+  async updateAccessibilitySettings(settings: any) {
+    return apiRequest('/api/accessibility/settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings)
+    });
+  }
+
+  async getAccessibilityProfiles() {
+    return apiRequest('/api/accessibility/profiles');
+  }
+
+  async saveAccessibilityProfile(profile: { name: string; description: string; settings: any }) {
+    return apiRequest('/api/accessibility/profiles', {
+      method: 'POST',
+      body: JSON.stringify(profile)
+    });
+  }
+
+  async deleteAccessibilityProfile(profileId: string) {
+    return apiRequest(`/api/accessibility/profiles/${profileId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async getPharmacy(id: string) {
+    return apiRequest(`/api/pharmacies/${id}`);
+  }
+
   // Ecommerce - Products
   async getProducts(params?: { category?: string; search?: string; inStock?: boolean; sortBy?: string }) {
     const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';

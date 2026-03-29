@@ -9,16 +9,16 @@ import {
   Settings,
   BarChart3,
   Activity,
-  Database,
-  Bell,
-  Lock,
-  Mail,
   RefreshCw,
-  Save,
   ArrowLeft,
-  LogOut
+  LogOut,
+  Power
 } from 'lucide-react';
 import { apiService } from '../services/api';
+import AdminAdvancedControls from './admin/AdminAdvancedControls';
+import UserManagement from './admin/UserManagement';
+import StakeholderManagement from './admin/StakeholderManagement';
+import SystemSettings from './admin/SystemSettings';
 
 interface SystemStats {
   users: {
@@ -52,45 +52,12 @@ interface SystemStats {
   };
 }
 
-interface SystemSettings {
-  notifications: {
-    emailAlerts: boolean;
-    pushNotifications: boolean;
-    emergencyAlerts: boolean;
-  };
-  security: {
-    twoFactorAuth: boolean;
-    sessionTimeout: number;
-    passwordPolicy: string;
-    ipWhitelist: boolean;
-  };
-  database: {
-    backupFrequency: string;
-    retentionDays: number;
-    autoBackup: boolean;
-  };
-  api: {
-    rateLimit: number;
-    timeout: number;
-    corsEnabled: boolean;
-  };
-  email: {
-    smtpHost: string;
-    smtpPort: number;
-    fromEmail: string;
-    fromName: string;
-  };
-}
-
 const AdminPanel: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'settings' | 'analytics'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'settings' | 'users' | 'stakeholders' | 'advanced'>('dashboard');
   const [stats, setStats] = useState<SystemStats | null>(null);
-  const [settings, setSettings] = useState<SystemSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -99,38 +66,14 @@ const AdminPanel: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [statsRes, settingsRes] = await Promise.all([
-        apiService.getAdminStats?.(),
-        apiService.getAdminSettings?.()
-      ]);
-
+      const statsRes = await apiService.getAdminStats?.();
       if (statsRes?.success) {
-        setStats(statsRes.stats);
-      }
-      if (settingsRes?.success) {
-        setSettings(settingsRes.settings);
+        setStats(statsRes.data);
       }
     } catch (err) {
       setError('Failed to load admin data');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSaveSettings = async () => {
-    if (!settings) return;
-    
-    try {
-      setSaving(true);
-      const response = await apiService.updateAdminSettings?.(settings);
-      if (response?.success) {
-        setSuccess('Settings saved successfully');
-        setTimeout(() => setSuccess(''), 3000);
-      }
-    } catch (err) {
-      setError('Failed to save settings');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -185,6 +128,9 @@ const AdminPanel: React.FC = () => {
           {[
             { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
             { id: 'analytics', label: 'Analytics', icon: Activity },
+            { id: 'users', label: 'Users', icon: Users },
+            { id: 'stakeholders', label: 'Stakeholders', icon: Briefcase },
+            { id: 'advanced', label: 'Advanced', icon: Power },
             { id: 'settings', label: 'Settings', icon: Settings }
           ].map(({ id, label, icon: Icon }) => (
             <button
@@ -206,13 +152,6 @@ const AdminPanel: React.FC = () => {
           <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
             <AlertTriangle className="w-5 h-5" />
             {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-700">
-            <Shield className="w-5 h-5" />
-            {success}
           </div>
         )}
 
@@ -351,176 +290,17 @@ const AdminPanel: React.FC = () => {
           </div>
         )}
 
+        {/* Users Tab */}
+        {activeTab === 'users' && <UserManagement />}
+
+        {/* Stakeholders Tab */}
+        {activeTab === 'stakeholders' && <StakeholderManagement />}
+
+        {/* Advanced Controls Tab */}
+        {activeTab === 'advanced' && <AdminAdvancedControls />}
+
         {/* Settings Tab */}
-        {activeTab === 'settings' && settings && (
-          <div className="space-y-6">
-            {/* Notifications */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-              <div className="flex items-center gap-3 mb-4">
-                <Bell className="w-5 h-5 text-blue-600" />
-                <h3 className="font-semibold text-gray-900">Notifications</h3>
-              </div>
-              <div className="space-y-4">
-                {Object.entries(settings.notifications).map(([key, value]) => (
-                  <label key={key} className="flex items-center justify-between cursor-pointer">
-                    <span className="text-gray-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                    <input
-                      type="checkbox"
-                      checked={value}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        notifications: { ...settings.notifications, [key]: e.target.checked }
-                      })}
-                      className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
-                    />
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Security */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-              <div className="flex items-center gap-3 mb-4">
-                <Lock className="w-5 h-5 text-red-600" />
-                <h3 className="font-semibold text-gray-900">Security</h3>
-              </div>
-              <div className="space-y-4">
-                <label className="flex items-center justify-between cursor-pointer">
-                  <span className="text-gray-700">Two-Factor Authentication</span>
-                  <input
-                    type="checkbox"
-                    checked={settings.security.twoFactorAuth}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      security: { ...settings.security, twoFactorAuth: e.target.checked }
-                    })}
-                    className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
-                  />
-                </label>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Session Timeout (minutes)
-                  </label>
-                  <input
-                    type="number"
-                    value={settings.security.sessionTimeout}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      security: { ...settings.security, sessionTimeout: parseInt(e.target.value) }
-                    })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Database */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-              <div className="flex items-center gap-3 mb-4">
-                <Database className="w-5 h-5 text-green-600" />
-                <h3 className="font-semibold text-gray-900">Database</h3>
-              </div>
-              <div className="space-y-4">
-                <label className="flex items-center justify-between cursor-pointer">
-                  <span className="text-gray-700">Auto Backup</span>
-                  <input
-                    type="checkbox"
-                    checked={settings.database.autoBackup}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      database: { ...settings.database, autoBackup: e.target.checked }
-                    })}
-                    className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
-                  />
-                </label>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Retention Days
-                  </label>
-                  <input
-                    type="number"
-                    value={settings.database.retentionDays}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      database: { ...settings.database, retentionDays: parseInt(e.target.value) }
-                    })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Email */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-              <div className="flex items-center gap-3 mb-4">
-                <Mail className="w-5 h-5 text-purple-600" />
-                <h3 className="font-semibold text-gray-900">Email Configuration</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SMTP Host</label>
-                  <input
-                    type="text"
-                    value={settings.email.smtpHost}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      email: { ...settings.email, smtpHost: e.target.value }
-                    })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SMTP Port</label>
-                  <input
-                    type="number"
-                    value={settings.email.smtpPort}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      email: { ...settings.email, smtpPort: parseInt(e.target.value) }
-                    })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">From Email</label>
-                  <input
-                    type="email"
-                    value={settings.email.fromEmail}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      email: { ...settings.email, fromEmail: e.target.value }
-                    })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">From Name</label>
-                  <input
-                    type="text"
-                    value={settings.email.fromName}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      email: { ...settings.email, fromName: e.target.value }
-                    })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Save Button */}
-            <div className="flex justify-end">
-              <button
-                onClick={handleSaveSettings}
-                disabled={saving}
-                className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
-              >
-                {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                Save Settings
-              </button>
-            </div>
-          </div>
-        )}
+        {activeTab === 'settings' && <SystemSettings />}
       </div>
     </div>
   );

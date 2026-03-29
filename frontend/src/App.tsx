@@ -24,6 +24,7 @@ import FloatingDownloadButton from './components/FloatingDownloadButton';
 
 // Contexts
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
+import { TestingProvider, ErrorBoundary } from './contexts/TestingContext';
 
 // Pages
 import Home from './pages/Home';
@@ -37,10 +38,8 @@ import Mentorship from './pages/Mentorship';
 import Settings from './pages/Settings';
 import Notifications from './pages/Notifications';
 import Tutorial from './pages/Tutorial';
-import VisualAccessibility from './pages/VisualAccessibility';
-import MotorAccessibility from './pages/MotorAccessibility';
-import HearingAccessibility from './pages/HearingAccessibility';
-import CognitiveAccessibility from './pages/CognitiveAccessibility';
+import AccessibilityHub from './pages/AccessibilityHub';
+import SystemHealthDashboard from './pages/SystemHealthDashboard';
 import SignLanguage from './pages/SignLanguage';
 import MedicationOrder from './pages/MedicationOrder';
 import SecureMap from './pages/SecureMap';
@@ -57,6 +56,7 @@ import ResourcesLibrary from './pages/ResourcesLibrary';
 import DirectMessages from './pages/DirectMessages';
 import LiveTracking from './pages/LiveTracking';
 import DailySafetyCheck from './pages/DailySafetyCheck';
+import CrimeReporting from './pages/CrimeReporting';
 
 // Utils
 import { secretCodeManager } from './utils/secretCode';
@@ -251,84 +251,87 @@ function App() {
   }
 
   return (
-    <AccessibilityProvider>
-      <Router>
-        <Analytics />
-        <div className="min-h-screen min-h-[100dvh] bg-gray-50 overflow-x-hidden" style={{ overflowY: 'visible' }}>
-          <OfflineIndicator />
-          
-          {/* App Install Banner */}
-          <AppInstallBanner
-            onInstall={handleDownload}
-            onDismiss={closeModal}
-          />
-          
-          {/* Update Notification */}
-          {isUpdateAvailable && (
-            <UpdateNotification
-              onUpdate={updateServiceWorker}
-              onDismiss={dismissUpdate}
-            />
-          )}
-          
-          <AppLayoutContent isAuthenticated={isAuthenticated}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/chatbot" element={<Chatbot />} />
-              <Route path="/rehana" element={<Chatbot />} />
-              <Route path="/videos" element={<Videos />} />
-              <Route path="/stories" element={<StorytellingPlatform />} />
-              <Route path="/clinics" element={<Clinics />} />
-              <Route path="/safe-spaces" element={<SafeSpaceLocator />} />
-              <Route path="/tracker" element={<Tracker />} />
-              <Route path="/games" element={<Games />} />
-              <Route path="/consent-game" element={<ConsentEducationGame />} />
-              <Route path="/inclusive-support" element={<InclusiveYouthSupport />} />
-              <Route path="/emergency" element={<Emergency />} />
-              <Route path="/mentorship" element={<Mentorship />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/tutorial" element={<Tutorial />} />
-              <Route path="/qr-verification" element={<QRVerification />} />
-              <Route path="/visual-accessibility" element={<VisualAccessibility />} />
-              <Route path="/motor-accessibility" element={<MotorAccessibility />} />
-              <Route path="/hearing-accessibility" element={<HearingAccessibility />} />
-              <Route path="/cognitive-accessibility" element={<CognitiveAccessibility />} />
-              <Route path="/sign-language" element={<SignLanguage />} />
-              <Route path="/medication-order" element={<MedicationOrder />} />
-              <Route path="/secure-map" element={<SecureMap />} />
-              <Route path="/settings" element={<Settings onLogout={handleLogout} />} />
-              <Route path="/dashboard" element={<DashboardAccessManager />} />
+    <ErrorBoundary>
+      <TestingProvider>
+        <AccessibilityProvider>
+          <Router>
+            <Analytics />
+            <div className="min-h-screen min-h-[100dvh] bg-gray-50 overflow-x-hidden" style={{ overflowY: 'visible' }}>
+              <OfflineIndicator />
               
-              {/* New Admin & Management Routes */}
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/audit-logs" element={<AuditLogViewer />} />
-              <Route path="/biometrics" element={<BiometricPage />} />
-              <Route path="/workflows" element={<WorkflowManager />} />
-              <Route path="/support-groups" element={<SupportGroups />} />
-              <Route path="/health-records" element={<HealthRecords />} />
-              <Route path="/resources" element={<ResourcesLibrary />} />
-              <Route path="/messages" element={<DirectMessages />} />
-              <Route path="/live-tracking" element={<LiveTracking />} />
-              <Route path="/daily-safety-check" element={<DailySafetyCheck />} />
+              {/* App Install Banner */}
+              <AppInstallBanner
+                onInstall={handleDownload}
+                onDismiss={closeModal}
+              />
               
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </AppLayoutContent>
+              {/* Update Notification */}
+              {isUpdateAvailable && (
+                <UpdateNotification
+                  onUpdate={updateServiceWorker}
+                  onDismiss={dismissUpdate}
+                />
+              )}
+              
+              <AppLayoutContent isAuthenticated={isAuthenticated}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/chatbot" element={<Chatbot />} />
+                  <Route path="/rehana" element={<Chatbot />} />
+                  <Route path="/videos" element={<Videos />} />
+                  <Route path="/stories" element={<StorytellingPlatform />} />
+                  <Route path="/clinics" element={<Clinics />} />
+                  <Route path="/safe-spaces" element={<SafeSpaceLocator />} />
+                  <Route path="/tracker" element={<Tracker />} />
+                  <Route path="/games" element={<Games />} />
+                  <Route path="/consent-game" element={<ConsentEducationGame />} />
+                  <Route path="/inclusive-support" element={<InclusiveYouthSupport />} />
+                  <Route path="/emergency" element={<Emergency />} />
+                  <Route path="/mentorship" element={<Mentorship />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/tutorial" element={<Tutorial />} />
+                  <Route path="/qr-verification" element={<QRVerification />} />
+                  <Route path="/accessibility" element={<AccessibilityHub />} />
+                  <Route path="/system-health" element={<SystemHealthDashboard />} />
+                  <Route path="/sign-language" element={<SignLanguage />} />
+                  <Route path="/medication-order" element={<MedicationOrder />} />
+                  <Route path="/secure-map" element={<SecureMap />} />
+                  <Route path="/settings" element={<Settings onLogout={handleLogout} />} />
+                  <Route path="/dashboard" element={<DashboardAccessManager />} />
+                  
+                  {/* New Admin & Management Routes */}
+                  <Route path="/admin" element={<AdminPanel />} />
+                  <Route path="/audit-logs" element={<AuditLogViewer />} />
+                  <Route path="/biometrics" element={<BiometricPage />} />
+                  <Route path="/workflows" element={<WorkflowManager />} />
+                  <Route path="/support-groups" element={<SupportGroups />} />
+                  <Route path="/health-records" element={<HealthRecords />} />
+                  <Route path="/resources" element={<ResourcesLibrary />} />
+                  <Route path="/messages" element={<DirectMessages />} />
+                  <Route path="/live-tracking" element={<LiveTracking />} />
+                  <Route path="/daily-safety-check" element={<DailySafetyCheck />} />
+                  <Route path="/report-crime" element={<CrimeReporting />} />
+                  
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </AppLayoutContent>
 
-            {/* App Download Modal */}
-            <AppDownloadModal
-              isOpen={showModal}
-              onClose={closeModal}
-              onDownload={handleDownload}
-            />
+                {/* App Download Modal */}
+                <AppDownloadModal
+                  isOpen={showModal}
+                  onClose={closeModal}
+                  onDownload={handleDownload}
+                />
 
-            {/* Floating Download Button */}
-            <FloatingDownloadButton
-              onOpenModal={openModal}
-            />
-          </div>
-        </Router>
-      </AccessibilityProvider>
+                {/* Floating Download Button */}
+                <FloatingDownloadButton
+                  onOpenModal={openModal}
+                />
+              </div>
+            </Router>
+          </AccessibilityProvider>
+        </TestingProvider>
+      </ErrorBoundary>
     );
 }
 

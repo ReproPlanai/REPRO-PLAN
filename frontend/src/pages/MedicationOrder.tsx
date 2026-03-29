@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { 
   Pill, 
   CheckCircle, 
@@ -87,12 +87,6 @@ interface Order {
   tier3Verified?: boolean;
 }
 
-const pharmacies: Pharmacy[] = [
-  { id: 'pharm_1', name: 'SafeHealth Pharmacy', address: '123 Main Street, Accra', phone: '+233-24-555-0123', distance: 0.8, rating: 4.6, deliveryAvailable: true, deliveryFee: 5.00, deliveryTime: '30-45 min', isOpen: true, coordinates: { lat: 5.6037, lng: -0.1870 } },
-  { id: 'pharm_2', name: 'Liberty Medical Center', address: '456 Broad Street, Accra', phone: '+233-24-555-0456', distance: 1.2, rating: 4.4, deliveryAvailable: true, deliveryFee: 7.00, deliveryTime: '45-60 min', isOpen: true, coordinates: { lat: 5.6137, lng: -0.1970 } },
-  { id: 'pharm_3', name: 'Youth Health Pharmacy', address: '789 Oxford Street, Accra', phone: '+233-24-555-0789', distance: 2.1, rating: 4.8, deliveryAvailable: false, deliveryFee: 0, deliveryTime: 'N/A', isOpen: false, coordinates: { lat: 5.6237, lng: -0.2070 } }
-];
-
 const categories = [
   { value: 'all', label: 'All' },
   { value: 'Contraception', label: 'Contraception' },
@@ -133,6 +127,9 @@ const MedicationOrder: React.FC = () => {
   // State for medications from API
   const [medications, setMedications] = useState<Medication[]>([]);
   const [isLoadingMeds, setIsLoadingMeds] = useState(false);
+  
+  // State for pharmacies from API
+  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   
   // Admin panel state
   const [showAdminPanel, setShowAdminPanel] = useState(false);
@@ -177,7 +174,6 @@ const MedicationOrder: React.FC = () => {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
 
-  // Load medications from API
   const loadMedications = useCallback(async () => {
     setIsLoadingMeds(true);
     try {
@@ -194,6 +190,23 @@ const MedicationOrder: React.FC = () => {
       setIsLoadingMeds(false);
     }
   }, []);
+
+  // Load pharmacies from API
+  const loadPharmacies = useCallback(async () => {
+    try {
+      const response = await apiService.getPharmacies?.() as { success?: boolean; pharmacies?: Pharmacy[] };
+      if (response?.success && response.pharmacies) {
+        setPharmacies(response.pharmacies);
+      }
+    } catch (error) {
+      console.error('Failed to load pharmacies:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadMedications();
+    loadPharmacies();
+  }, [loadMedications, loadPharmacies]);
 
   // Admin: Add/Edit medication
   const handleSaveMedication = async () => {
