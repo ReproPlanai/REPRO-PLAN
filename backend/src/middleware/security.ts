@@ -14,6 +14,17 @@ export const requireHTTPS = (req: Request, res: Response, next: NextFunction): v
     return next();
   }
   
+  // Skip healthcheck endpoint (Railway internal healthcheck uses HTTP)
+  if (req.path === '/health') {
+    return next();
+  }
+  
+  // Skip localhost/internal requests
+  const host = req.headers.host || '';
+  if (host.includes('localhost') || host.includes('127.0.0.1') || host.includes('::1')) {
+    return next();
+  }
+  
   // Check if request is secure
   const isSecure = req.secure || 
                    req.headers['x-forwarded-proto'] === 'https' ||
