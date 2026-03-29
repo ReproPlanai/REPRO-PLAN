@@ -1,13 +1,12 @@
 import React from 'react';
+import PageContainer from '../components/Layout/PageContainer';
 import ClinicFinder from '../components/Clinics/ClinicFinder';
 
 const Clinics: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="pb-6">
-        <ClinicFinder />
-      </main>
-    </div>
+    <PageContainer gradient>
+      <ClinicFinder />
+    </PageContainer>
   );
 };
 

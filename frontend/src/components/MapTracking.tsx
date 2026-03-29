@@ -9,6 +9,7 @@ import {
   ZoomOut,
   RefreshCw
 } from 'lucide-react';
+import { apiService } from '../services/api';
 
 interface LocationData {
   id: string;
@@ -28,50 +29,89 @@ interface LocationData {
 }
 
 interface MapTrackingProps {
-  locations: LocationData[];
-  onLocationSelect: (location: LocationData) => void;
-  onNavigateToLocation: (location: LocationData) => void;
+  locations?: LocationData[];
+  onLocationSelect?: (location: LocationData) => void;
+  onNavigateToLocation?: (location: LocationData) => void;
 }
 
 const MapTracking: React.FC<MapTrackingProps> = ({
-  locations,
+  locations: propLocations,
   onLocationSelect,
   onNavigateToLocation
 }) => {
+  const [locations, setLocations] = useState<LocationData[]>(propLocations || []);
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
-  const [mapCenter, setMapCenter] = useState({ lat: 6.3000, lng: -10.8000 }); // Liberia center
+  const [mapCenter, setMapCenter] = useState({ lat: 5.6037, lng: -0.1870 }); // Ghana (Accra) center
   const [zoom, setZoom] = useState(12);
   const [mapType, setMapType] = useState<'standard' | 'satellite' | 'hybrid'>('standard');
   const [isTracking, setIsTracking] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
 
-  // Simulate real-time location updates
+  // Track real-time location updates via API (no simulation)
   useEffect(() => {
     if (!isTracking) return;
 
-    const interval = setInterval(() => {
-      // Simulate location updates for active alerts
-      const activeLocations = locations.filter(loc => loc.status === 'active');
-      if (activeLocations.length > 0) {
-        const randomLocation = activeLocations[Math.floor(Math.random() * activeLocations.length)];
-        // Simulate small location changes
-        const updatedLocation = {
-          ...randomLocation,
-          location: {
-            ...randomLocation.location,
-            lat: randomLocation.location.lat + (Math.random() - 0.5) * 0.001,
-            lng: randomLocation.location.lng + (Math.random() - 0.5) * 0.001
-          },
-          lastSeen: new Date().toISOString()
+    // Poll for location updates from backend every 10 seconds
+    const interval = setInterval(async () => {
+      try {
+        // Fetch latest alert locations from API
+        const response = await apiService.getAlerts?.('POLICE', undefined, { status: 'active' }) as { 
+          success?: boolean; 
+          alerts?: any[] 
         };
         
-        // Update the location in the parent component
-        onLocationSelect(updatedLocation);
+        if (response?.success && response.alerts) {
+          // Transform alerts to location data
+          const locationData = response.alerts
+            .filter(alert => alert.location?.coordinates)
+            .map(alert => ({
+              id: alert.id,
+              userId: alert.userId || 'unknown',
+              userName: alert.userName || `User ${alert.userId?.slice(-4) || 'Unknown'}`,
+              location: {
+                lat: alert.location.coordinates.lat,
+                lng: alert.location.coordinates.lng,
+                address: alert.location.address || 'Unknown Location'
+              },
+              timestamp: alert.createdAt || new Date().toISOString(),
+              status: alert.status || 'active',
+              priority: alert.priority || 'medium',
+              type: mapAlertType(alert.alertType),
+              phoneNumber: alert.phoneNumber || 'N/A',
+              lastSeen: alert.updatedAt || new Date().toISOString()
+            }));
+
+          // Update locations via parent callback if provided
+          if (locationData.length > 0 && onLocationSelect) {
+            // Find the most recently updated location
+            const latestLocation = locationData.sort((a, b) => 
+              new Date(b.lastSeen).getTime() - new Date(a.lastSeen).getTime()
+            )[0];
+            
+            if (latestLocation) {
+              onLocationSelect(latestLocation as LocationData);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch location updates:', error);
       }
-    }, 5000); // Update every 5 seconds
+    }, 10000); // Poll every 10 seconds
 
     return () => clearInterval(interval);
-  }, [isTracking, locations, onLocationSelect]);
+  }, [isTracking, onLocationSelect]);
+
+  // Map backend alert types to location types
+  const mapAlertType = (alertType: string): LocationData['type'] => {
+    const typeMap: Record<string, LocationData['type']> = {
+      'gbv': 'distress',
+      'medical': 'emergency',
+      'safety': 'sos',
+      'community': 'panic',
+      'system': 'emergency'
+    };
+    return typeMap[alertType] || 'emergency';
+  };
 
   const getMarkerColor = (priority: LocationData['priority']) => {
     switch (priority) {
@@ -96,11 +136,11 @@ const MapTracking: React.FC<MapTrackingProps> = ({
   const handleLocationClick = (location: LocationData) => {
     setSelectedLocation(location);
     setMapCenter(location.location);
-    onLocationSelect(location);
+    onLocationSelect?.(location);
   };
 
   const handleNavigate = (location: LocationData) => {
-    onNavigateToLocation(location);
+    onNavigateToLocation?.(location);
     // In a real app, this would open navigation app
     alert(`Navigating to ${location.userName} at ${location.location.address}`);
   };

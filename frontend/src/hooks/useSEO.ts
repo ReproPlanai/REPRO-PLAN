@@ -16,19 +16,19 @@ interface SEOConfig {
 const seoConfigs: Record<string, SEOConfig> = {
   '/': {
     title: 'REPRO PLAN - Anonymous SRHR Platform for Youth',
-    description: 'Anonymous, inclusive, and scalable Sexual and Reproductive Health and Rights platform for youth. Get safe access to SRHR information, education, and support in Liberia and West Africa.',
-    keywords: ['SRHR', 'sexual health', 'reproductive health', 'youth', 'Liberia', 'West Africa', 'anonymous', 'safe space'],
+    description: 'Anonymous, inclusive, and scalable Sexual and Reproductive Health and Rights platform for youth. Get safe access to SRHR information, education, and support in Ghana.',
+    keywords: ['SRHR', 'sexual health', 'reproductive health', 'youth', 'Ghana', 'anonymous', 'safe space'],
     type: 'website',
     section: 'Health & Wellness',
     tags: ['SRHR', 'Youth Health', 'Mobile Health']
   },
   '/chatbot': {
-    title: 'Anonymous SRHR Chatbot - REPRO PLAN',
-    description: 'Ask questions about sexual and reproductive health anonymously. Get accurate, evidence-based information from our AI-powered chatbot.',
-    keywords: ['SRHR chatbot', 'anonymous health questions', 'sexual health AI', 'reproductive health support'],
+    title: 'Rehana - AI SRHR Assistant - REPRO PLAN',
+    description: 'Chat with Rehana, your confidential AI assistant for sexual and reproductive health. Ask questions anonymously and get accurate, evidence-based information.',
+    keywords: ['Rehana', 'SRHR assistant', 'anonymous health questions', 'sexual health AI', 'reproductive health support'],
     type: 'article',
     section: 'Health Education',
-    tags: ['Chatbot', 'AI', 'Health Education']
+    tags: ['Rehana', 'AI Assistant', 'Health Education']
   },
   '/videos': {
     title: 'Educational SRHR Videos - REPRO PLAN',
@@ -37,14 +37,6 @@ const seoConfigs: Record<string, SEOConfig> = {
     type: 'article',
     section: 'Health Education',
     tags: ['Videos', 'Education', 'Health Content']
-  },
-  '/articles': {
-    title: 'Expert SRHR Articles - REPRO PLAN',
-    description: 'Read in-depth articles about sexual and reproductive health from medical experts and health professionals.',
-    keywords: ['SRHR articles', 'health articles', 'sexual health information', 'reproductive health guides'],
-    type: 'article',
-    section: 'Health Education',
-    tags: ['Articles', 'Expert Content', 'Health Information']
   },
   '/clinics': {
     title: 'Find Health Clinics - REPRO PLAN',
@@ -237,7 +229,7 @@ export const useSEO = (customConfig?: Partial<SEOConfig>) => {
               "@type": "ListItem",
               "position": 1,
               "name": "REPRO PLAN",
-              "item": "https://repro-plan.netlify.app"
+              "item": "https://reproplanai.com"
             },
             {
               "@type": "ListItem",

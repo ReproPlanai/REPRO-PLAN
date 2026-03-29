@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, CheckCircle, Users } from 'lucide-react';
+import { CheckCircle, Users } from 'lucide-react';
 
 interface SecretCodeEntryProps {
   onCodeVerified: (role: string) => void;
@@ -25,19 +25,6 @@ const SecretCodeEntry: React.FC<SecretCodeEntryProps> = ({ onCodeVerified }) => 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-3 sm:p-4">
       <div className="bg-white rounded-2xl shadow-xl border border-gray-200 max-w-md w-full p-4 sm:p-6 lg:p-8">
-        {/* Header */}
-        <div className="text-center mb-4 sm:mb-6">
-          <div className="mx-auto flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full mb-3 sm:mb-4">
-            <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
-          </div>
-          <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-2">
-            Secure Access Portal
-          </h1>
-          <p className="text-xs sm:text-sm lg:text-base text-gray-600 px-2">
-            Select your stakeholder role to continue
-          </p>
-        </div>
-
         {/* Role Selection */}
         <div className="space-y-3 sm:space-y-4">
           <div className="text-center text-xs sm:text-sm text-gray-600">

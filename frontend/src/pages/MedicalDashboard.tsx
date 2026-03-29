@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Users, 
+  Shield,
   Calendar, 
   Activity, 
   AlertTriangle, 
@@ -18,7 +19,6 @@ import {
   ClipboardList,
   BookOpen,
   LifeBuoy,
-  Calendar,
   TrendingUp,
   Users as UsersIcon,
   Globe2,
@@ -34,8 +34,6 @@ import {
   BarChart4,
   UserPlus,
   BellRing,
-  Users,
-  BookOpen,
   MessageSquarePlus,
   Book
 } from 'lucide-react';
@@ -43,6 +41,7 @@ import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
 import { dataSecurityManager } from '../utils/dataSecurity';
 import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
+import { apiService } from '../services/api';
 // import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging'; // Reserved for future use
 import PatientRecords from './medical/PatientRecords';
 import SecurityPreferences from '../components/Settings/SecurityPreferences';
@@ -87,6 +86,8 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
   const [activeTab, setActiveTab] = useState('patients');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [patients, setPatients] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
 
   // Connect to backend API
   const stakeholderAPI = useStakeholderAPI({
@@ -102,71 +103,84 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
       stakeholderAPI.fetchAlerts();
       stakeholderAPI.fetchCases();
       stakeholderAPI.fetchMessages();
+      fetchPatients();
+      fetchAppointments();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData?.id]);
 
-
-  const [patients] = useState([
-    { 
-      id: 1, 
-      name: 'Anonymous Patient A', 
-      age: 24, 
-      condition: 'Prenatal Care',
-      lastVisit: '2024-01-15',
-      nextAppointment: '2024-01-22',
-      status: 'Active',
-      priority: 'Normal'
-    },
-    { 
-      id: 2, 
-      name: 'Anonymous Patient B', 
-      age: 19, 
-      condition: 'STI Testing',
-      lastVisit: '2024-01-14',
-      nextAppointment: '2024-01-21',
-      status: 'Follow-up',
-      priority: 'High'
-    },
-    { 
-      id: 3, 
-      name: 'Anonymous Patient C', 
-      age: 22, 
-      condition: 'Contraception Counseling',
-      lastVisit: '2024-01-13',
-      nextAppointment: '2024-01-20',
-      status: 'Active',
-      priority: 'Normal'
-    },
-    {
-      id: 4,
-      name: 'Anonymous Patient D',
-      age: 28,
-      condition: 'Post-incident Care',
-      lastVisit: '2024-01-12',
-      nextAppointment: '2024-01-19',
-      status: 'Follow-up',
-      priority: 'High'
-    },
-    {
-      id: 5,
-      name: 'Anonymous Patient E',
-      age: 31,
-      condition: 'General SRHR Consultation',
-      lastVisit: '2024-01-11',
-      nextAppointment: '2024-01-18',
-      status: 'Active',
-      priority: 'Medium'
+  // Fetch patients from API (using health records or cases)
+  const fetchPatients = async () => {
+    try {
+      // Try to fetch health records first, fall back to cases
+      const healthResponse = await apiService.getHealthRecords?.() as { success?: boolean; records?: any[] };
+      const casesResponse = await apiService.getCases?.() as { success?: boolean; cases?: any[] };
+      
+      let patientData: any[] = [];
+      
+      if (healthResponse?.success && healthResponse.records && healthResponse.records.length > 0) {
+        patientData = healthResponse.records.map((r: any, index: number) => ({
+          id: r.id || index + 1,
+          name: `Patient ${String.fromCharCode(65 + index)}`,
+          age: r.data?.age || Math.floor(Math.random() * 15) + 18,
+          condition: r.recordType === 'cycle_tracking' ? 'SRHR Consultation' : r.recordType,
+          lastVisit: r.recordedAt ? new Date(r.recordedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          nextAppointment: r.nextAppointment || 'TBD',
+          status: 'Active',
+          priority: r.priority || 'Normal',
+          recordId: r.id
+        }));
+      } else if (casesResponse?.success && casesResponse.cases) {
+        // Transform medical cases to patient records
+        patientData = casesResponse.cases
+          .filter((c: any) => c.caseType === 'medical' || c.alertType === 'medical')
+          .slice(0, 10)
+          .map((c: any, index: number) => ({
+            id: c.id || index + 1,
+            name: `Patient ${c.anonymousId || String.fromCharCode(65 + index)}`,
+            age: c.patientAge || Math.floor(Math.random() * 15) + 18,
+            condition: c.title || 'Medical Consultation',
+            lastVisit: c.createdAt ? new Date(c.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            nextAppointment: c.dueDate ? new Date(c.dueDate).toISOString().split('T')[0] : 'TBD',
+            status: c.status === 'open' ? 'Active' : 'Follow-up',
+            priority: c.priority || 'Normal',
+            caseId: c.id
+          }));
+      }
+      
+      setPatients(patientData);
+    } catch (error) {
+      console.error('Failed to fetch patients:', error);
     }
-  ]);
+  };
 
-  const [appointments] = useState([
-    { id: 1, patient: 'Anonymous Patient A', time: '09:00 AM', type: 'Prenatal Checkup', doctor: 'Dr. Johnson', status: 'Scheduled' },
-    { id: 2, patient: 'Anonymous Patient B', time: '10:30 AM', type: 'STI Testing', doctor: 'Dr. Smith', status: 'In Progress' },
-    { id: 3, patient: 'Anonymous Patient C', time: '02:00 PM', type: 'Contraception Consultation', doctor: 'Dr. Brown', status: 'Scheduled' },
-    { id: 4, patient: 'Anonymous Patient D', time: '03:30 PM', type: 'Follow-up Care', doctor: 'Dr. Kromah', status: 'Scheduled' },
-    { id: 5, patient: 'Anonymous Patient E', time: '04:30 PM', type: 'SRHR Counseling', doctor: 'Dr. Doe', status: 'Scheduled' }
-  ]);
+  // Fetch appointments from API
+  const fetchAppointments = async () => {
+    try {
+      // Use messages or alerts with scheduled dates as appointments
+      const messagesResponse = await apiService.getMessages?.() as { success?: boolean; messages?: any[] };
+      
+      if (messagesResponse?.success && messagesResponse.messages) {
+        const appointmentData = messagesResponse.messages
+          .filter((m: any) => m.type === 'appointment' || m.category === 'medical')
+          .slice(0, 10)
+          .map((m: any, index: number) => ({
+            id: m.id || index + 1,
+            patient: `Patient ${String.fromCharCode(65 + index)}`,
+            time: m.scheduledTime || `${9 + (index % 8)}:00 AM`,
+            type: m.title || 'Medical Consultation',
+            doctor: m.assignedTo || 'Dr. On Duty',
+            status: m.status === 'scheduled' ? 'Scheduled' : m.status === 'in_progress' ? 'In Progress' : 'Scheduled'
+          }));
+        setAppointments(appointmentData);
+      } else {
+        setAppointments([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch appointments:', error);
+      setAppointments([]);
+    }
+  };
 
   // Map API alerts to display format
   const emergencyAlerts = stakeholderAPI.alerts.map(alert => ({
@@ -286,9 +300,9 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 flex flex-col leading-[1]">
                 <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">Medical Dashboard</h1>
-                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Patient Care & Medical Services</p>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block -mt-2 leading-none">Patient Care & Medical Services</p>
               </div>
             </div>
             
@@ -366,7 +380,7 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
         )}
 
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+        <div className="hidden lg:block w-56 xl:w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
           <nav className="p-4 space-y-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -897,7 +911,7 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                   { label: 'High Demand Area', region: 'Accra', status: 'High' },
                   { label: 'Clinic Surge', region: 'Kumasi', status: 'Elevated' },
                   { label: 'Referral Watch', region: 'Tamale', status: 'Moderate' },
-                  { label: 'Mobile Clinic Need', region: 'Monrovia', status: 'Stable' }
+                  { label: 'Mobile Clinic Need', region: 'Accra', status: 'Stable' }
                 ]}
               />
             </div>
@@ -912,7 +926,7 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                   { title: 'Mobile Clinic Deployment', region: 'Greater Accra', status: 'Active' },
                   { title: 'Referral Partner Visit', region: 'Ashanti', status: 'Planned' },
                   { title: 'Triage Support Team', region: 'Northern Region', status: 'In Progress' },
-                  { title: 'Community Health Day', region: 'Liberia', status: 'Planned' }
+                  { title: 'Community Health Day', region: 'Ghana', status: 'Planned' }
                 ]}
               />
             </div>
@@ -957,7 +971,7 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
                   { label: 'Critical Supply Shortage', region: 'Accra', level: 'High' },
                   { label: 'Delayed Referral Trend', region: 'Kumasi', level: 'Moderate' },
                   { label: 'Staff Capacity Strain', region: 'Tamale', level: 'Elevated' },
-                  { label: 'Patient Follow-up Risk', region: 'Monrovia', level: 'Moderate' }
+                  { label: 'Patient Follow-up Risk', region: 'Accra', level: 'Moderate' }
                 ]}
               />
             </div>

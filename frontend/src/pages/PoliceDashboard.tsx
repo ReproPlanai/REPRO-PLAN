@@ -7,6 +7,8 @@ import {
   Search,
   Eye,
   CheckCircle,
+  Shield,
+  Users,
   TrendingUp,
   Bell,
   FileText,
@@ -20,7 +22,6 @@ import {
   BookOpen,
   LifeBuoy,
   Calendar,
-  TrendingUp,
   Users as UsersIcon,
   Globe2,
   Map,
@@ -35,8 +36,6 @@ import {
   BarChart4,
   UserPlus,
   BellRing,
-  Users,
-  BookOpen,
   MessageSquarePlus,
   Book
 } from 'lucide-react';
@@ -169,22 +168,27 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
     assigned: caseRecord.assignedRole || 'Unassigned'
   }));
 
-  // Placeholder data for secure visualizations
+  // Real-time metrics from API data (no fallbacks)
   const policeData = {
     emergencyTypes: [
-      { id: 1, label: 'GBV', value: stakeholderAPI.alerts.filter(a => a.alertType === 'gbv').length || 10 },
-      { id: 2, label: 'Medical', value: stakeholderAPI.alerts.filter(a => a.alertType === 'medical').length || 8 },
-      { id: 3, label: 'Safety', value: stakeholderAPI.alerts.filter(a => a.alertType === 'safety').length || 6 },
-      { id: 4, label: 'Other', value: stakeholderAPI.alerts.filter(a => a.alertType === 'other').length || 4 }
-    ],
-    responseTimes: [
-      { id: 1, label: 'Avg Response (min)', value: calculateAverageResponseTime(stakeholderAPI.alerts) }
-    ],
+      { id: 1, label: 'GBV', value: stakeholderAPI.alerts.filter(a => a.alertType === 'gbv').length },
+      { id: 2, label: 'Medical', value: stakeholderAPI.alerts.filter(a => a.alertType === 'medical').length },
+      { id: 3, label: 'Safety', value: stakeholderAPI.alerts.filter(a => a.alertType === 'safety').length },
+      { id: 4, label: 'Other', value: stakeholderAPI.alerts.filter(a => a.alertType === 'other').length }
+    ].filter(item => item.value > 0),
+    responseTimes: stakeholderAPI.alerts
+      .filter(a => a.responseTime)
+      .slice(0, 10)
+      .map((a, i) => ({
+        id: i + 1,
+        label: new Date(a.createdAt).toLocaleDateString(),
+        value: a.responseTime || 0
+      })),
     caseStatus: [
       { id: 1, label: 'Open', value: stakeholderAPI.cases.filter(c => c.status === 'open').length },
       { id: 2, label: 'In Progress', value: stakeholderAPI.cases.filter(c => c.status === 'in_progress').length },
       { id: 3, label: 'Resolved', value: stakeholderAPI.cases.filter(c => c.status === 'resolved').length }
-    ]
+    ].filter(item => item.value > 0)
   };
 
   const tabs = [
@@ -260,9 +264,9 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 flex flex-col leading-[1]">
                 <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">Police Dashboard</h1>
-                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Emergency Response & Case Management</p>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block -mt-2 leading-none">Emergency Response & Case Management</p>
               </div>
             </div>
             
@@ -294,7 +298,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
               onClick={() => setIsMenuOpen(false)}
               aria-label="Close menu"
             />
-            <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl p-4">
+            <div className="absolute left-0 top-0 h-full w-64 sm:w-72 bg-white shadow-xl p-4">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-base font-semibold text-gray-900">Menu</span>
                 <button
@@ -340,7 +344,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
         )}
 
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+        <div className="hidden lg:block w-56 xl:w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
           <nav className="p-4 space-y-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -865,7 +869,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
                   { label: 'High Risk Zone', region: 'Accra Central', status: 'High' },
                   { label: 'Alert Cluster', region: 'Kumasi', status: 'Elevated' },
                   { label: 'Patrol Focus', region: 'Tamale', status: 'Moderate' },
-                  { label: 'Partner Watch', region: 'Monrovia', status: 'Stable' }
+                  { label: 'Partner Watch', region: 'Accra', status: 'Stable' }
                 ]}
               />
             </div>
@@ -880,7 +884,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
                   { title: 'Night Patrol Sweep', region: 'Greater Accra', status: 'Active' },
                   { title: 'Community Liaison Visit', region: 'Ashanti', status: 'Planned' },
                   { title: 'Incident Scene Support', region: 'Northern Region', status: 'In Progress' },
-                  { title: 'Cross-Agency Drill', region: 'Liberia', status: 'Planned' }
+                  { title: 'Cross-Agency Drill', region: 'Ghana', status: 'Planned' }
                 ]}
               />
             </div>
@@ -925,7 +929,7 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
                   { label: 'High Priority Alerts', region: 'Accra', level: 'High' },
                   { label: 'Delayed Dispatch', region: 'Kumasi', level: 'Moderate' },
                   { label: 'Resource Shortage', region: 'Tamale', level: 'Elevated' },
-                  { label: 'Partner Capacity', region: 'Monrovia', level: 'Moderate' }
+                  { label: 'Partner Capacity', region: 'Accra', level: 'Moderate' }
                 ]}
               />
             </div>

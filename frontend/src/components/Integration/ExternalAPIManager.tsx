@@ -20,6 +20,7 @@ import {
   TrendingUp,
   Users
 } from 'lucide-react';
+import { apiService } from '../../services/api';
 
 interface APIConnection {
   id: string;
@@ -68,9 +69,9 @@ const ExternalAPIManager: React.FC<ExternalAPIManagerProps> = ({
     const roleBasedConnections: APIConnection[] = [
       {
         id: 'gov-1',
-        name: 'Liberia Government Database',
+        name: 'Ghana Government Database',
         type: 'government',
-        endpoint: 'https://api.liberia.gov.lr/v1',
+        endpoint: 'https://api.ghana.gov.gh/v1',
         status: 'connected',
         lastSync: new Date(Date.now() - 300000).toISOString(),
         dataCount: 1247,
@@ -86,7 +87,7 @@ const ExternalAPIManager: React.FC<ExternalAPIManagerProps> = ({
         id: 'emergency-1',
         name: 'Emergency Services API',
         type: 'emergency',
-        endpoint: 'https://emergency.liberia.gov.lr/api',
+        endpoint: 'https://emergency.ghana.gov.gh/api',
         status: 'connected',
         lastSync: new Date(Date.now() - 120000).toISOString(),
         dataCount: 89,
@@ -135,89 +136,67 @@ const ExternalAPIManager: React.FC<ExternalAPIManagerProps> = ({
     setConnections(roleBasedConnections);
   }, [userRole]);
 
-  // Simulate data integration
+  // Fetch real integration data from API
   useEffect(() => {
-    const sampleData: IntegrationData[] = [
-      {
-        source: 'Liberia Government Database',
-        type: 'citizen_record',
-        data: {
-          name: 'Anonymous Citizen',
-          id: 'LIB-2024-001',
-          status: 'verified',
-          lastUpdate: new Date().toISOString()
-        },
-        timestamp: new Date(Date.now() - 300000).toISOString(),
-        confidence: 95,
-        isVerified: true
-      },
-      {
-        source: 'Weather Service',
-        type: 'weather_alert',
-        data: {
-          alert: 'Heavy rainfall expected',
-          severity: 'moderate',
-          location: 'Monrovia',
-          duration: '2-4 hours'
-        },
-        timestamp: new Date(Date.now() - 600000).toISOString(),
-        confidence: 88,
-        isVerified: true
-      },
-      {
-        source: 'Emergency Services API',
-        type: 'emergency_response',
-        data: {
-          incident: 'Traffic accident',
-          location: 'Broad Street',
-          responseTime: '4.2 minutes',
-          status: 'resolved'
-        },
-        timestamp: new Date(Date.now() - 120000).toISOString(),
-        confidence: 92,
-        isVerified: true
+    const fetchIntegrationData = async () => {
+      try {
+        const response = await apiService.getExternalData?.() as { 
+          success?: boolean; 
+          data?: IntegrationData[] 
+        };
+        if (response?.success && response.data) {
+          setIntegratedData(response.data);
+        } else {
+          setIntegratedData([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch integration data:', error);
+        setIntegratedData([]);
       }
-    ];
-
-    setIntegratedData(sampleData);
+    };
+    fetchIntegrationData();
   }, []);
 
   const syncConnection = async (connectionId: string) => {
     setIsSyncing(true);
     setSelectedConnection(connectionId);
 
-    // Simulate API sync
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Call real API sync endpoint
+      const response = await apiService.syncExternalConnection?.(connectionId) as {
+        success?: boolean;
+        connection?: APIConnection;
+        newData?: IntegrationData;
+      };
 
-    setConnections(prev => prev.map(conn => 
-      conn.id === connectionId 
-        ? { 
-            ...conn, 
-            status: 'connected',
-            lastSync: new Date().toISOString(),
-            dataCount: conn.dataCount + Math.floor(Math.random() * 10)
-          }
-        : conn
-    ));
+      if (response?.success && response.connection) {
+        setConnections(prev => prev.map(conn => 
+          conn.id === connectionId 
+            ? { 
+                ...conn, 
+                status: response.connection?.status || 'connected',
+                lastSync: new Date().toISOString(),
+                dataCount: response.connection?.dataCount || conn.dataCount
+              }
+            : conn
+        ));
 
-    // Simulate receiving new data
-    const newData: IntegrationData = {
-      source: connections.find(c => c.id === connectionId)?.name || 'Unknown',
-      type: 'sync_update',
-      data: {
-        records: Math.floor(Math.random() * 5),
-        timestamp: new Date().toISOString()
-      },
-      timestamp: new Date().toISOString(),
-      confidence: 90,
-      isVerified: true
-    };
-
-    setIntegratedData(prev => [newData, ...prev.slice(0, 9)]);
-    onDataReceived(newData);
-
-    setIsSyncing(false);
-    setSelectedConnection(null);
+        if (response.newData) {
+          setIntegratedData(prev => [response.newData!, ...prev.slice(0, 9)]);
+          onDataReceived(response.newData);
+        }
+      }
+    } catch (error) {
+      console.error('Sync failed:', error);
+      setConnections(prev => prev.map(conn => 
+        conn.id === connectionId 
+          ? { ...conn, status: 'error' as const }
+          : conn
+      ));
+    } finally {
+      setIsSyncing(false);
+      setSelectedConnection(null);
+    }
   };
 
   const toggleConnection = (connectionId: string) => {

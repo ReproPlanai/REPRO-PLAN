@@ -1,0 +1,111 @@
+# Fortune 500 Enterprise .gitignore
+# REPRO PLAN Frontend
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+build/
+dist/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output/
+.jest/
+
+# Testing
+.nyc_output
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+.temp/
+.tmp/
+
+# Misc
+.eslintcache
+.stylelintcache
+*.pem
+*.key
+*.cert
+
+# TypeScript
+*.tsbuildinfo
+
+# PWA
+**/service-worker.js
+**/workbox-*.js
+# Note: sw.js in public folder should be committed for PWA functionality
+
+# Vercel
+.vercel/
+.vercel
+
+# Local development
+.local/
+local/
+
+# Fortune 500 Enterprise Specific
+# Security scans
+.scannerwork/
+.sonar/
+
+# Audit logs
+audit/
+security-reports/
+
+# Deployment artifacts
+.deploy/
+deploy-artifacts/
+
+# Backup files
+*.bak
+*.backup
+
+# Sensitive config
+config/secrets.*
+secrets.*

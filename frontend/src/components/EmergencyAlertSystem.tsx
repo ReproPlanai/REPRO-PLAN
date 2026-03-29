@@ -10,8 +10,10 @@ import {
   Shield,
   X,
   CheckCircle,
-  Navigation
+  Navigation,
+  RefreshCw
 } from 'lucide-react';
+import { apiService } from '../services/api';
 
 interface EmergencyAlert {
   id: string;
@@ -33,17 +35,21 @@ interface EmergencyAlert {
 interface EmergencyAlertSystemProps {
   onAlertReceived: (alert: EmergencyAlert) => void;
   onLocationUpdate: (location: { lat: number; lng: number; address: string }) => void;
+  userRole?: string;
 }
 
 const EmergencyAlertSystem: React.FC<EmergencyAlertSystemProps> = ({
   onAlertReceived,
-  onLocationUpdate
+  onLocationUpdate,
+  userRole = 'ADMIN'
 }) => {
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
   const [currentAlert, setCurrentAlert] = useState<EmergencyAlert | null>(null);
   const [soundPlaying, setSoundPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [lastFetch, setLastFetch] = useState<Date>(new Date());
 
   // Emergency alert sound
   const playEmergencySound = useCallback(() => {
@@ -73,57 +79,116 @@ const EmergencyAlertSystem: React.FC<EmergencyAlertSystemProps> = ({
     setTimeout(() => setSoundPlaying(false), 1000);
   }, [isSoundEnabled, soundPlaying]);
 
-  // Simulate receiving emergency alerts
-  useEffect(() => {
-    const simulateAlerts = () => {
-      const alertTypes: EmergencyAlert['type'][] = ['panic', 'emergency', 'sos', 'distress'];
-      const priorities: EmergencyAlert['priority'][] = ['medium', 'high', 'critical'];
-      
-      const newAlert: EmergencyAlert = {
-        id: `alert_${Date.now()}`,
-        type: alertTypes[Math.floor(Math.random() * alertTypes.length)],
-        userId: `user_${Math.floor(Math.random() * 1000)}`,
-        userName: `Anonymous User ${Math.floor(Math.random() * 100)}`,
-        location: {
-          lat: 6.3000 + (Math.random() - 0.5) * 0.1, // Liberia coordinates
-          lng: -10.8000 + (Math.random() - 0.5) * 0.1,
-          address: `Location ${Math.floor(Math.random() * 100)}`
-        },
-        timestamp: new Date().toISOString(),
-        status: 'active',
-        priority: priorities[Math.floor(Math.random() * priorities.length)],
-        description: 'Emergency assistance requested',
-        phoneNumber: `+231${Math.floor(Math.random() * 90000000) + 10000000}`
+  // Fetch real alerts from API
+  const fetchAlerts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await apiService.getAlerts(userRole, undefined, { status: 'active' }) as { 
+        success?: boolean; 
+        alerts?: any[] 
       };
+      
+      if (response.success && response.alerts) {
+        // Transform backend alerts to EmergencyAlert format
+        const transformedAlerts: EmergencyAlert[] = response.alerts.map(alert => ({
+          id: alert.id || `alert_${Date.now()}_${Math.random()}`,
+          type: mapAlertType(alert.alertType),
+          userId: alert.userId || 'unknown',
+          userName: alert.userId ? `User ${alert.userId.slice(-4)}` : 'Anonymous User',
+          location: {
+            lat: alert.location?.coordinates?.lat || 5.6037,
+            lng: alert.location?.coordinates?.lng || -0.1870,
+            address: alert.location?.address || 'Unknown Location'
+          },
+          timestamp: alert.createdAt || new Date().toISOString(),
+          status: alert.status || 'active',
+          priority: mapPriority(alert.priority),
+          description: alert.description || 'Emergency assistance requested',
+          phoneNumber: alert.userId ? '+233-XXX-XXX-XXXX' : 'Not provided'
+        }));
 
-      setAlerts(prev => [newAlert, ...prev.slice(0, 9)]); // Keep last 10 alerts
-      setCurrentAlert(newAlert);
-      setIsAlertVisible(true);
-      
-      // Play emergency sound
-      playEmergencySound();
-      
-      // Notify parent component
-      onAlertReceived(newAlert);
-      onLocationUpdate(newAlert.location);
+        // Check for new alerts
+        const newAlerts = transformedAlerts.filter(
+          newAlert => !alerts.find(existing => existing.id === newAlert.id)
+        );
+
+        if (newAlerts.length > 0) {
+          // Play sound for new alerts
+          playEmergencySound();
+          
+          // Show the most recent alert
+          const latestAlert = newAlerts[0];
+          setCurrentAlert(latestAlert);
+          setIsAlertVisible(true);
+          
+          // Notify parent
+          onAlertReceived(latestAlert);
+          onLocationUpdate(latestAlert.location);
+        }
+
+        setAlerts(transformedAlerts);
+        setLastFetch(new Date());
+      }
+    } catch (error) {
+      console.error('Failed to fetch alerts:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [userRole, alerts, playEmergencySound, onAlertReceived, onLocationUpdate]);
+
+  // Map backend alert types to frontend types
+  const mapAlertType = (type: string): EmergencyAlert['type'] => {
+    const typeMap: Record<string, EmergencyAlert['type']> = {
+      'gbv': 'distress',
+      'medical': 'emergency',
+      'safety': 'sos',
+      'community': 'panic',
+      'system': 'emergency'
     };
+    return typeMap[type] || 'emergency';
+  };
 
-    // Simulate alerts every 30-60 seconds for demo
-    const interval = setInterval(simulateAlerts, 30000 + Math.random() * 30000);
+  // Map backend priority to frontend priority
+  const mapPriority = (priority: string): EmergencyAlert['priority'] => {
+    const priorityMap: Record<string, EmergencyAlert['priority']> = {
+      'critical': 'critical',
+      'high': 'high',
+      'medium': 'medium',
+      'low': 'low'
+    };
+    return priorityMap[priority] || 'medium';
+  };
+
+  // Initial fetch and polling
+  useEffect(() => {
+    fetchAlerts();
+    
+    // Poll for new alerts every 10 seconds
+    const interval = setInterval(fetchAlerts, 10000);
     
     return () => clearInterval(interval);
-  }, [onAlertReceived, onLocationUpdate, playEmergencySound]);
+  }, [fetchAlerts]);
 
-  const handleAlertResponse = (alertId: string, action: 'accept' | 'resolve') => {
-    setAlerts(prev => prev.map(alert => 
-      alert.id === alertId 
-        ? { ...alert, status: action === 'accept' ? 'responding' : 'resolved' }
-        : alert
-    ));
-    
-    if (action === 'resolve') {
-      setIsAlertVisible(false);
-      setCurrentAlert(null);
+  const handleAlertResponse = async (alertId: string, action: 'accept' | 'resolve') => {
+    try {
+      // Update via API
+      await apiService.updateAlert(alertId, {
+        status: action === 'accept' ? 'responding' : 'resolved'
+      });
+
+      // Update local state
+      setAlerts(prev => prev.map(alert => 
+        alert.id === alertId 
+          ? { ...alert, status: action === 'accept' ? 'responding' : 'resolved' }
+          : alert
+      ));
+      
+      if (action === 'resolve') {
+        setIsAlertVisible(false);
+        setCurrentAlert(null);
+      }
+    } catch (error) {
+      console.error('Failed to update alert:', error);
     }
   };
 
@@ -176,6 +241,14 @@ const EmergencyAlertSystem: React.FC<EmergencyAlertSystemProps> = ({
             <span className="text-sm text-gray-600">
               {isSoundEnabled ? 'Sound On' : 'Sound Off'}
             </span>
+            <button
+              onClick={fetchAlerts}
+              disabled={loading}
+              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              title="Refresh alerts"
+            >
+              <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+            </button>
           </div>
         </div>
 
@@ -208,6 +281,11 @@ const EmergencyAlertSystem: React.FC<EmergencyAlertSystemProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Last fetch time */}
+        <p className="text-xs text-gray-500 mt-2">
+          Last updated: {lastFetch.toLocaleTimeString()}
+        </p>
       </div>
 
       {/* Current Emergency Alert Modal */}
@@ -288,50 +366,60 @@ const EmergencyAlertSystem: React.FC<EmergencyAlertSystemProps> = ({
           <h3 className="text-lg font-medium text-gray-900">Recent Emergency Alerts</h3>
         </div>
         <div className="divide-y divide-gray-200">
-          {alerts.slice(0, 5).map((alert) => (
-            <div key={alert.id} className="p-4 hover:bg-gray-50 transition-colors">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start space-x-3">
-                  <div className={`w-3 h-3 rounded-full mt-2 ${getStatusColor(alert.status)}`}></div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1">
-                      {getAlertIcon(alert.type)}
-                      <span className="font-medium text-gray-900">{alert.userName}</span>
-                      <span className={`px-2 py-1 text-xs rounded-full border ${getPriorityColor(alert.priority)}`}>
-                        {alert.priority.toUpperCase()}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">{alert.description}</p>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
-                      <div className="flex items-center space-x-1">
-                        <MapPin size={12} />
-                        <span>{alert.location.address}</span>
+          {alerts.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              <AlertTriangle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p>No active emergency alerts</p>
+              <p className="text-sm text-gray-400 mt-1">
+                Alerts will appear here when triggered
+              </p>
+            </div>
+          ) : (
+            alerts.slice(0, 5).map((alert) => (
+              <div key={alert.id} className="p-4 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-3">
+                    <div className={`w-3 h-3 rounded-full mt-2 ${getStatusColor(alert.status)}`}></div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        {getAlertIcon(alert.type)}
+                        <span className="font-medium text-gray-900">{alert.userName}</span>
+                        <span className={`px-2 py-1 text-xs rounded-full border ${getPriorityColor(alert.priority)}`}>
+                          {alert.priority.toUpperCase()}
+                        </span>
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock size={12} />
-                        <span>{new Date(alert.timestamp).toLocaleTimeString()}</span>
+                      <p className="text-sm text-gray-600 mb-2">{alert.description}</p>
+                      <div className="flex items-center space-x-4 text-xs text-gray-500">
+                        <div className="flex items-center space-x-1">
+                          <MapPin size={12} />
+                          <span>{alert.location.address}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Clock size={12} />
+                          <span>{new Date(alert.timestamp).toLocaleTimeString()}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleAlertResponse(alert.id, 'accept')}
-                    disabled={alert.status !== 'active'}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <CheckCircle size={16} />
-                  </button>
-                  <button
-                    onClick={() => handleAlertResponse(alert.id, 'resolve')}
-                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
-                  >
-                    <CheckCircle size={16} />
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleAlertResponse(alert.id, 'accept')}
+                      disabled={alert.status !== 'active'}
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <CheckCircle size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleAlertResponse(alert.id, 'resolve')}
+                      className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+                    >
+                      <CheckCircle size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

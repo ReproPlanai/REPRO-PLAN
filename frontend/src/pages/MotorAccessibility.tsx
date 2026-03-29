@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAccessibility } from '../contexts/AccessibilityContext';
 import { 
-  ArrowLeft,
   Keyboard,
   Mic,
   Target,
@@ -23,9 +23,10 @@ interface VoiceCommand {
 
 const MotorAccessibility: React.FC = () => {
   const navigate = useNavigate();
+  const { settings, updateSetting } = useAccessibility();
   const [voiceCommands, setVoiceCommands] = useState<VoiceCommand[]>([]);
-  const [largeTouchTargets, setLargeTouchTargets] = useState(false);
-  const [keyboardNavigation, setKeyboardNavigation] = useState(false);
+  const largeTouchTargets = settings.largeTouchTargets;
+  const keyboardNavigation = settings.keyboardNavigation;
   const [voiceControl, setVoiceControl] = useState(false);
   const [slowClick, setSlowClick] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -109,9 +110,9 @@ const MotorAccessibility: React.FC = () => {
         description: 'Emergency support'
       },
       {
-        command: 'articles',
-        action: () => navigate('/articles'),
-        description: 'Read articles'
+        command: 'videos',
+        action: () => navigate('/videos'),
+        description: 'Watch videos'
       },
       {
         command: 'games',
@@ -133,22 +134,15 @@ const MotorAccessibility: React.FC = () => {
     setVoiceCommands(commands);
   }, [navigate, speakText]);
 
-  // Apply accessibility settings
+  // Apply motor accessibility (large touch targets from context, slow-click local)
   useEffect(() => {
     const root = document.documentElement;
-    
-    if (largeTouchTargets) {
-      root.classList.add('large-touch-targets');
-    } else {
-      root.classList.remove('large-touch-targets');
-    }
-    
     if (slowClick) {
       root.classList.add('slow-click');
     } else {
       root.classList.remove('slow-click');
     }
-  }, [largeTouchTargets, slowClick]);
+  }, [slowClick]);
 
   const accessibilityFeatures = [
     {
@@ -157,7 +151,7 @@ const MotorAccessibility: React.FC = () => {
       description: 'Make buttons and links larger and easier to tap',
       icon: Target,
       isEnabled: largeTouchTargets,
-      onToggle: () => setLargeTouchTargets(!largeTouchTargets)
+      onToggle: () => updateSetting('largeTouchTargets', !largeTouchTargets)
     },
     {
       id: 'keyboard-nav',
@@ -165,7 +159,7 @@ const MotorAccessibility: React.FC = () => {
       description: 'Navigate using Tab, Enter, and arrow keys',
       icon: Keyboard,
       isEnabled: keyboardNavigation,
-      onToggle: () => setKeyboardNavigation(!keyboardNavigation)
+      onToggle: () => updateSetting('keyboardNavigation', !keyboardNavigation)
     },
     {
       id: 'voice-control',
@@ -201,11 +195,11 @@ const MotorAccessibility: React.FC = () => {
       speakText: 'Finding nearby healthcare clinics'
     },
     {
-      title: 'Health Articles',
-      description: 'Read health information with large text',
+      title: 'Watch Videos',
+      description: 'Watch health information with large text',
       icon: BookOpen,
-      action: () => navigate('/articles'),
-      speakText: 'Opening health articles with accessibility features'
+      action: () => navigate('/videos'),
+      speakText: 'Opening health videos with accessibility features'
     },
     {
       title: 'Interactive Games',
@@ -221,28 +215,17 @@ const MotorAccessibility: React.FC = () => {
     { command: 'Say "Chat"', description: 'Open chatbot' },
     { command: 'Say "Clinics"', description: 'Find healthcare providers' },
     { command: 'Say "Emergency"', description: 'Access emergency support' },
-    { command: 'Say "Articles"', description: 'Read health articles' },
+    { command: 'Say "Videos"', description: 'Watch health videos' },
     { command: 'Say "Games"', description: 'Play educational games' },
     { command: 'Say "Settings"', description: 'Open app settings' },
     { command: 'Say "Help"', description: 'Get voice command help' }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
-      {/* Back Button */}
-      <div className="p-4 sm:p-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="w-6 h-6 text-gray-600" />
-        </button>
-      </div>
-
+    <div className="w-full h-full bg-gradient-to-br from-green-50 via-white to-blue-50 overflow-x-hidden">
       {/* Content */}
       <div className="flex-1 p-4 sm:p-6">
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="space-y-6">
           
           {/* Accessibility Features */}
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">

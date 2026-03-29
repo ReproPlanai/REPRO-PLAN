@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './i18n';
-import './styles/accessibility.css';
+import { Analytics } from '@vercel/analytics/react';
 
 // Components
 import OfflineIndicator from './components/OfflineIndicator';
 import UpdateNotification from './components/UI/UpdateNotification';
 import useServiceWorkerUpdate from './hooks/useServiceWorkerUpdate';
-import DesktopHeader from './components/Layout/DesktopHeader';
+import UnifiedHeader from './components/Layout/UnifiedHeader';
 import BottomNavigation from './components/Layout/BottomNavigation';
 import LoginForm from './components/Auth/LoginForm';
 import CreateCodeForm from './components/Auth/CreateCodeForm';
 import ForgetCodeForm from './components/Auth/ForgetCodeForm';
 import PreAuthLoader from './components/Auth/PreAuthLoader';
-import SRHRAlerts from './components/SMS/SRHRAlerts';
 import StorytellingPlatform from './components/Storytelling/StorytellingPlatform';
 import SafeSpaceLocator from './components/SafeSpace/SafeSpaceLocator';
 import ConsentEducationGame from './components/Games/ConsentEducationGame';
@@ -22,6 +21,8 @@ import DashboardAccessManager from './components/Dashboard/DashboardAccessManage
 import AppDownloadModal from './components/AppDownloadModal';
 import AppInstallBanner from './components/AppInstallBanner';
 import FloatingDownloadButton from './components/FloatingDownloadButton';
+import SafetyCheckManager from './components/Safety/SafetyCheckManager';
+import NotificationSystem from './components/UI/NotificationSystem';
 
 // Contexts
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
@@ -30,14 +31,11 @@ import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import Home from './pages/Home';
 import Chatbot from './pages/Chatbot';
 import Videos from './pages/Videos';
-import Articles from './pages/Articles';
-import SMSInterface from './components/SMS/SMSInterface';
 import Clinics from './pages/Clinics';
 import Tracker from './pages/Tracker';
 import Games from './pages/Games';
 import Emergency from './pages/Emergency';
 import Mentorship from './pages/Mentorship';
-import OfflineMode from './pages/OfflineMode';
 import Settings from './pages/Settings';
 import Notifications from './pages/Notifications';
 import Tutorial from './pages/Tutorial';
@@ -45,13 +43,24 @@ import VisualAccessibility from './pages/VisualAccessibility';
 import MotorAccessibility from './pages/MotorAccessibility';
 import HearingAccessibility from './pages/HearingAccessibility';
 import CognitiveAccessibility from './pages/CognitiveAccessibility';
+import SignLanguage from './pages/SignLanguage';
 import MedicationOrder from './pages/MedicationOrder';
 import SecureMap from './pages/SecureMap';
 import QRVerification from './pages/QRVerification';
 
+// New Admin & Management Pages
+import AdminPanel from './pages/AdminPanel';
+import AuditLogViewer from './pages/AuditLogViewer';
+import BiometricPage from './pages/BiometricPage';
+import WorkflowManager from './pages/WorkflowManager';
+import SupportGroups from './pages/SupportGroups';
+import HealthRecords from './pages/HealthRecords';
+import ResourcesLibrary from './pages/ResourcesLibrary';
+import DirectMessages from './pages/DirectMessages';
+import LiveTracking from './pages/LiveTracking';
+
 // Utils
 import { secretCodeManager } from './utils/secretCode';
-import { smsIntegration } from './utils/smsIntegration';
 import { offlineStorage } from './utils/offlineStorage';
 import { productionResetManager } from './utils/productionReset';
 
@@ -59,12 +68,43 @@ import { productionResetManager } from './utils/productionReset';
 import { useAppDownloadModal } from './hooks/useAppDownloadModal';
 import { cacheManager } from './utils/cacheManager';
 
-// Component to conditionally render header
-const ConditionalHeader: React.FC = () => {
+// Layout content with route-based header visibility and mobile-first full screen
+const AppLayoutContent: React.FC<{ children: React.ReactNode; isAuthenticated: boolean }> = ({ children, isAuthenticated }) => {
   const location = useLocation();
-  const shouldShowHeader = !location.pathname.startsWith('/dashboard');
-  
-  return shouldShowHeader ? <DesktopHeader /> : null;
+  const isDashboardRoute = location.pathname.startsWith('/dashboard');
+  // Show unified header and bottom nav for all main app routes (except dashboard which has its own header)
+  const shouldShowMainNavigation = !isDashboardRoute;
+
+  return (
+    <>
+      {shouldShowMainNavigation && (
+        <>
+          <UnifiedHeader />
+          <div className="fixed top-4 right-4 z-50">
+            <NotificationSystem />
+          </div>
+          <BottomNavigation />
+        </>
+      )}
+      <main
+        className={
+          shouldShowMainNavigation
+            ? 'flex-1 w-full h-full overflow-x-hidden overflow-y-auto bg-gray-50 pt-14 sm:pt-16'
+            : 'flex-1 w-full h-full overflow-x-hidden overflow-y-auto bg-gray-50'
+        }
+        style={{
+          paddingTop: shouldShowMainNavigation ? 'calc(3.5rem + env(safe-area-inset-top))' : 'env(safe-area-inset-top)',
+          paddingBottom: shouldShowMainNavigation ? 'calc(4rem + env(safe-area-inset-bottom))' : 'env(safe-area-inset-bottom)',
+          height: '100dvh',
+          minHeight: '100dvh'
+        }}
+      >
+        <div className="w-full h-full">
+          {children}
+        </div>
+      </main>
+    </>
+  );
 };
 
 function App() {
@@ -141,12 +181,6 @@ function App() {
     
     // Check initial URL
     handleStakeholderAccess();
-
-    // Seed offline mock data for feature testing
-    offlineStorage.seedMockData();
-
-    // Initialize SMS integration
-    smsIntegration.processOfflineQueue();
 
     // Initialize cache manager with new features
     cacheManager.initializeCache().then(() => {
@@ -247,7 +281,8 @@ function App() {
   return (
     <AccessibilityProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50 overflow-x-hidden" style={{ overflowY: 'visible' }}>
+        <Analytics />
+        <div className="min-h-screen min-h-[100dvh] bg-gray-50 overflow-x-hidden" style={{ overflowY: 'visible' }}>
           <OfflineIndicator />
           
           {/* App Install Banner */}
@@ -264,47 +299,48 @@ function App() {
             />
           )}
           
-          {/* Desktop Header - Hide for dashboard pages */}
-          <ConditionalHeader />
-          
-            {/* Main content area with proper mobile spacing */}
-            <main className="flex-1 lg:ml-0 min-h-screen-safe">
-              <div className="w-full max-w-none">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/chatbot" element={<Chatbot />} />
-                  <Route path="/videos" element={<Videos />} />
-                  <Route path="/articles" element={<Articles />} />
-                  <Route path="/sms" element={<SMSInterface />} />
-                  <Route path="/sms-alerts" element={<SRHRAlerts />} />
-                  <Route path="/stories" element={<StorytellingPlatform />} />
-                  <Route path="/clinics" element={<Clinics />} />
-                  <Route path="/safe-spaces" element={<SafeSpaceLocator />} />
-                  <Route path="/tracker" element={<Tracker />} />
-                  <Route path="/games" element={<Games />} />
-                  <Route path="/consent-game" element={<ConsentEducationGame />} />
-                  <Route path="/inclusive-support" element={<InclusiveYouthSupport />} />
-                  <Route path="/emergency" element={<Emergency />} />
-                  <Route path="/mentorship" element={<Mentorship />} />
-                  <Route path="/offline" element={<OfflineMode />} />
-                  <Route path="/notifications" element={<Notifications />} />
-                  <Route path="/tutorial" element={<Tutorial />} />
-                  <Route path="/qr-verification" element={<QRVerification />} />
-                  <Route path="/visual-accessibility" element={<VisualAccessibility />} />
-                  <Route path="/motor-accessibility" element={<MotorAccessibility />} />
-                  <Route path="/hearing-accessibility" element={<HearingAccessibility />} />
-                  <Route path="/cognitive-accessibility" element={<CognitiveAccessibility />} />
-                  <Route path="/medication-order" element={<MedicationOrder />} />
-                  <Route path="/secure-map" element={<SecureMap />} />
-                  <Route path="/settings" element={<Settings onLogout={handleLogout} />} />
-                  <Route path="/dashboard" element={<DashboardAccessManager />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </div>
-            </main>
-
-            {/* Bottom Navigation for Mobile Authenticated Users */}
-            <BottomNavigation isAuthenticated={isAuthenticated} />
+          <AppLayoutContent isAuthenticated={isAuthenticated}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/chatbot" element={<Chatbot />} />
+              <Route path="/rehana" element={<Chatbot />} />
+              <Route path="/videos" element={<Videos />} />
+              <Route path="/stories" element={<StorytellingPlatform />} />
+              <Route path="/clinics" element={<Clinics />} />
+              <Route path="/safe-spaces" element={<SafeSpaceLocator />} />
+              <Route path="/tracker" element={<Tracker />} />
+              <Route path="/games" element={<Games />} />
+              <Route path="/consent-game" element={<ConsentEducationGame />} />
+              <Route path="/inclusive-support" element={<InclusiveYouthSupport />} />
+              <Route path="/emergency" element={<Emergency />} />
+              <Route path="/mentorship" element={<Mentorship />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/tutorial" element={<Tutorial />} />
+              <Route path="/qr-verification" element={<QRVerification />} />
+              <Route path="/visual-accessibility" element={<VisualAccessibility />} />
+              <Route path="/motor-accessibility" element={<MotorAccessibility />} />
+              <Route path="/hearing-accessibility" element={<HearingAccessibility />} />
+              <Route path="/cognitive-accessibility" element={<CognitiveAccessibility />} />
+              <Route path="/sign-language" element={<SignLanguage />} />
+              <Route path="/medication-order" element={<MedicationOrder />} />
+              <Route path="/secure-map" element={<SecureMap />} />
+              <Route path="/settings" element={<Settings onLogout={handleLogout} />} />
+              <Route path="/dashboard" element={<DashboardAccessManager />} />
+              
+              {/* New Admin & Management Routes */}
+              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/audit-logs" element={<AuditLogViewer />} />
+              <Route path="/biometrics" element={<BiometricPage />} />
+              <Route path="/workflows" element={<WorkflowManager />} />
+              <Route path="/support-groups" element={<SupportGroups />} />
+              <Route path="/health-records" element={<HealthRecords />} />
+              <Route path="/resources" element={<ResourcesLibrary />} />
+              <Route path="/messages" element={<DirectMessages />} />
+              <Route path="/live-tracking" element={<LiveTracking />} />
+              
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </AppLayoutContent>
 
             {/* App Download Modal */}
             <AppDownloadModal
@@ -317,6 +353,9 @@ function App() {
             <FloatingDownloadButton
               onOpenModal={openModal}
             />
+
+            {/* Safety Check Manager - Daily Wellness Check-ins */}
+            {isAuthenticated && <SafetyCheckManager />}
         </div>
       </Router>
     </AccessibilityProvider>

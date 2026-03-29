@@ -12,7 +12,6 @@ import {
   Phone,
   Play,
   Download,
-  FileText,
   Smartphone,
   QrCode
 } from 'lucide-react';
@@ -39,22 +38,6 @@ const Home: React.FC = () => {
       description: 'Watch expert SRHR content',
       color: 'bg-red-500',
       textColor: 'text-red-600'
-    },
-    {
-      path: '/articles',
-      icon: FileText,
-      title: 'Expert Articles',
-      description: 'Read in-depth SRHR guides',
-      color: 'bg-blue-500',
-      textColor: 'text-blue-600'
-    },
-    {
-      path: '/sms',
-      icon: Smartphone,
-      title: 'SMS & USSD',
-      description: 'Access via SMS and USSD codes',
-      color: 'bg-green-500',
-      textColor: 'text-green-600'
     },
     {
       path: '/clinics',
@@ -97,14 +80,6 @@ const Home: React.FC = () => {
       textColor: 'text-indigo-600'
     },
     {
-      path: '/offline',
-      icon: Download,
-      title: 'Offline Mode',
-      description: 'Access downloaded content',
-      color: 'bg-gray-500',
-      textColor: 'text-gray-600'
-    },
-    {
       path: '/qr-verification',
       icon: QrCode,
       title: 'QR Code Verification',
@@ -121,10 +96,10 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+    <div className="w-full h-full bg-gray-50 overflow-x-hidden">
       
-      <main className="p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
+      <main className="p-4 sm:p-6">
+        <div className="space-y-6">
           {/* Hero section - Enhanced for mobile */}
           <div className="bg-gradient-to-br from-primary-600 to-secondary-600 rounded-2xl p-6 sm:p-8 text-white mb-6 sm:mb-8 shadow-xl">
               <div className="flex items-center space-x-3 sm:space-x-4 mb-4">

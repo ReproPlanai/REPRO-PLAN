@@ -1,14 +1,12 @@
 import React from 'react';
+import PageContainer from '../components/Layout/PageContainer';
 import ChatInterface from '../components/Chatbot/ChatInterface';
 
 const Chatbot: React.FC = () => {
-
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex-1">
-        <ChatInterface />
-      </div>
-    </div>
+    <PageContainer noPadding>
+      <ChatInterface />
+    </PageContainer>
   );
 };
 

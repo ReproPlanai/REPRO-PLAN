@@ -18,10 +18,10 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, showPrivacy = true }) 
     <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4" style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}>
       <div className="flex items-center justify-between">
         {/* Left side - Title and subtitle only */}
-        <div className="flex-1 min-w-0 pr-4">
+        <div className="flex-1 min-w-0 pr-4 flex flex-col leading-[1]">
           <h1 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{title}</h1>
           {subtitle && (
-            <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-tight break-words max-w-[200px] sm:max-w-none">
+            <p className="text-xs sm:text-sm text-gray-600 -mt-2 leading-none break-words max-w-[200px] sm:max-w-none">
               {subtitle}
             </p>
           )}

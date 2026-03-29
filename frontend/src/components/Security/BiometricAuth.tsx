@@ -14,6 +14,8 @@ import {
   Scan
 } from 'lucide-react';
 
+import { apiService } from '../../services/api';
+
 interface BiometricData {
   id: string;
   type: 'fingerprint' | 'face' | 'voice' | 'iris';
@@ -45,48 +47,27 @@ const BiometricAuth: React.FC<BiometricAuthProps> = ({
   const [selectedBiometric, setSelectedBiometric] = useState<BiometricData['type'] | null>(null);
   const [enrollmentProgress, setEnrollmentProgress] = useState(0);
 
-  // Initialize biometric data
+  // Fetch biometric data from API
   useEffect(() => {
-    const initialBiometrics: BiometricData[] = [
-      {
-        id: '1',
-        type: 'fingerprint',
-        name: 'Right Index Finger',
-        isRegistered: true,
-        lastUsed: new Date(Date.now() - 3600000).toISOString(),
-        confidence: 95,
-        isActive: true
-      },
-      {
-        id: '2',
-        type: 'face',
-        name: 'Face Recognition',
-        isRegistered: false,
-        lastUsed: '',
-        confidence: 0,
-        isActive: false
-      },
-      {
-        id: '3',
-        type: 'voice',
-        name: 'Voice Recognition',
-        isRegistered: false,
-        lastUsed: '',
-        confidence: 0,
-        isActive: false
-      },
-      {
-        id: '4',
-        type: 'iris',
-        name: 'Iris Scan',
-        isRegistered: false,
-        lastUsed: '',
-        confidence: 0,
-        isActive: false
+    const fetchBiometrics = async () => {
+      try {
+        const response = await apiService.getBiometrics?.() as {
+          success?: boolean;
+          biometrics?: BiometricData[];
+        };
+        
+        if (response?.success && response.biometrics) {
+          setBiometrics(response.biometrics);
+        } else {
+          setBiometrics([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch biometrics:', error);
+        setBiometrics([]);
       }
-    ];
-
-    setBiometrics(initialBiometrics);
+    };
+    
+    fetchBiometrics();
   }, []);
 
   const startBiometricScan = async (type: BiometricData['type']) => {
@@ -94,18 +75,25 @@ const BiometricAuth: React.FC<BiometricAuthProps> = ({
     setScanProgress(0);
     setScanResult('pending');
 
-    // Simulate biometric scanning process
-    const scanInterval = setInterval(() => {
-      setScanProgress(prev => {
-        if (prev >= 100) {
+    try {
+      // Call API for biometric authentication
+      const response = await apiService.authenticateBiometric?.(type) as {
+        success?: boolean;
+        message?: string;
+      };
+      
+      // Animate progress
+      let progress = 0;
+      const scanInterval = setInterval(() => {
+        progress += 10;
+        setScanProgress(progress);
+        
+        if (progress >= 100) {
           clearInterval(scanInterval);
           setIsScanning(false);
           
-          // Simulate scan result (90% success rate for demo)
-          const isSuccess = Math.random() > 0.1;
-          setScanResult(isSuccess ? 'success' : 'failure');
-          
-          if (isSuccess) {
+          if (response?.success) {
+            setScanResult('success');
             onAuthSuccess(type);
             // Update last used timestamp
             setBiometrics(prev => prev.map(bio => 
@@ -114,19 +102,21 @@ const BiometricAuth: React.FC<BiometricAuthProps> = ({
                 : bio
             ));
           } else {
-            onAuthFailure('Biometric scan failed. Please try again.');
+            setScanResult('failure');
+            onAuthFailure(response?.message || 'Biometric scan failed. Please try again.');
           }
           
-          return 100;
+          // Clear result after 3 seconds
+          setTimeout(() => {
+            setScanResult(null);
+          }, 3000);
         }
-        return prev + 10;
-      });
-    }, 200);
-
-    // Clear result after 3 seconds
-    setTimeout(() => {
-      setScanResult(null);
-    }, 3000);
+      }, 200);
+    } catch (error) {
+      setIsScanning(false);
+      setScanResult('failure');
+      onAuthFailure('Authentication system error. Please try again.');
+    }
   };
 
   const startEnrollment = (type: BiometricData['type']) => {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, AlertTriangle, CheckCircle, LogIn, UserPlus, RefreshCw } from 'lucide-react';
+import { AlertTriangle, CheckCircle, LogIn, UserPlus, RefreshCw } from 'lucide-react';
 import { apiService } from '../services/api';
 
 interface PortalLoginProps {
@@ -188,30 +188,8 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 max-w-md w-full p-4 sm:p-6 lg:p-8">
-        {/* Back Button */}
-        <button
-          onClick={onBack}
-          className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 mb-4 text-sm sm:text-base"
-        >
-          <ArrowLeft size={16} className="sm:w-5 sm:h-5" />
-          <span className="text-xs sm:text-sm">Back to Access Portal</span>
-        </button>
-
-        {/* Header */}
-        <div className="text-center mb-4 sm:mb-6">
-          <div className={`mx-auto flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r ${currentRole.color} rounded-full mb-3 sm:mb-4`}>
-            <span className="text-lg sm:text-2xl">{currentRole.icon}</span>
-          </div>
-          <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-2">
-            {currentRole.title}
-          </h1>
-          <p className="text-xs sm:text-sm lg:text-base text-gray-600 px-2">
-            {currentRole.description}
-          </p>
-        </div>
-
+    <div className="min-h-screen min-h-[100dvh] bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-x-hidden">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 max-w-md w-full p-4 sm:p-6 lg:p-8 mx-4 sm:mx-6">
         {/* Error Message */}
         {error && (
           <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">

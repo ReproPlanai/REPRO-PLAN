@@ -89,10 +89,15 @@ const UserExperienceManager: React.FC<UserExperienceManagerProps> = ({
     available: [
       { code: 'en', name: 'English', native: 'English' },
       { code: 'fr', name: 'French', native: 'Français' },
-      { code: 'es', name: 'Spanish', native: 'Español' },
-      { code: 'pt', name: 'Portuguese', native: 'Português' },
-      { code: 'ar', name: 'Arabic', native: 'العربية' },
-      { code: 'zh', name: 'Chinese', native: '中文' }
+      { code: 'tw', name: 'Twi', native: 'Twi' },
+      { code: 'ga', name: 'Ga', native: 'Ga' },
+      { code: 'ewe', name: 'Ewe', native: 'Eʋegbe' },
+      { code: 'dag', name: 'Dagbani', native: 'Dagbani' },
+      { code: 'fante', name: 'Fante', native: 'Fante' },
+      { code: 'bassa', name: 'Bassa', native: 'Bassa' },
+      { code: 'kpelle', name: 'Kpelle', native: 'Kpelle' },
+      { code: 'kru', name: 'Kru', native: 'Kru' },
+      { code: 'vai', name: 'Vai', native: 'Vai' }
     ]
   });
 

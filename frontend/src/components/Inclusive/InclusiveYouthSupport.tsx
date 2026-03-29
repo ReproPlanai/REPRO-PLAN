@@ -16,6 +16,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { offlineStorage } from '../../utils/offlineStorage';
+import { apiService } from '../../services/api';
 
 interface InclusiveService {
   id: string;
@@ -69,169 +70,6 @@ const InclusiveYouthSupport: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showDiscreetMode, setShowDiscreetMode] = useState(false);
 
-  const inclusiveServices: InclusiveService[] = useMemo(() => [
-    {
-      id: '1',
-      name: 'Liberia Youth Health Network',
-      description: 'Comprehensive SRHR services for all youth, including LGBTQ+ individuals',
-      type: 'counseling',
-      services: ['Confidential counseling', 'STI testing', 'Mental health support', 'Peer support groups'],
-      contact: '+231-555-0301',
-      location: 'Monrovia, Montserrado',
-      hours: 'Mon-Sat: 9AM-6PM',
-      isAnonymous: true,
-      isLGBTQFriendly: true,
-      languages: ['English', 'Liberian English'],
-      specialFeatures: ['LGBTQ+ friendly', 'Confidential', 'Peer counselors', 'Free services'],
-      rating: 4.8,
-      isVerified: true,
-      website: 'www.youthhealthnetwork.lr'
-    },
-    {
-      id: '2',
-      name: 'Safe Space Counseling Center',
-      description: 'Dedicated counseling services for marginalized youth',
-      type: 'counseling',
-      services: ['Individual counseling', 'Group therapy', 'Crisis intervention', 'Family support'],
-      contact: '+231-555-0302',
-      location: 'Paynesville, Montrovia',
-      hours: 'Mon-Fri: 8AM-5PM',
-      isAnonymous: true,
-      isLGBTQFriendly: true,
-      languages: ['English', 'Liberian English', 'Bassa'],
-      specialFeatures: ['LGBTQ+ affirming', 'Trauma-informed care', 'Sliding scale fees', 'Online sessions'],
-      rating: 4.9,
-      isVerified: true
-    },
-    {
-      id: '3',
-      name: 'Inclusive Health Clinic',
-      description: 'Medical services with a focus on inclusive care',
-      type: 'medical',
-      services: ['STI testing and treatment', 'HIV prevention', 'Mental health screening', 'Hormone therapy'],
-      contact: '+231-555-0303',
-      location: 'Sinkor, Monrovia',
-      hours: 'Mon-Fri: 8AM-4PM',
-      isAnonymous: true,
-      isLGBTQFriendly: true,
-      languages: ['English', 'Liberian English'],
-      specialFeatures: ['LGBTQ+ competent', 'Confidential', 'Free testing', 'PrEP available'],
-      rating: 4.7,
-      isVerified: true
-    },
-    {
-      id: '4',
-      name: 'Liberia LGBTQ+ Support Hotline',
-      description: '24/7 confidential support for LGBTQ+ youth',
-      type: 'hotline',
-      services: ['Crisis support', 'Information and referrals', 'Peer counseling', 'Safety planning'],
-      contact: '+231-555-0304',
-      location: 'Nationwide',
-      hours: '24/7',
-      isAnonymous: true,
-      isLGBTQFriendly: true,
-      languages: ['English', 'Liberian English'],
-      specialFeatures: ['24/7 availability', 'Anonymous', 'Crisis intervention', 'Peer support'],
-      rating: 4.9,
-      isVerified: true
-    }
-  ], []);
-
-  const inclusiveResources: InclusiveResource[] = useMemo(() => [
-    {
-      id: '1',
-      title: 'Understanding Your Identity',
-      type: 'guide',
-      content: 'A comprehensive guide to understanding sexual orientation and gender identity, written specifically for Liberian youth.',
-      category: 'health',
-      language: 'English',
-      isAgeAppropriate: true,
-      tags: ['identity', 'LGBTQ+', 'self-acceptance', 'coming out']
-    },
-    {
-      id: '2',
-      title: 'Safe Relationships for Everyone',
-      type: 'article',
-      content: 'Information about healthy relationships, consent, and communication for all types of relationships.',
-      category: 'relationships',
-      language: 'English',
-      isAgeAppropriate: true,
-      tags: ['relationships', 'consent', 'communication', 'safety']
-    },
-    {
-      id: '3',
-      title: 'Mental Health and Wellbeing',
-      type: 'guide',
-      content: 'Resources for maintaining mental health, dealing with stress, and finding support.',
-      category: 'mental_health',
-      language: 'English',
-      isAgeAppropriate: true,
-      tags: ['mental health', 'stress', 'anxiety', 'depression', 'support']
-    },
-    {
-      id: '4',
-      title: 'Your Rights and Legal Protections',
-      type: 'article',
-      content: 'Understanding your rights as a young person and where to find legal support if needed.',
-      category: 'rights',
-      language: 'English',
-      isAgeAppropriate: true,
-      tags: ['rights', 'legal', 'protection', 'discrimination']
-    },
-    {
-      id: '5',
-      title: 'STI Prevention and Testing',
-      type: 'guide',
-      content: 'Comprehensive information about STI prevention, testing, and treatment options.',
-      category: 'health',
-      language: 'English',
-      isAgeAppropriate: true,
-      tags: ['STI', 'prevention', 'testing', 'treatment', 'safe sex']
-    }
-  ], []);
-
-  const sampleSupportGroups: SupportGroup[] = useMemo(() => [
-    {
-      id: '1',
-      name: 'Liberia Youth Support Circle',
-      description: 'A safe space for LGBTQ+ youth to connect, share experiences, and support each other',
-      meetingSchedule: 'Every Saturday, 2PM-4PM',
-      location: 'Monrovia Youth Center',
-      isOnline: false,
-      isAnonymous: true,
-      ageGroup: '16-25',
-      focus: ['Peer support', 'Identity exploration', 'Community building'],
-      contact: '+231-555-0401',
-      isActive: true
-    },
-    {
-      id: '2',
-      name: 'Online Support Group',
-      description: 'Virtual support group for youth who cannot attend in-person meetings',
-      meetingSchedule: 'Every Wednesday, 7PM-8PM',
-      location: 'Online (Zoom)',
-      isOnline: true,
-      isAnonymous: true,
-      ageGroup: '18-30',
-      focus: ['Online support', 'Mental health', 'Peer connection'],
-      contact: 'support@youthhealthnetwork.lr',
-      isActive: true
-    },
-    {
-      id: '3',
-      name: 'Parents and Allies Group',
-      description: 'Support group for parents, family members, and allies of LGBTQ+ youth',
-      meetingSchedule: 'First Sunday of each month, 3PM-5PM',
-      location: 'Community Center, Paynesville',
-      isOnline: false,
-      isAnonymous: false,
-      ageGroup: 'All ages',
-      focus: ['Family support', 'Education', 'Advocacy'],
-      contact: '+231-555-0403',
-      isActive: true
-    }
-  ], []);
-
   const categories = [
     { value: 'all', label: 'All Services', icon: Users },
     { value: 'counseling', label: 'Counseling', icon: MessageCircle },
@@ -242,29 +80,52 @@ const InclusiveYouthSupport: React.FC = () => {
     { value: 'legal', label: 'Legal', icon: Shield }
   ];
 
+  // Fetch data from API instead of using sample data
   const loadData = useCallback(async () => {
     try {
+      // Fetch from API first
+      const [servicesResponse, resourcesResponse, groupsResponse] = await Promise.all([
+        apiService.getClinics?.() as Promise<{ success?: boolean; clinics?: InclusiveService[] }>,
+        apiService.getResources?.() as Promise<{ success?: boolean; resources?: InclusiveResource[] }>,
+        apiService.getSupportGroups?.() as Promise<{ success?: boolean; groups?: SupportGroup[] }>
+      ]);
+
+      if (servicesResponse?.success && servicesResponse.clinics) {
+        setServices(servicesResponse.clinics);
+        await offlineStorage.storeData('inclusive_services', servicesResponse.clinics);
+      } else {
+        const storedServices = await offlineStorage.getData('inclusive_services');
+        setServices(storedServices || []);
+      }
+
+      if (resourcesResponse?.success && resourcesResponse.resources) {
+        setResources(resourcesResponse.resources);
+        await offlineStorage.storeData('inclusive_resources', resourcesResponse.resources);
+      } else {
+        const storedResources = await offlineStorage.getData('inclusive_resources');
+        setResources(storedResources || []);
+      }
+
+      if (groupsResponse?.success && groupsResponse.groups) {
+        setSupportGroups(groupsResponse.groups);
+        await offlineStorage.storeData('support_groups', groupsResponse.groups);
+      } else {
+        const storedGroups = await offlineStorage.getData('support_groups');
+        setSupportGroups(storedGroups || []);
+      }
+    } catch (error) {
+      console.error('Failed to load inclusive data:', error);
+      // Fallback to offline storage on error
       const [storedServices, storedResources, storedGroups] = await Promise.all([
         offlineStorage.getData('inclusive_services'),
         offlineStorage.getData('inclusive_resources'),
         offlineStorage.getData('support_groups')
       ]);
-
-      setServices(storedServices || inclusiveServices);
-      setResources(storedResources || inclusiveResources);
-      setSupportGroups(storedGroups || sampleSupportGroups);
-
-      // Store sample data if not exists
-      if (!storedServices) await offlineStorage.storeData('inclusive_services', inclusiveServices);
-      if (!storedResources) await offlineStorage.storeData('inclusive_resources', inclusiveResources);
-      if (!storedGroups) await offlineStorage.storeData('support_groups', sampleSupportGroups);
-    } catch (error) {
-      console.error('Failed to load inclusive data:', error);
-      setServices(inclusiveServices);
-      setResources(inclusiveResources);
-      setSupportGroups(sampleSupportGroups);
+      setServices(storedServices || []);
+      setResources(storedResources || []);
+      setSupportGroups(storedGroups || []);
     }
-  }, [inclusiveServices, inclusiveResources, sampleSupportGroups]);
+  }, []);
 
   const getFilteredServices = () => {
     let filtered = services;
@@ -697,19 +558,19 @@ const InclusiveYouthSupport: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <span className="text-red-800">LGBTQ+ Support Hotline</span>
                         <button
-                          onClick={() => handleCall('+231-555-0304')}
+                          onClick={() => handleCall('+233-24-555-0304')}
                           className="text-red-600 font-bold hover:underline"
                         >
-                          +231-555-0304
+                          +233-24-555-0304
                         </button>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-red-800">Crisis Support</span>
                         <button
-                          onClick={() => handleCall('+231-555-9999')}
+                          onClick={() => handleCall('+233-24-555-9999')}
                           className="text-red-600 font-bold hover:underline"
                         >
-                          +231-555-9999
+                          +233-24-555-9999
                         </button>
                       </div>
                     </div>

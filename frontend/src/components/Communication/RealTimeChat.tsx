@@ -12,6 +12,7 @@ import {
   User,
   Shield
 } from 'lucide-react';
+import { apiService } from '../../services/api';
 
 interface Message {
   id: string;
@@ -60,84 +61,60 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Simulate chat rooms based on user role
+  // Fetch chat rooms from API
   useEffect(() => {
-    const roleBasedRooms: ChatRoom[] = [
-      {
-        id: 'emergency-1',
-        name: 'Emergency Response',
-        type: 'emergency',
-        participants: ['police', 'medical', 'safehouse'],
-        unreadCount: 3,
-        isActive: true
-      },
-      {
-        id: 'general-1',
-        name: 'General Communication',
-        type: 'general',
-        participants: ['admin', 'police', 'medical', 'safehouse', 'ngo'],
-        unreadCount: 1,
-        isActive: true
+    const fetchChatRooms = async () => {
+      try {
+        const response = await apiService.getChatRooms?.(userRole) as {
+          success?: boolean;
+          rooms?: ChatRoom[];
+        };
+        
+        if (response?.success && response.rooms) {
+          setChatRooms(response.rooms);
+        } else {
+          setChatRooms([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch chat rooms:', error);
+        setChatRooms([]);
       }
-    ];
-
-    if (userRole === 'POLICE') {
-      roleBasedRooms.push({
-        id: 'police-1',
-        name: 'Police Operations',
-        type: 'group',
-        participants: ['police'],
-        unreadCount: 0,
-        isActive: true
-      });
-    }
-
-    setChatRooms(roleBasedRooms);
+    };
+    
+    fetchChatRooms();
   }, [userRole]);
 
-  // Simulate messages
+  // Fetch messages from API when room changes
   useEffect(() => {
-    const sampleMessages: Message[] = [
-      {
-        id: '1',
-        senderId: 'police-1',
-        senderName: 'Officer Johnson',
-        senderRole: 'POLICE',
-        content: 'Emergency reported in Monrovia. Need medical assistance.',
-        timestamp: new Date(Date.now() - 300000).toISOString(),
-        type: 'emergency',
-        isRead: true,
-        isEncrypted: true,
-        priority: 'critical'
-      },
-      {
-        id: '2',
-        senderId: 'medical-1',
-        senderName: 'Dr. Smith',
-        senderRole: 'MEDICAL',
-        content: 'Medical team dispatched. ETA 5 minutes.',
-        timestamp: new Date(Date.now() - 240000).toISOString(),
-        type: 'text',
-        isRead: true,
-        isEncrypted: true,
-        priority: 'high'
-      },
-      {
-        id: '3',
-        senderId: 'safehouse-1',
-        senderName: 'Safe House Manager',
-        senderRole: 'SAFEHOUSE',
-        content: 'Safe house ready to receive if needed.',
-        timestamp: new Date(Date.now() - 120000).toISOString(),
-        type: 'text',
-        isRead: false,
-        isEncrypted: true,
-        priority: 'medium'
-      }
-    ];
+    if (!activeRoom) {
+      setMessages([]);
+      return;
+    }
 
-    setMessages(sampleMessages);
-  }, []);
+    const fetchMessages = async () => {
+      try {
+        const response = await apiService.getMessages?.({ toStakeholderId: activeRoom }) as {
+          success?: boolean;
+          messages?: Message[];
+        };
+        
+        if (response?.success && response.messages) {
+          setMessages(response.messages);
+        } else {
+          setMessages([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch messages:', error);
+        setMessages([]);
+      }
+    };
+    
+    fetchMessages();
+    
+    // Poll for new messages every 10 seconds
+    const interval = setInterval(fetchMessages, 10000);
+    return () => clearInterval(interval);
+  }, [activeRoom]);
 
   const sendMessage = () => {
     if (!message.trim() || !activeRoom) return;

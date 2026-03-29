@@ -18,7 +18,7 @@ export const useStakeholderAPI = ({ role, stakeholderId }: UseStakeholderAPIProp
     setLoading(true);
     setError(null);
     try {
-      const response = await apiService.getAlerts(role, stakeholderId, filters) as { success?: boolean; alerts?: any[] };
+      const response = await apiService.getAlerts(role, stakeholderId?.toString(), filters) as { success?: boolean; alerts?: any[] };
       setAlerts(response.alerts || []);
     } catch (err: any) {
       setError(err.message);
@@ -32,7 +32,7 @@ export const useStakeholderAPI = ({ role, stakeholderId }: UseStakeholderAPIProp
     setLoading(true);
     setError(null);
     try {
-      const response = await apiService.getCases(role, stakeholderId, filters) as { success?: boolean; cases?: any[] };
+      const response = await apiService.getCases(role, stakeholderId?.toString(), filters) as { success?: boolean; cases?: any[] };
       setCases(response.cases || []);
     } catch (err: any) {
       setError(err.message);
@@ -46,7 +46,7 @@ export const useStakeholderAPI = ({ role, stakeholderId }: UseStakeholderAPIProp
     setLoading(true);
     setError(null);
     try {
-      const response = await apiService.getMessages(role, stakeholderId, isRead) as { success?: boolean; messages?: any[] };
+      const response = await apiService.getMessages?.({ toStakeholderId: stakeholderId?.toString(), isRead }) as { success?: boolean; messages?: any[] };
       setMessages(response.messages || []);
     } catch (err: any) {
       setError(err.message);
@@ -107,7 +107,7 @@ export const useStakeholderAPI = ({ role, stakeholderId }: UseStakeholderAPIProp
     setLoading(true);
     setError(null);
     try {
-      const response = await apiService.sendMessage({
+      const response = await apiService.createMessage({
         ...messageData,
         fromRole: role,
         fromStakeholderId: stakeholderId || 0
@@ -127,7 +127,7 @@ export const useStakeholderAPI = ({ role, stakeholderId }: UseStakeholderAPIProp
     setLoading(true);
     setError(null);
     try {
-      const response = await apiService.updateAlert(id, updates);
+      const response = await apiService.updateAlert(id.toString(), updates);
       await fetchAlerts();
       return response;
     } catch (err: any) {
@@ -143,7 +143,7 @@ export const useStakeholderAPI = ({ role, stakeholderId }: UseStakeholderAPIProp
     setLoading(true);
     setError(null);
     try {
-      const response = await apiService.updateCase(id, updates);
+      const response = await apiService.updateCase(id.toString(), updates);
       await fetchCases();
       return response;
     } catch (err: any) {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, User, Phone, MessageSquare, AlertTriangle, CheckCircle } from 'lucide-react';
+import { apiService } from '../../services/api';
 
 interface UnifiedVerificationFormProps {
   onVerificationComplete: (isVerified: boolean) => void;
@@ -59,15 +60,17 @@ const UnifiedVerificationForm: React.FC<UnifiedVerificationFormProps> = ({
       // Validate required fields
       if (!formData.secureId || !formData.phoneNumber || !formData.reason || !formData.emergencyContact) {
         setErrorMessage('Please fill in all required fields.');
+        setIsSubmitting(false);
         return;
       }
 
       if (!formData.agreeToTerms) {
         setErrorMessage('You must agree to the terms and conditions.');
+        setIsSubmitting(false);
         return;
       }
 
-      // Simulate verification process
+      // Start verification process
       setVerificationStatus('pending');
       
       // Generate OTP if needed
@@ -77,15 +80,23 @@ const UnifiedVerificationForm: React.FC<UnifiedVerificationFormProps> = ({
         setShowOTPInput(true);
         onOTPGenerated?.(otp);
         setVerificationStatus('idle');
+        setIsSubmitting(false);
         return;
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Call real API for verification
+      const response = await apiService.loginUser(formData.secureId) as { 
+        success: boolean; 
+        user?: any 
+      };
       
-      setVerificationStatus('verified');
-      onVerificationComplete(true);
-      
+      if (response.success) {
+        setVerificationStatus('verified');
+        onVerificationComplete(true);
+      } else {
+        setVerificationStatus('error');
+        setErrorMessage('Verification failed. Please check your secure ID and try again.');
+      }
     } catch (error) {
       setVerificationStatus('error');
       setErrorMessage('An unexpected error occurred. Please try again.');
@@ -99,13 +110,24 @@ const UnifiedVerificationForm: React.FC<UnifiedVerificationFormProps> = ({
     setIsSubmitting(true);
     
     try {
-      // Simulate OTP verification
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setVerificationStatus('verified');
-      onVerificationComplete(true);
+      setIsSubmitting(true);
+      
+      // Call real API to verify OTP
+      const response = await apiService.loginUser(otpCode) as { 
+        success: boolean; 
+        user?: any 
+      };
+      
+      if (response.success) {
+        setVerificationStatus('verified');
+        onVerificationComplete(true);
+      } else {
+        setVerificationStatus('error');
+        setErrorMessage('Invalid OTP. Please try again.');
+      }
     } catch (error) {
       setVerificationStatus('error');
-      setErrorMessage('Invalid OTP. Please try again.');
+      setErrorMessage('Failed to verify OTP. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

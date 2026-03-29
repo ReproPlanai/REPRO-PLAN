@@ -26,6 +26,15 @@ const FloatingDownloadButton: React.FC<FloatingDownloadButtonProps> = ({
     }
   }, []);
 
+  // Auto-hide after 10 seconds
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsDismissed(true);
+      localStorage.setItem('repro-plan-floating-button-dismissed', 'true');
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="fixed bottom-4 right-4 z-40">
       {/* Expanded State */}

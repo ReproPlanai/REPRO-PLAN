@@ -7,7 +7,6 @@ import {
   Menu,
   X,
   Bell, 
-  Search,
   Download,
   Eye,
   AlertTriangle,
@@ -20,7 +19,6 @@ import {
   BookOpen,
   LifeBuoy,
   Calendar,
-  TrendingUp,
   Users as UsersIcon,
   Globe2,
   Map,
@@ -35,18 +33,19 @@ import {
   BarChart4,
   UserPlus,
   BellRing,
-  Users,
-  BookOpen,
   MessageSquarePlus,
-  Book
+  Book,
+  UserCheck
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
 import { dataSecurityManager } from '../utils/dataSecurity';
+import { userVerificationService } from '../utils/userVerification';
 import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
 import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging';
 import UserManagement from './admin/UserManagement';
 import SystemSettings from './admin/SystemSettings';
+import StakeholderManagement from './admin/StakeholderManagement';
 import { apiService } from '../services/api';
 import SecurityPreferences from '../components/Settings/SecurityPreferences';
 import RoleSettingsPanel from '../components/Settings/RoleSettingsPanel';
@@ -86,10 +85,111 @@ interface AdminDashboardProps {
   onLogout: () => void;
 }
 
+const AnalyticsTab: React.FC<{
+  userData: any;
+  stakeholderAPI: ReturnType<typeof useStakeholderAPI>;
+  dashboardMetrics: { totalUsers: number; activeUsers: number; totalStakeholders: number; totalAlerts: number; totalCases: number };
+  dataSecurityManager: typeof dataSecurityManager;
+}> = ({ stakeholderAPI, dashboardMetrics, dataSecurityManager }) => {
+  const alertsByType = stakeholderAPI.alerts.reduce((acc: Record<string, number>, a) => {
+    acc[a.alertType || 'other'] = (acc[a.alertType || 'other'] || 0) + 1;
+    return acc;
+  }, {});
+  const casesByStatus = stakeholderAPI.cases.reduce((acc: Record<string, number>, c) => {
+    acc[c.status || 'unknown'] = (acc[c.status || 'unknown'] || 0) + 1;
+    return acc;
+  }, {});
+  const chartDataAlerts = Object.entries(alertsByType).map(([label, value]) => ({ id: label, label, value }));
+  const chartDataCases = Object.entries(casesByStatus).map(([label, value]) => ({ id: label, label, value }));
+
+  const handleExportReport = () => {
+    const rows = [
+      ['Metric', 'Value'],
+      ['Total Users', String(dashboardMetrics.totalUsers)],
+      ['Active Users', String(dashboardMetrics.activeUsers)],
+      ['Total Stakeholders', String(dashboardMetrics.totalStakeholders)],
+      ['Total Alerts', String(stakeholderAPI.alerts.length)],
+      ['Total Cases', String(stakeholderAPI.cases.length)],
+      ['Active Alerts', String(stakeholderAPI.alerts.filter(a => a.status === 'active').length)],
+      ['Open Cases', String(stakeholderAPI.cases.filter(c => c.status === 'open').length)]
+    ];
+    const csv = rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `analytics-report-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <p className="text-sm text-gray-600">Platform metrics and trends</p>
+        <button
+          onClick={handleExportReport}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center gap-2"
+        >
+          <Download size={16} />
+          Export Report
+        </button>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Total Users</p>
+          <p className="text-2xl font-semibold text-gray-900">{dashboardMetrics.totalUsers}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Active Users</p>
+          <p className="text-2xl font-semibold text-green-600">{dashboardMetrics.activeUsers}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Alerts</p>
+          <p className="text-2xl font-semibold text-gray-900">{stakeholderAPI.alerts.length}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Cases</p>
+          <p className="text-2xl font-semibold text-gray-900">{stakeholderAPI.cases.length}</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {chartDataAlerts.length > 0 && (
+          <SecureDataViewer
+            data={chartDataAlerts}
+            chartType="bar"
+            title="Alerts by Type"
+            description="Distribution of emergency alerts by type"
+            userRole="ADMIN"
+            onDataAccess={(log) => dataSecurityManager.logDataAccess(log)}
+          />
+        )}
+        {chartDataCases.length > 0 && (
+          <SecureDataViewer
+            data={chartDataCases}
+            chartType="pie"
+            title="Cases by Status"
+            description="Case distribution by status"
+            userRole="ADMIN"
+            onDataAccess={(log) => dataSecurityManager.logDataAccess(log)}
+          />
+        )}
+      </div>
+      {chartDataAlerts.length === 0 && chartDataCases.length === 0 && (
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-gray-600">No chart data yet. Alerts and cases will appear here as they are created.</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [alertFilters, setAlertFilters] = useState<{ status?: string; priority?: string }>({});
+  const [caseFilters, setCaseFilters] = useState<{ status?: string; priority?: string }>({});
+  const [verificationRefresh, setVerificationRefresh] = useState(0);
   const [dashboardMetrics, setDashboardMetrics] = useState({
     totalAlerts: 0,
     totalCases: 0,
@@ -120,25 +220,31 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
 
   const fetchDashboardMetrics = async () => {
     try {
-      // In a real implementation, you'd have API endpoints for these metrics
-      // For now, we'll calculate from available data
-      const alertsResponse = await apiService.getAlerts('ADMIN', userData?.id) as { success?: boolean; alerts?: any[] };
-      const casesResponse = await apiService.getCases('ADMIN', userData?.id) as { success?: boolean; cases?: any[] };
+      const [alertsResponse, casesResponse, usersResponse, stakeholdersResponse] = await Promise.all([
+        apiService.getAlerts('ADMIN', userData?.id) as Promise<{ success?: boolean; alerts?: any[] }>,
+        apiService.getCases('ADMIN', userData?.id) as Promise<{ success?: boolean; cases?: any[] }>,
+        apiService.getUsers() as Promise<{ success?: boolean; users?: any[] }>,
+        apiService.getStakeholders() as Promise<{ success?: boolean; stakeholders?: any[] }>
+      ]);
 
-      // Calculate metrics from API responses
       const totalAlerts = alertsResponse?.success ? (alertsResponse.alerts?.length || 0) : 0;
       const totalCases = casesResponse?.success ? (casesResponse.cases?.length || 0) : 0;
-      const activeAlerts = stakeholderAPI.alerts.filter(a => a.status === 'active').length;
+      const users = usersResponse?.success ? (usersResponse.users || []) : [];
+      const totalUsers = users.length;
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const activeUsers = users.filter((u: any) => u.isUsed && u.lastLogin && u.lastLogin >= sevenDaysAgo).length;
+      const totalStakeholders = stakeholdersResponse?.success ? (stakeholdersResponse.stakeholders?.length || 0) : 0;
+      const activeAlerts = (alertsResponse?.alerts || []).filter((a: any) => a.status === 'active').length;
 
       setDashboardMetrics({
         totalAlerts,
         totalCases,
         activeAlerts,
-        totalUsers: 0, // Would need a separate API endpoint
-        activeUsers: 0, // Would need a separate API endpoint
-        totalStakeholders: 0, // Would need a separate API endpoint
-        systemHealth: 100, // Mock for now - would be from system monitoring
-        responseTime: Math.floor(Math.random() * 100) + 50 // Mock response time
+        totalUsers,
+        activeUsers,
+        totalStakeholders,
+        systemHealth: 100,
+        responseTime: Math.floor(Math.random() * 100) + 50
       });
     } catch (error) {
       console.error('Failed to fetch dashboard metrics:', error);
@@ -167,9 +273,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
     { id: 1, user: 'Anonymous User', action: 'Accessed chatbot', time: '5 min ago', location: 'Accra' },
     { id: 2, user: 'Anonymous User', action: 'Downloaded resource', time: '12 min ago', location: 'Kumasi' },
     { id: 3, user: 'Anonymous User', action: 'Used emergency feature', time: '18 min ago', location: 'Tamale' },
-    { id: 4, user: 'Anonymous User', action: 'Submitted mentorship request', time: '22 min ago', location: 'Monrovia' },
-    { id: 5, user: 'Anonymous User', action: 'Completed SRHR quiz', time: '30 min ago', location: 'Buchanan' },
-    { id: 6, user: 'Anonymous User', action: 'Generated QR verification', time: '45 min ago', location: 'Ganta' }
+    { id: 4, user: 'Anonymous User', action: 'Submitted mentorship request', time: '22 min ago', location: 'Accra' },
+    { id: 5, user: 'Anonymous User', action: 'Completed SRHR quiz', time: '30 min ago', location: 'Tema' },
+    { id: 6, user: 'Anonymous User', action: 'Generated QR verification', time: '45 min ago', location: 'Tamale' }
   ]);
 
   // Placeholder data for secure visualizations
@@ -194,6 +300,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
     { id: 'cases', label: 'Cases', icon: FileText },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'security', label: 'Security', icon: Shield },
+    { id: 'verification', label: 'Verification Requests', icon: UserCheck },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp },
     { id: 'operations', label: 'Operations', icon: ClipboardList },
     { id: 'training', label: 'Training', icon: CheckCircle },
@@ -219,6 +326,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
     { id: 'regional', label: 'Regional', icon: BarChart4 },
     { id: 'volunteers', label: 'Volunteers', icon: UserPlus },
     { id: 'policy', label: 'Policy Updates', icon: BellRing },
+    { id: 'stakeholders', label: 'Stakeholders', icon: UsersIcon },
     { id: 'directory', label: 'Stakeholder Directory', icon: Users },
     { id: 'playbooks', label: 'Playbooks', icon: BookOpen },
     { id: 'knowledge', label: 'Knowledge', icon: Book },
@@ -241,9 +349,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 flex flex-col leading-[1]">
                 <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">Admin Dashboard</h1>
-                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">System Administration Portal</p>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block -mt-2 leading-none">System Administration Portal</p>
               </div>
             </div>
             
@@ -321,7 +429,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
         )}
 
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+        <div className="hidden lg:block w-56 xl:w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
           <nav className="p-4 space-y-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -464,88 +572,241 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
             </div>
           )}
 
-          {/* Users Tab */}
-          {activeTab === 'users' && (
+          {/* Alerts Tab */}
+          {activeTab === 'alerts' && (
             <div className="space-y-4 sm:space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">User Management</h2>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                      type="text"
-                      placeholder="Search users..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full sm:w-auto pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    />
-                  </div>
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
-                    Export Data
-                  </button>
-                </div>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Emergency Alerts</h2>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <select
+                  value={alertFilters.status ?? ''}
+                  onChange={(e) => {
+                    const next = { ...alertFilters, status: e.target.value || undefined };
+                    setAlertFilters(next);
+                    stakeholderAPI.fetchAlerts(next);
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="pending">Pending</option>
+                </select>
+                <select
+                  value={alertFilters.priority ?? ''}
+                  onChange={(e) => {
+                    const next = { ...alertFilters, priority: e.target.value || undefined };
+                    setAlertFilters(next);
+                    stakeholderAPI.fetchAlerts(next);
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">All Priority</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+                <button
+                  onClick={() => {
+                    setAlertFilters({});
+                    stakeholderAPI.fetchAlerts();
+                  }}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
+                >
+                  Reset Filters
+                </button>
               </div>
-
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-3 sm:p-4 border-b border-gray-200">
-                  <h3 className="text-base sm:text-lg font-medium text-gray-900">Recent User Activity</h3>
-                </div>
-                
-                {/* Mobile Card View */}
-                <div className="block sm:hidden">
-                  <div className="p-3 space-y-3">
-                    {userActivity.map((activity) => (
-                      <div key={activity.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
-                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                          <span className="text-sm font-medium text-gray-900">{activity.user}</span>
-                          <span className="text-xs text-gray-500">{activity.time}</span>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div className="block sm:hidden p-3 space-y-3">
+                  {stakeholderAPI.alerts.length === 0 ? (
+                    <p className="text-gray-500 text-sm py-4">No alerts found</p>
+                  ) : (
+                    stakeholderAPI.alerts.map((alert) => (
+                      <div key={alert.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                        <div className="flex justify-between items-start">
+                          <span className="text-sm font-medium text-gray-900">{alert.alertType}</span>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            alert.status === 'active' ? 'bg-red-100 text-red-700' :
+                            alert.status === 'resolved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                          }`}>{alert.status}</span>
                         </div>
-                        <div className="text-sm text-gray-600">{activity.action}</div>
-                        <div className="text-xs text-gray-500">{activity.location}</div>
-                        <div className="flex space-x-2 pt-2">
-                          <button className="text-blue-600 hover:text-blue-800 text-sm">
-                            <Eye size={14} className="inline mr-1" />
-                            View
+                        <p className="text-sm text-gray-600">{alert.description}</p>
+                        <p className="text-xs text-gray-500">{alert.location?.address || 'N/A'}, {alert.location?.city || ''}</p>
+                        <p className="text-xs text-gray-500">{new Date(alert.createdAt).toLocaleString()}</p>
+                        {alert.status === 'active' && (
+                          <button
+                            onClick={() => stakeholderAPI.updateAlert(alert.id, { status: 'resolved' })}
+                            className="text-sm text-blue-600 hover:text-blue-800"
+                          >
+                            Mark Resolved
                           </button>
-                          <button className="text-gray-600 hover:text-gray-800 text-sm">
-                            <Download size={14} className="inline mr-1" />
-                            Download
-                          </button>
-                        </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
+                    ))
+                  )}
                 </div>
-
-                {/* Desktop Table View */}
                 <div className="hidden sm:block overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full min-w-[640px]">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {userActivity.map((activity) => (
-                        <tr key={activity.id}>
-                          <td className="px-4 py-3 text-sm text-gray-900">{activity.user}</td>
-                          <td className="px-4 py-3 text-sm text-gray-600">{activity.action}</td>
-                          <td className="px-4 py-3 text-sm text-gray-600">{activity.location}</td>
-                          <td className="px-4 py-3 text-sm text-gray-500">{activity.time}</td>
-                          <td className="px-4 py-3 text-sm">
-                            <button className="text-blue-600 hover:text-blue-800 mr-3">
-                              <Eye size={16} />
-                            </button>
-                            <button className="text-gray-600 hover:text-gray-800">
-                              <Download size={16} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                      {stakeholderAPI.alerts.length === 0 ? (
+                        <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-500">No alerts found</td></tr>
+                      ) : (
+                        stakeholderAPI.alerts.map((alert) => (
+                          <tr key={alert.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 text-sm text-gray-900">{alert.alertType}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">{alert.description}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600">{alert.location?.address || 'N/A'}, {alert.location?.city || ''}</td>
+                            <td className="px-4 py-3 text-sm">
+                              <span className={`px-2 py-1 text-xs rounded-full ${
+                                alert.status === 'active' ? 'bg-red-100 text-red-700' :
+                                alert.status === 'resolved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                              }`}>{alert.status}</span>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-500">{new Date(alert.createdAt).toLocaleString()}</td>
+                            <td className="px-4 py-3 text-sm">
+                              {alert.status === 'active' && (
+                                <button
+                                  onClick={() => stakeholderAPI.updateAlert(alert.id, { status: 'resolved' })}
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  Resolve
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Cases Tab */}
+          {activeTab === 'cases' && (
+            <div className="space-y-4 sm:space-y-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Case Management</h2>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <select
+                  value={caseFilters.status ?? ''}
+                  onChange={(e) => {
+                    const next = { ...caseFilters, status: e.target.value || undefined };
+                    setCaseFilters(next);
+                    stakeholderAPI.fetchCases(next);
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">All Status</option>
+                  <option value="open">Open</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="pending">Pending</option>
+                </select>
+                <select
+                  value={caseFilters.priority ?? ''}
+                  onChange={(e) => {
+                    const next = { ...caseFilters, priority: e.target.value || undefined };
+                    setCaseFilters(next);
+                    stakeholderAPI.fetchCases(next);
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">All Priority</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+                <button
+                  onClick={() => {
+                    setCaseFilters({});
+                    stakeholderAPI.fetchCases();
+                  }}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
+                >
+                  Reset Filters
+                </button>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div className="block sm:hidden p-3 space-y-3">
+                  {stakeholderAPI.cases.length === 0 ? (
+                    <p className="text-gray-500 text-sm py-4">No cases found</p>
+                  ) : (
+                    stakeholderAPI.cases.map((c) => (
+                      <div key={c.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                        <div className="flex justify-between items-start">
+                          <span className="text-sm font-medium text-gray-900">{c.caseNumber}</span>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            c.status === 'open' ? 'bg-red-100 text-red-700' :
+                            c.status === 'resolved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                          }`}>{c.status}</span>
+                        </div>
+                        <p className="text-sm text-gray-600">{c.description}</p>
+                        <p className="text-xs text-gray-500">{c.location?.address || 'N/A'}, {c.location?.city || ''}</p>
+                        <p className="text-xs text-gray-500">{new Date(c.createdAt).toLocaleString()}</p>
+                        {c.status === 'open' && (
+                          <button
+                            onClick={() => stakeholderAPI.updateCase(c.id, { status: 'resolved' })}
+                            className="text-sm text-blue-600 hover:text-blue-800"
+                          >
+                            Mark Resolved
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full min-w-[640px]">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Case #</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {stakeholderAPI.cases.length === 0 ? (
+                        <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No cases found</td></tr>
+                      ) : (
+                        stakeholderAPI.cases.map((c) => (
+                          <tr key={c.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 text-sm font-mono text-gray-900">{c.caseNumber}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600">{c.caseType}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">{c.description}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600">{c.location?.address || 'N/A'}, {c.location?.city || ''}</td>
+                            <td className="px-4 py-3 text-sm">
+                              <span className={`px-2 py-1 text-xs rounded-full ${
+                                c.status === 'open' ? 'bg-red-100 text-red-700' :
+                                c.status === 'resolved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                              }`}>{c.status}</span>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-500">{new Date(c.createdAt).toLocaleString()}</td>
+                            <td className="px-4 py-3 text-sm">
+                              {c.status === 'open' && (
+                                <button
+                                  onClick={() => stakeholderAPI.updateCase(c.id, { status: 'resolved' })}
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  Resolve
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -576,8 +837,143 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
           {activeTab === 'security' && (
             <div className="space-y-6">
               <h2 className="text-xl font-semibold text-gray-900">Security Dashboard</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                  <h3 className="text-base font-medium text-gray-900 mb-3">Access Log Summary</h3>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {(() => {
+                      const logs = dataSecurityManager.getAccessLogs('ADMIN').slice(-20).reverse();
+                      return logs.length === 0 ? (
+                        <p className="text-sm text-gray-500">No access logs yet</p>
+                      ) : (
+                        logs.map((log, i) => (
+                          <div key={i} className="text-sm p-2 bg-gray-50 rounded">
+                            <span className="font-medium">{log.userRole}</span> accessed <span className="font-medium">{log.dataType}</span>
+                            {log.accessGranted ? (
+                              <span className="text-green-600 ml-1">✓</span>
+                            ) : (
+                              <span className="text-red-600 ml-1">✗</span>
+                            )}
+                            <p className="text-xs text-gray-500 mt-0.5">{new Date(log.timestamp).toLocaleString()}</p>
+                          </div>
+                        ))
+                      );
+                    })()}
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                  <h3 className="text-base font-medium text-gray-900 mb-3">Security Status</h3>
+                  {(() => {
+                    const status = dataSecurityManager.getSecurityStatus('ADMIN');
+                    return (
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Active NDA</span>
+                          <span className={status.hasActiveNDA ? 'text-green-600' : 'text-gray-500'}>
+                            {status.hasActiveNDA ? 'Yes' : 'No'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Sensitive Data Access</span>
+                          <span className={status.canAccessSensitiveData ? 'text-green-600' : 'text-gray-500'}>
+                            {status.canAccessSensitiveData ? 'Allowed' : 'Restricted'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Recent Access Count</span>
+                          <span className="text-gray-900">{status.recentAccessCount}</span>
+                        </div>
+                        {status.lastAccessTime && (
+                          <div className="flex justify-between">
+                            <span className="text-sm text-gray-600">Last Access</span>
+                            <span className="text-gray-900 text-sm">{new Date(status.lastAccessTime).toLocaleString()}</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">Security Preferences</h4>
+                    <SecurityPreferences role="ADMIN" />
+                  </div>
+                </div>
+              </div>
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <p className="text-gray-600">Security monitoring and access control features will be implemented here.</p>
+                <h3 className="text-base font-medium text-gray-900 mb-2">Active Sessions</h3>
+                <p className="text-sm text-gray-600">Stakeholder sessions are managed via OTP. No persistent sessions in demo mode.</p>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'verification' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">Verification Requests</h2>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                {(() => {
+                  void verificationRefresh; // trigger re-render when refresh changes
+                  const requests = userVerificationService.getAllRequests();
+                  const pending = requests.filter(r => r.status === 'pending');
+                  return pending.length === 0 ? (
+                    <div className="p-6 text-center text-gray-500">
+                      No pending verification requests
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-gray-200">
+                      {pending.map((req) => (
+                        <div key={req.id} className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div>
+                            <p className="font-medium text-gray-900">ID: {req.id}</p>
+                            <p className="text-sm text-gray-600">Phone: {req.phoneNumber}</p>
+                            <p className="text-sm text-gray-600">Reason: {req.reason}</p>
+                            <p className="text-xs text-gray-500">{new Date(req.timestamp).toLocaleString()}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                userVerificationService.adminApprove(req.id);
+                                setVerificationRefresh(v => v + 1);
+                              }}
+                              className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => {
+                                userVerificationService.adminReject(req.id);
+                                setVerificationRefresh(v => v + 1);
+                              }}
+                              className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Recent Requests (All)</h3>
+                {(() => {
+                  void verificationRefresh;
+                  const all = userVerificationService.getAllRequests().slice(-10).reverse();
+                  return all.length === 0 ? (
+                    <p className="text-sm text-gray-500">No verification requests yet</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {all.map((r) => (
+                        <div key={r.id} className="text-sm flex justify-between items-center">
+                          <span>{r.phoneNumber} - {(r.reason || '').slice(0, 40)}{(r.reason || '').length > 40 ? '...' : ''}</span>
+                          <span className={`px-2 py-0.5 rounded text-xs ${
+                            r.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            r.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>{r.status}</span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}
@@ -585,9 +981,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
           {activeTab === 'analytics' && (
             <div className="space-y-6">
               <h2 className="text-xl font-semibold text-gray-900">Analytics Dashboard</h2>
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <p className="text-gray-600">Advanced analytics and reporting features will be implemented here.</p>
-              </div>
+              <AnalyticsTab
+                userData={userData}
+                stakeholderAPI={stakeholderAPI}
+                dashboardMetrics={dashboardMetrics}
+                dataSecurityManager={dataSecurityManager}
+              />
             </div>
           )}
 
@@ -756,7 +1155,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                   { label: 'Hotspot Alpha', region: 'Accra', status: 'High' },
                   { label: 'Hotspot Bravo', region: 'Kumasi', status: 'Moderate' },
                   { label: 'Hotspot Delta', region: 'Tamale', status: 'Elevated' },
-                  { label: 'Hotspot Echo', region: 'Monrovia', status: 'Stable' }
+                  { label: 'Hotspot Echo', region: 'Accra', status: 'Stable' }
                 ]}
               />
             </div>
@@ -771,7 +1170,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                   { title: 'Incident Assessment Team', region: 'Greater Accra', status: 'Active' },
                   { title: 'Stakeholder Field Visit', region: 'Ashanti', status: 'Planned' },
                   { title: 'Community Safety Audit', region: 'Northern Region', status: 'In Progress' },
-                  { title: 'Partnership Outreach', region: 'Liberia', status: 'Planned' }
+                  { title: 'Partnership Outreach', region: 'Ghana', status: 'Planned' }
                 ]}
               />
             </div>
@@ -816,7 +1215,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                   { label: 'Data Access Anomaly', region: 'Accra', level: 'High' },
                   { label: 'Delayed Response Trend', region: 'Kumasi', level: 'Moderate' },
                   { label: 'Partner Capacity Strain', region: 'Tamale', level: 'Elevated' },
-                  { label: 'Funding Gap Risk', region: 'Monrovia', level: 'Moderate' }
+                  { label: 'Funding Gap Risk', region: 'Accra', level: 'Moderate' }
                 ]}
               />
             </div>
@@ -959,6 +1358,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                   { title: 'Partner Access Policy', date: 'Dec 28, 2025', status: 'Acknowledged' }
                 ]}
               />
+            </div>
+          )}
+
+          {activeTab === 'stakeholders' && (
+            <div className="space-y-6">
+              <StakeholderManagement />
             </div>
           )}
 

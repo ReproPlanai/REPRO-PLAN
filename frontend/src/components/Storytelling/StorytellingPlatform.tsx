@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { offlineStorage } from '../../utils/offlineStorage';
 import { secretCodeManager } from '../../utils/secretCode';
+import { apiService } from '../../services/api';
 
 interface Story {
   id: string;
@@ -32,9 +33,9 @@ interface Story {
   audioUrl?: string;
   videoUrl?: string;
   duration?: number; // for audio/video
-  language: 'english' | 'liberian_english' | 'bassa' | 'kpelle' | 'kru' | 'vai';
+  language: 'english' | 'french' | 'twi' | 'ga' | 'ewe' | 'dagbani' | 'fante' | 'bassa' | 'kpelle' | 'kru' | 'vai';
   ageGroup: '13-17' | '18-24' | '25-35' | '35+';
-  location?: string; // County in Liberia
+  location?: string; // Region in Ghana
 }
 
 interface StoryForm {
@@ -71,7 +72,7 @@ const StorytellingPlatform: React.FC = () => {
     category: 'general',
     isAnonymous: true,
     tags: [],
-    language: 'liberian_english',
+    language: 'english',
     ageGroup: '18-24',
     location: ''
   });
@@ -88,34 +89,17 @@ const StorytellingPlatform: React.FC = () => {
 
   const languages = [
     { value: 'english', label: 'English' },
-    { value: 'swahili', label: 'Swahili (Kiswahili)' },
-    { value: 'hausa', label: 'Hausa' },
-    { value: 'yoruba', label: 'Yoruba' },
-    { value: 'igbo', label: 'Igbo' },
     { value: 'french', label: 'French (Français)' },
-    { value: 'arabic', label: 'Arabic (العربية)' },
-    { value: 'amharic', label: 'Amharic (አማርኛ)' },
-    { value: 'oromo', label: 'Oromo' },
-    { value: 'zulu', label: 'Zulu (isiZulu)' },
-    { value: 'xhosa', label: 'Xhosa (isiXhosa)' },
     { value: 'twi', label: 'Twi' },
-    { value: 'wolof', label: 'Wolof' },
-    { value: 'fula', label: 'Fula (Fulfulde)' },
-    { value: 'lingala', label: 'Lingala' },
-    { value: 'kinyarwanda', label: 'Kinyarwanda' },
-    { value: 'luganda', label: 'Luganda' },
-    { value: 'chichewa', label: 'Chichewa' },
-    { value: 'tswana', label: 'Tswana (Setswana)' },
-    { value: 'sotho', label: 'Sotho (Sesotho)' },
     { value: 'ga', label: 'Ga' },
     { value: 'ewe', label: 'Ewe' },
+    { value: 'dagbani', label: 'Dagbani' },
+    { value: 'fante', label: 'Fante' },
     { value: 'bassa', label: 'Bassa' },
     { value: 'kpelle', label: 'Kpelle' },
     { value: 'kru', label: 'Kru' },
     { value: 'vai', label: 'Vai' },
-    { value: 'portuguese', label: 'Portuguese (Português)' },
-    { value: 'afrikaans', label: 'Afrikaans' },
-    { value: 'other', label: 'Other African Language' }
+    { value: 'other', label: 'Other' }
   ];
 
   const ageGroups = [
@@ -125,26 +109,12 @@ const StorytellingPlatform: React.FC = () => {
     { value: '35+', label: '35+ years' }
   ];
 
-  // African regions (starting with Ghana, expandable to all Africa)
+  // Ghana regions
   const africanRegions = [
-    // Ghana (Starting country)
     'Greater Accra', 'Ashanti', 'Western', 'Eastern', 'Central', 'Northern',
     'Upper East', 'Upper West', 'Volta', 'Bono', 'Bono East', 'Ahafo',
     'Western North', 'Oti', 'Savannah', 'North East',
-    // West Africa
-    'Lagos', 'Kano', 'Abuja', 'Dakar', 'Abidjan', 'Bamako', 'Ouagadougou',
-    'Conakry', 'Freetown', 'Monrovia', 'Banjul', 'Bissau', 'Lomé', 'Cotonou',
-    // East Africa
-    'Nairobi', 'Dar es Salaam', 'Kampala', 'Addis Ababa', 'Kigali', 'Juba',
-    'Mogadishu', 'Djibouti', 'Khartoum', 'Asmara',
-    // Central Africa
-    'Kinshasa', 'Brazzaville', 'Bangui', 'Yaoundé', 'Douala', 'Libreville',
-    'Malabo', 'N\'Djamena', 'Luanda',
-    // Southern Africa
-    'Johannesburg', 'Cape Town', 'Durban', 'Harare', 'Lusaka', 'Gaborone',
-    'Maputo', 'Windhoek', 'Lilongwe', 'Mbabane', 'Maseru',
-    // North Africa
-    'Cairo', 'Casablanca', 'Algiers', 'Tunis', 'Tripoli', 'Khartoum'
+    'Accra', 'Kumasi', 'Tamale', 'Tema', 'Takoradi', 'Cape Coast', 'Sunyani'
   ];
 
   const commonTags = [
@@ -154,78 +124,37 @@ const StorytellingPlatform: React.FC = () => {
 
   const loadStories = useCallback(async () => {
     try {
-      const storedStories = await offlineStorage.getData('srhr_stories');
-      if (storedStories) {
-        setStories(storedStories);
+      // Try to fetch from API first
+      const response = await apiService.getStories?.() as { success?: boolean; stories?: Story[] };
+      if (response?.success && response.stories && response.stories.length > 0) {
+        setStories(response.stories);
+        await offlineStorage.storeData('srhr_stories', response.stories);
       } else {
-        // TODO: Load stories from API instead of sample data
-        // const { apiService } = await import('../../services/api');
-        // const response = await apiService.getStories();
-        // if (response.success) setStories(response.stories);
-
-        // For now, using sample stories for demonstration
-        const sampleStories = generateSampleStories();
-        setStories(sampleStories);
-        await offlineStorage.storeData('srhr_stories', sampleStories);
+        // Fall back to offline storage
+        const storedStories = await offlineStorage.getData('srhr_stories');
+        if (storedStories && storedStories.length > 0) {
+          setStories(storedStories);
+        } else {
+          setStories([]);
+        }
       }
     } catch (error) {
       console.error('Failed to load stories:', error);
+      // Fall back to offline storage on error
+      try {
+        const storedStories = await offlineStorage.getData('srhr_stories');
+        if (storedStories) {
+          setStories(storedStories);
+        } else {
+          setStories([]);
+        }
+      } catch {
+        setStories([]);
+      }
     }
   }, []);
 
-  const generateSampleStories = (): Story[] => [
-    {
-      id: '1',
-      title: 'My First Period Experience',
-      content: 'I was 13 when I got my first period. I was scared and didn\'t know what was happening. My mother wasn\'t around, so I asked my older sister. She explained everything and helped me understand that it\'s normal. Now I help other girls in my community understand their bodies too.',
-      type: 'text',
-      category: 'period_health',
-      author: 'ABC12345',
-      timestamp: new Date(Date.now() - 86400000).toISOString(),
-      likes: 12,
-      isAnonymous: true,
-      isModerated: true,
-      isApproved: true,
-      tags: ['period', 'education', 'community'],
-      language: 'english',
-      ageGroup: '13-17',
-      location: 'Greater Accra'
-    },
-    {
-      id: '2',
-      title: 'Learning About Consent',
-      content: 'I used to think that if someone said "no" but didn\'t fight back, it was okay. I learned that consent must be enthusiastic and ongoing. This changed how I approach relationships. Everyone deserves respect and choice.',
-      type: 'text',
-      category: 'consent',
-      author: 'DEF67890',
-      timestamp: new Date(Date.now() - 172800000).toISOString(),
-      likes: 8,
-      isAnonymous: true,
-      isModerated: true,
-      isApproved: true,
-      tags: ['consent', 'relationships', 'education'],
-      language: 'english',
-      ageGroup: '18-24',
-      location: 'Bong'
-    },
-    {
-      id: '3',
-      title: 'Getting STI Testing',
-      content: 'I was nervous about getting tested, but the clinic staff were so kind and professional. They explained everything and made me feel comfortable. Getting tested regularly is important for my health and my partner\'s health.',
-      type: 'text',
-      category: 'sti_prevention',
-      author: 'GHI23456',
-      timestamp: new Date(Date.now() - 259200000).toISOString(),
-      likes: 15,
-      isAnonymous: true,
-      isModerated: true,
-      isApproved: true,
-      tags: ['sti', 'testing', 'health'],
-      language: 'liberian_english',
-      ageGroup: '18-24',
-      location: 'Nimba'
-    }
-  ];
+  // Remove sample data generator - no longer needed
 
   const saveStories = async (storiesToSave: Story[]) => {
     try {
@@ -319,7 +248,7 @@ const StorytellingPlatform: React.FC = () => {
       category: 'general',
       isAnonymous: true,
       tags: [],
-      language: 'liberian_english',
+      language: 'english',
       ageGroup: '18-24',
       location: ''
     });
@@ -415,28 +344,18 @@ const StorytellingPlatform: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-3 sm:p-4 lg:p-6">
-      {/* Header - Mobile Optimized */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
-          <div className="flex items-center space-x-3 mb-4 sm:mb-0">
-            <div className="p-2 sm:p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl">
-              <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">Storytelling Platform</h1>
-              <p className="text-sm sm:text-base text-gray-600">Share and learn from SRHR experiences</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowCreateForm(true)}
-            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 sm:py-2 rounded-lg flex items-center justify-center space-x-2 touch-target"
-          >
-            <Plus size={16} />
-            <span className="text-sm sm:text-base">Share Story</span>
-          </button>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
+        <h2 className="text-lg font-semibold text-gray-900">Share and learn from SRHR experiences</h2>
+        <button
+          onClick={() => setShowCreateForm(true)}
+          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 sm:py-2 rounded-lg flex items-center justify-center space-x-2 touch-target"
+        >
+          <Plus size={16} />
+          <span className="text-sm sm:text-base">Share Story</span>
+        </button>
+      </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div className="bg-purple-50 rounded-lg p-3 sm:p-4">
             <div className="flex items-center space-x-2 mb-2">
               <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
@@ -464,7 +383,6 @@ const StorytellingPlatform: React.FC = () => {
               {stories.reduce((sum, s) => sum + s.likes, 0)}
             </p>
           </div>
-        </div>
       </div>
 
       {/* Filters - Mobile Optimized */}

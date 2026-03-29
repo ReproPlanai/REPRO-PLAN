@@ -5,6 +5,7 @@ import {
   AlertCircle, 
   Download
 } from 'lucide-react';
+import { apiService } from '../../services/api';
 
 interface VerificationRecord {
   id: string;
@@ -66,15 +67,48 @@ const QRVerificationManager: React.FC<QRVerificationManagerProps> = ({
 
   const getCurrentLocation = (): string => {
     // In a real implementation, this would get the actual location
-    return 'Liberia, West Africa';
+    return 'Ghana';
   };
 
-  const generateUserCode = () => {
+  const generateUserCode = async () => {
     setIsGenerating(true);
-    // Generate a random user code
-    const code = 'USER' + Math.random().toString(36).substring(2, 8).toUpperCase();
-    setUserCode(code);
+    try {
+      // Request code from API instead of generating locally
+      const response = await apiService.generateQRCode?.() as {
+        success?: boolean;
+        code?: string;
+      };
+      
+      if (response?.success && response.code) {
+        setUserCode(response.code);
+      } else {
+        // Fallback to timestamp-based code if API unavailable
+        setUserCode('USER' + Date.now().toString(36).substring(0, 6).toUpperCase());
+      }
+    } catch {
+      setUserCode('USER' + Date.now().toString(36).substring(0, 6).toUpperCase());
+    }
     setIsGenerating(false);
+  };
+
+  const verifyQRCode = async (code: string) => {
+    try {
+      const response = await apiService.verifyQRCode?.(code) as {
+        success?: boolean;
+        verified?: boolean;
+        userCode?: string;
+      };
+      
+      handleScanResult({
+        userCode: response?.userCode || code,
+        verified: response?.verified || false
+      });
+    } catch {
+      handleScanResult({
+        userCode: code,
+        verified: false
+      });
+    }
   };
 
   const exportVerificationHistory = () => {
@@ -109,32 +143,18 @@ const QRVerificationManager: React.FC<QRVerificationManagerProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-6 mb-6">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-            <QrCode className="w-6 h-6" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold">QR Code Verification</h2>
-            <p className="text-blue-100">Secure user verification system</p>
-          </div>
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+          <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
+          <div className="text-sm text-gray-600">Total Verifications</div>
         </div>
-        
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white/20 rounded-lg p-3">
-            <div className="text-2xl font-bold">{stats.total}</div>
-            <div className="text-sm text-blue-100">Total Verifications</div>
-          </div>
-          <div className="bg-white/20 rounded-lg p-3">
-            <div className="text-2xl font-bold">{stats.verified}</div>
-            <div className="text-sm text-blue-100">Verified Users</div>
-          </div>
-          <div className="bg-white/20 rounded-lg p-3">
-            <div className="text-2xl font-bold">{stats.today}</div>
-            <div className="text-sm text-blue-100">Today</div>
-          </div>
+        <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+          <div className="text-2xl font-bold text-gray-900">{stats.verified}</div>
+          <div className="text-sm text-gray-600">Verified Users</div>
+        </div>
+        <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+          <div className="text-2xl font-bold text-gray-900">{stats.today}</div>
+          <div className="text-sm text-gray-600">Today</div>
         </div>
       </div>
 
@@ -259,15 +279,16 @@ const QRVerificationManager: React.FC<QRVerificationManagerProps> = ({
                 </button>
                 <button
                   onClick={() => {
-                    // Simulate successful scan
-                    handleScanResult({
-                      userCode: 'DEMO123456',
-                      verified: true
-                    });
+                    // In production, this would trigger camera scan
+                    // For now, prompt user to enter code manually
+                    const code = prompt('Enter QR Code (or scan with camera):');
+                    if (code) {
+                      verifyQRCode(code);
+                    }
                   }}
                   className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  Simulate Scan
+                  Scan QR Code
                 </button>
               </div>
             </div>

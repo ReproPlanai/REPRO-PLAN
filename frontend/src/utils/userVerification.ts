@@ -110,6 +110,27 @@ class UserVerificationService {
     this.verifiedUsers.push(verification);
   }
 
+  // Admin: approve a pending verification request
+  adminApprove(requestId: string): boolean {
+    const request = this.verificationRequests.find(req => req.id === requestId && req.status === 'pending');
+    if (!request) return false;
+    this.approveVerification(requestId);
+    return true;
+  }
+
+  // Admin: reject a pending verification request
+  adminReject(requestId: string): boolean {
+    const request = this.verificationRequests.find(req => req.id === requestId && req.status === 'pending');
+    if (!request) return false;
+    request.status = 'rejected';
+    return true;
+  }
+
+  // Admin: get all requests (pending, approved, rejected)
+  getAllRequests(): VerificationRequest[] {
+    return [...this.verificationRequests];
+  }
+
   // Check if user is verified
   isUserVerified(id: string, phoneNumber: string): boolean {
     return this.verifiedUsers.some(

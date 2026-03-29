@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAccessibility } from '../contexts/AccessibilityContext';
 import { 
-  ArrowLeft,
   Brain,
   BookOpen,
   Clock,
@@ -24,10 +24,11 @@ import {
 
 const CognitiveAccessibility: React.FC = () => {
   const navigate = useNavigate();
-  const [simpleLanguage, setSimpleLanguage] = useState(true);
-  const [showProgress, setShowProgress] = useState(true);
-  const [confirmActions, setConfirmActions] = useState(true);
-  const [reduceDistractions, setReduceDistractions] = useState(false);
+  const { settings, updateSetting } = useAccessibility();
+  const simpleLanguage = settings.simpleLanguage;
+  const showProgress = settings.showProgress;
+  const confirmActions = settings.confirmActions;
+  const reduceDistractions = settings.reduceDistractions;
   const [stepByStep, setStepByStep] = useState(true);
   const [visualAids, setVisualAids] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -51,29 +52,6 @@ const CognitiveAccessibility: React.FC = () => {
     }
   };
 
-  // Apply accessibility settings
-  useEffect(() => {
-    const root = document.documentElement;
-    
-    if (simpleLanguage) {
-      root.classList.add('simple-language');
-    } else {
-      root.classList.remove('simple-language');
-    }
-    
-    if (reduceDistractions) {
-      root.classList.add('reduce-distractions');
-    } else {
-      root.classList.remove('reduce-distractions');
-    }
-    
-    if (visualAids) {
-      root.classList.add('visual-aids');
-    } else {
-      root.classList.remove('visual-aids');
-    }
-  }, [simpleLanguage, reduceDistractions, visualAids]);
-
   const accessibilityFeatures = [
     {
       id: 'simple-language',
@@ -81,7 +59,7 @@ const CognitiveAccessibility: React.FC = () => {
       description: 'Use easy words and short sentences',
       icon: BookOpen,
       isEnabled: simpleLanguage,
-      onToggle: () => setSimpleLanguage(!simpleLanguage)
+      onToggle: () => updateSetting('simpleLanguage', !simpleLanguage)
     },
     {
       id: 'show-progress',
@@ -89,7 +67,7 @@ const CognitiveAccessibility: React.FC = () => {
       description: 'Always show what step you are on',
       icon: Target,
       isEnabled: showProgress,
-      onToggle: () => setShowProgress(!showProgress)
+      onToggle: () => updateSetting('showProgress', !showProgress)
     },
     {
       id: 'confirm-actions',
@@ -97,7 +75,7 @@ const CognitiveAccessibility: React.FC = () => {
       description: 'Ask before doing important things',
       icon: CheckCircle,
       isEnabled: confirmActions,
-      onToggle: () => setConfirmActions(!confirmActions)
+      onToggle: () => updateSetting('confirmActions', !confirmActions)
     },
     {
       id: 'reduce-distractions',
@@ -105,7 +83,7 @@ const CognitiveAccessibility: React.FC = () => {
       description: 'Hide things that might confuse you',
       icon: Eye,
       isEnabled: reduceDistractions,
-      onToggle: () => setReduceDistractions(!reduceDistractions)
+      onToggle: () => updateSetting('reduceDistractions', !reduceDistractions)
     },
     {
       id: 'step-by-step',
@@ -144,7 +122,7 @@ const CognitiveAccessibility: React.FC = () => {
       title: 'Read Stories',
       description: 'Read easy health stories',
       icon: BookOpen,
-      action: () => navigate('/articles'),
+      action: () => navigate('/stories'),
       speakText: 'Opening easy health stories to read'
     },
     {
@@ -249,21 +227,10 @@ const CognitiveAccessibility: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-orange-50">
-      {/* Back Button */}
-      <div className="p-4 sm:p-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="w-6 h-6 text-gray-600" />
-        </button>
-      </div>
-
+    <div className="w-full h-full bg-gradient-to-br from-yellow-50 via-white to-orange-50 overflow-x-hidden">
       {/* Content */}
       <div className="flex-1 p-4 sm:p-6">
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="space-y-6">
           
           {/* Accessibility Features */}
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">

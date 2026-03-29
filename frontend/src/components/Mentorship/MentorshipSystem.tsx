@@ -8,6 +8,7 @@ import {
   UserPlus
 } from 'lucide-react';
 import { offlineStorage } from '../../utils/offlineStorage';
+import { apiService } from '../../services/api';
 
 interface Mentor {
   id: string;
@@ -59,82 +60,31 @@ const MentorshipSystem: React.FC = () => {
     message: ''
   });
 
-  // Sample mentors data
-  const sampleMentors: Mentor[] = useMemo(() => [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      age: 28,
-      experience: '5 years in SRHR counseling',
-      specialties: ['Contraception', 'STI Prevention', 'Relationships'],
-      rating: 4.9,
-      reviews: 127,
-      available: true,
-      languages: ['English', 'Kpelle'],
-      bio: 'Passionate about empowering young people with accurate SRHR information. Trained counselor with experience in youth-friendly services.',
-      isOnline: true,
-      responseTime: 'Usually responds within 2 hours'
-    },
-    {
-      id: '2',
-      name: 'Michael Brown',
-      age: 32,
-      experience: '7 years in healthcare',
-      specialties: ['Men\'s Health', 'Mental Health', 'Peer Support'],
-      rating: 4.8,
-      reviews: 89,
-      available: true,
-      languages: ['English', 'Bassa'],
-      bio: 'Healthcare professional dedicated to supporting young men with their health and wellness journey.',
-      isOnline: false,
-      responseTime: 'Usually responds within 4 hours'
-    },
-    {
-      id: '3',
-      name: 'Aisha Kamara',
-      age: 25,
-      experience: '3 years in youth advocacy',
-      specialties: ['Gender Rights', 'Consent Education', 'Crisis Support'],
-      rating: 4.9,
-      reviews: 156,
-      available: true,
-      languages: ['English', 'Kru', 'Vai'],
-      bio: 'Youth advocate and trained peer counselor specializing in gender-based violence prevention and support.',
-      isOnline: true,
-      responseTime: 'Usually responds within 1 hour'
-    },
-    {
-      id: '4',
-      name: 'David Wilson',
-      age: 30,
-      experience: '6 years in community health',
-      specialties: ['HIV/AIDS', 'Testing', 'Treatment Support'],
-      rating: 4.7,
-      reviews: 98,
-      available: false,
-      languages: ['English'],
-      bio: 'Community health worker with extensive experience in HIV prevention and support services.',
-      isOnline: false,
-      responseTime: 'Usually responds within 6 hours'
-    }
-  ], []);
+  // Remove sample mentors - fetch from API only
 
   const loadMentorshipData = useCallback(async () => {
     try {
-      const [mentorsData, requestsData, messagesData] = await Promise.all([
-        offlineStorage.getData('mentors'),
+      // Fetch mentors from API
+      const mentorsResponse = await apiService.getMentors?.() as { success?: boolean; mentors?: Mentor[] };
+      if (mentorsResponse?.success && mentorsResponse.mentors) {
+        setMentors(mentorsResponse.mentors);
+      } else {
+        setMentors([]);
+      }
+      
+      // Load local data from offline storage
+      const [requestsData, messagesData] = await Promise.all([
         offlineStorage.getData('mentorship_requests'),
         offlineStorage.getData('chat_messages')
       ]);
       
-      setMentors(mentorsData || sampleMentors);
       setMentorshipRequests(requestsData || []);
       setChatMessages(messagesData || []);
     } catch (error) {
       console.error('Failed to load mentorship data:', error);
-      setMentors(sampleMentors);
+      setMentors([]);
     }
-  }, [sampleMentors]);
+  }, []);
 
   const saveMentorshipData = async () => {
     try {
@@ -307,16 +257,7 @@ const MentorshipSystem: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-primary-100 rounded-full mb-4">
-            <Users className="w-6 h-6 sm:w-8 sm:h-8 text-primary-600" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Peer Mentorship</h1>
-          <p className="text-sm sm:text-base text-gray-600">
-            Connect with trained mentors for guidance and support
-          </p>
-        </div>
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">Connect with trained mentors for guidance and support</h2>
 
       {/* Mentors Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

@@ -1,50 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Save, Bell, Shield, Database, Globe, Mail } from 'lucide-react';
 
-const SystemSettings: React.FC = () => {
-  const [settings, setSettings] = useState({
-    notifications: {
-      emailAlerts: true,
-      smsAlerts: false,
-      pushNotifications: true,
-      emergencyAlerts: true
-    },
-    security: {
-      twoFactorAuth: false,
-      sessionTimeout: 30,
-      passwordPolicy: 'strong',
-      ipWhitelist: false
-    },
-    database: {
-      backupFrequency: 'daily',
-      retentionDays: 90,
-      autoBackup: true
-    },
-    api: {
-      rateLimit: 100,
-      timeout: 30,
-      corsEnabled: true
-    },
-    email: {
-      smtpHost: 'smtp.example.com',
-      smtpPort: 587,
-      fromEmail: 'noreply@reproplan.org',
-      fromName: 'REPRO PLAN'
-    }
-  });
+const defaultSettings = {
+  notifications: {
+    emailAlerts: true,
+    pushNotifications: true,
+    emergencyAlerts: true
+  },
+  security: {
+    twoFactorAuth: false,
+    sessionTimeout: 30,
+    passwordPolicy: 'strong',
+    ipWhitelist: false
+  },
+  database: {
+    backupFrequency: 'daily',
+    retentionDays: 90,
+    autoBackup: true
+  },
+  api: {
+    rateLimit: 100,
+    timeout: 30,
+    corsEnabled: true
+  },
+  email: {
+    smtpHost: 'smtp.example.com',
+    smtpPort: 587,
+    fromEmail: 'noreply@reproplan.org',
+    fromName: 'REPRO PLAN'
+  }
+};
 
+const SystemSettings: React.FC = () => {
+  const [settings, setSettings] = useState(defaultSettings);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const { apiService } = await import('../../services/api');
+        const res = await apiService.getSystemSettings() as { success: boolean; settings?: typeof defaultSettings };
+        if (res.success && res.settings) {
+          setSettings({ ...defaultSettings, ...res.settings });
+        }
+      } catch (err) {
+        setLoadError('Failed to load settings');
+      }
+    };
+    load();
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
+    setLoadError(null);
     try {
-      // Save settings to backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      const { apiService } = await import('../../services/api');
+      const res = await apiService.updateSystemSettings(settings) as { success: boolean };
+      if (res.success) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        setLoadError('Failed to save settings');
+      }
     } catch (error) {
       console.error('Failed to save settings:', error);
+      setLoadError('Failed to save settings');
     } finally {
       setSaving(false);
     }
@@ -62,6 +84,11 @@ const SystemSettings: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {loadError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+          {loadError}
+        </div>
+      )}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">System Settings</h2>
@@ -94,15 +121,6 @@ const SystemSettings: React.FC = () => {
               type="checkbox"
               checked={settings.notifications.emailAlerts}
               onChange={(e) => updateSetting('notifications', 'emailAlerts', e.target.checked)}
-              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-            />
-          </label>
-          <label className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-sm text-gray-700">SMS Alerts</span>
-            <input
-              type="checkbox"
-              checked={settings.notifications.smsAlerts}
-              onChange={(e) => updateSetting('notifications', 'smsAlerts', e.target.checked)}
               className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
             />
           </label>

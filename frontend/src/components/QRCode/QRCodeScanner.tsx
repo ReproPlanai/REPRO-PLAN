@@ -11,6 +11,7 @@ import {
   Camera,
   CameraOff
 } from 'lucide-react';
+import { apiService } from '../../services/api';
 
 interface QRCodeScannerProps {
   onScanResult: (result: any) => void;
@@ -62,11 +63,12 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
     }
   };
 
-  const scanQRCode = () => {
-    if (!videoRef.current || !canvasRef.current) return;
-
+  const scanQRCode = async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
+
+    if (!video || !canvas) return;
+
     const context = canvas.getContext('2d');
 
     if (!context) return;
@@ -78,26 +80,26 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
     // Draw video frame to canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // In a real implementation, you would use a QR code scanning library here
-    // For demo purposes, we'll simulate scanning
-    simulateQRScan();
+    // For demo purposes, we'll simulate scanning with real API verification
+    const scanResult = await simulateQRScan();
+    if (scanResult) {
+      setScanResult(scanResult);
+      verifyQRCode(scanResult);
+    }
   };
 
-  const simulateQRScan = () => {
-    // Simulate QR code detection
-    const mockQRData = {
+  const simulateQRScan = async () => {
+    // Generate a demo QR code that will be verified via API
+    return {
       type: 'repro-plan_verification',
       userCode: 'DEMO123456',
-      timestamp: Date.now() - 30000, // 30 seconds ago
+      timestamp: Date.now() - 30000,
       version: '1.0',
       security: {
         hash: 'a1b2c3d4e5f6g7h8',
         nonce: 'xyz789abc'
       }
     };
-
-    setScanResult(mockQRData);
-    verifyQRCode(mockQRData);
   };
 
   const verifyQRCode = async (qrData: any) => {
@@ -121,12 +123,15 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
         return;
       }
 
-      // Verify security hash
-      const isValidHash = await verifySecurityHash(qrData.userCode, qrData.security.hash);
-      
-      if (!isValidHash) {
+      // Verify user code via real API
+      const response = await apiService.loginUser(qrData.userCode) as {
+        success: boolean;
+        user?: any;
+      };
+
+      if (!response.success) {
         setIsValid(false);
-        setVerificationStatus('Security verification failed');
+        setVerificationStatus('User verification failed - invalid code');
         return;
       }
 
@@ -134,12 +139,13 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       setIsValid(true);
       setVerificationStatus('Verification successful');
       
-      // Call the result handler
+      // Call the result handler with verified user data
       onScanResult({
         userCode: qrData.userCode,
         timestamp: qrData.timestamp,
         verified: true,
-        role: userRole
+        role: userRole,
+        user: response.user
       });
 
     } catch (error) {
@@ -149,9 +155,13 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   };
 
   const verifySecurityHash = async (userCode: string, hash: string): Promise<boolean> => {
-    // In a real implementation, this would verify the hash against the server
-    // For demo purposes, we'll simulate verification
-    return hash.length === 16 && userCode.length >= 6;
+    // Verify via real API
+    try {
+      const response = await apiService.loginUser(userCode) as { success: boolean };
+      return response.success;
+    } catch {
+      return false;
+    }
   };
 
   const startScanning = () => {

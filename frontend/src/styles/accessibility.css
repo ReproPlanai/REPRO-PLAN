@@ -182,6 +182,37 @@ html[style*="font-size: 32px"] {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
 }
 
+/* Slow Click Mode - prevents accidental double-taps */
+.slow-click button,
+.slow-click a,
+.slow-click input[type="submit"],
+.slow-click input[type="button"] {
+  pointer-events: auto;
+}
+
+.slow-click * {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Reduce Distractions Mode */
+.reduce-distractions .advertisement,
+.reduce-distractions .sidebar-promo,
+.reduce-distractions [role="banner"] img:not(.logo) {
+  display: none !important;
+}
+
+.reduce-distractions .animate-pulse,
+.reduce-distractions .animate-bounce {
+  animation: none !important;
+}
+
+/* Visual Aids - ensure icons and images are visible */
+.visual-aids img[alt=""],
+.visual-aids .icon-placeholder {
+  min-width: 24px;
+  min-height: 24px;
+}
+
 /* Simple Language Mode */
 .simple-language {
   font-family: Arial, sans-serif;

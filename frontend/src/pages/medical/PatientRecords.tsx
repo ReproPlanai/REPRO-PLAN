@@ -42,7 +42,7 @@ const PatientRecords: React.FC = () => {
         return;
       }
 
-      const response = await apiService.getHealthRecords(numericUserId) as { success: boolean; records?: any[] };
+      const response = await apiService.getHealthRecords(String(numericUserId)) as { success: boolean; records?: any[] };
       if (response.success && response.records) {
         // Transform API data to match component interface
         const transformedRecords = response.records.map((record: any, index: number) => ({

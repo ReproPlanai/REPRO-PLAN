@@ -32,11 +32,16 @@ export const COUNTRIES: Record<string, CountryConfig> = {
     defaultLanguage: 'en',
     languages: [
       { code: 'en', name: 'English', nativeName: 'English' },
+      { code: 'fr', name: 'French', nativeName: 'Français' },
       { code: 'tw', name: 'Twi', nativeName: 'Twi' },
       { code: 'ga', name: 'Ga', nativeName: 'Ga' },
       { code: 'ewe', name: 'Ewe', nativeName: 'Eʋegbe' },
       { code: 'dag', name: 'Dagbani', nativeName: 'Dagbani' },
-      { code: 'fante', name: 'Fante', nativeName: 'Fante' }
+      { code: 'fante', name: 'Fante', nativeName: 'Fante' },
+      { code: 'bassa', name: 'Bassa', nativeName: 'Bassa' },
+      { code: 'kpelle', name: 'Kpelle', nativeName: 'Kpelle' },
+      { code: 'kru', name: 'Kru', nativeName: 'Kru' },
+      { code: 'vai', name: 'Vai', nativeName: 'Vai' }
     ],
     regions: [
       { code: 'AH', name: 'Ahafo' },
@@ -75,11 +80,10 @@ export const COUNTRIES: Record<string, CountryConfig> = {
     phoneCode: '+234',
     currency: 'NGN',
     defaultLanguage: 'en',
+    isActive: false,
     languages: [
       { code: 'en', name: 'English', nativeName: 'English' },
-      { code: 'ha', name: 'Hausa', nativeName: 'Hausa' },
-      { code: 'yo', name: 'Yoruba', nativeName: 'Yorùbá' },
-      { code: 'ig', name: 'Igbo', nativeName: 'Igbo' }
+      { code: 'fr', name: 'French', nativeName: 'Français' }
     ],
     regions: [
       { code: 'AB', name: 'Abia' },
@@ -127,8 +131,7 @@ export const COUNTRIES: Record<string, CountryConfig> = {
       medical: '199',
       fire: '199',
       gbv: '0800-800-800'
-    },
-    isActive: false
+    }
   },
   SN: {
     code: 'SN',
@@ -228,11 +231,8 @@ export const getActiveCountries = (): CountryConfig[] => {
   return Object.values(COUNTRIES).filter(country => country.isActive);
 };
 
-// Get West African countries
+// Get West African countries (Ghana only for now)
 export const getWestAfricanCountries = (): CountryConfig[] => {
-  const westAfricaCodes = ['GH', 'NG', 'SN', 'CI', 'ML', 'BF', 'NE', 'TD', 'MR', 'GM', 'GW', 'GN', 'SL', 'LR', 'TG', 'BJ'];
-  return westAfricaCodes
-    .map(code => COUNTRIES[code])
-    .filter(country => country !== undefined);
+  return [COUNTRIES.GH].filter(Boolean);
 };
 

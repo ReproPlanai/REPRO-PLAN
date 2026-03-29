@@ -39,8 +39,8 @@
     "emergencyHelp": "Emergency Help"
   },
   "chatbot": {
-    "title": "Anonymous Chat",
-    "subtitle": "Ask any SRHR question safely",
+    "title": "Rehana",
+    "subtitle": "Your confidential SRHR assistant",
     "placeholder": "Type your question here...",
     "send": "Send",
     "typing": "Typing...",
@@ -137,27 +137,21 @@
     "privacy": "Privacy Protected",
     "anonymous": "Anonymous"
   },
+  "signLanguage": {
+    "title": "Ghana Sign Language",
+    "subtitle": "SRHR phrases and resources",
+    "aboutGSL": "About Ghana Sign Language",
+    "intro": "Ghana Sign Language (GSL) is the primary sign language used by the Deaf community in Ghana. REPRO PLAN provides GSL resources to make sexual and reproductive health information accessible. Learn essential phrases for healthcare visits, emergencies, and SRHR discussions.",
+    "quickPhrases": "Quick SRHR Phrases in GSL",
+    "phraseHint": "Tap a phrase to learn more. Video demonstrations coming soon.",
+    "glossary": "SRHR Terms Glossary",
+    "resources": "Resources",
+    "videoComingSoon": "GSL video demonstration coming soon. Contact GNAD for interpreter services."
+  },
   "languages": {
     "en": "English",
-    "sw": "Swahili (Kiswahili)",
-    "ha": "Hausa",
-    "yo": "Yoruba",
-    "ig": "Igbo",
     "fr": "French (Français)",
-    "ar": "Arabic (العربية)",
-    "am": "Amharic (አማርኛ)",
-    "om": "Oromo",
-    "zu": "Zulu (isiZulu)",
-    "xh": "Xhosa (isiXhosa)",
     "tw": "Twi",
-    "wo": "Wolof",
-    "ff": "Fula (Fulfulde)",
-    "ln": "Lingala",
-    "rw": "Kinyarwanda",
-    "lg": "Luganda",
-    "ny": "Chichewa",
-    "tn": "Tswana (Setswana)",
-    "st": "Sotho (Sesotho)",
     "ga": "Ga",
     "ewe": "Ewe",
     "dag": "Dagbani",
@@ -165,8 +159,6 @@
     "bassa": "Bassa",
     "kpelle": "Kpelle",
     "kru": "Kru",
-    "vai": "Vai",
-    "pt": "Portuguese (Português)",
-    "af": "Afrikaans"
+    "vai": "Vai"
   }
 }

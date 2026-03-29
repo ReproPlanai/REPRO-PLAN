@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Download, Eye, Edit, Trash2, Plus, Phone } from 'lucide-react';
+import { Search, Filter, Download, Eye, Edit, Trash2, Plus, Phone, X, Copy, Check } from 'lucide-react';
 
 interface User {
   id: number;
@@ -12,6 +12,66 @@ interface User {
   createdAt: string;
 }
 
+const EditUserForm: React.FC<{
+  user: User;
+  onSave: (updates: Partial<User>) => void;
+  onCancel: () => void;
+  loading: boolean;
+}> = ({ user, onSave, onCancel, loading }) => {
+  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber || '');
+  const [isVerified, setIsVerified] = useState(user.isVerified);
+  const [surveyLink, setSurveyLink] = useState(user.surveyLink || '');
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm text-gray-600 mb-1">Phone Number</label>
+        <input
+          type="text"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+          placeholder="+233-24-XXX-XXXX"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <div>
+        <label className="block text-sm text-gray-600 mb-1">Survey Link</label>
+        <input
+          type="url"
+          value={surveyLink}
+          onChange={(e) => setSurveyLink(e.target.value)}
+          placeholder="https://reproplanai.com/survey/..."
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={isVerified}
+          onChange={(e) => setIsVerified(e.target.checked)}
+          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+        />
+        <span className="text-sm text-gray-700">Verified</span>
+      </label>
+      <div className="flex gap-3">
+        <button
+          onClick={() => onSave({ phoneNumber: phoneNumber || undefined, surveyLink: surveyLink || undefined, isVerified })}
+          disabled={loading}
+          className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        >
+          {loading ? 'Saving...' : 'Save'}
+        </button>
+        <button
+          onClick={onCancel}
+          disabled={loading}
+          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
@@ -19,6 +79,11 @@ const UserManagement: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive' | 'unused'>('all');
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [addSuccess, setAddSuccess] = useState<{ secretCode: string; surveyLink: string } | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -70,6 +135,70 @@ const UserManagement: React.FC = () => {
     }
 
     setFilteredUsers(filtered);
+  };
+
+  const handleAddUser = async () => {
+    setLoading(true);
+    try {
+      const { apiService } = await import('../../services/api');
+      const response = await apiService.registerUser() as { success: boolean; secretCode?: string; surveyLink?: string };
+      if (response.success && response.secretCode && response.surveyLink) {
+        setAddSuccess({ secretCode: response.secretCode, surveyLink: response.surveyLink });
+        await fetchUsers();
+      }
+    } catch (error) {
+      console.error('Failed to add user:', error);
+      alert('Failed to add user. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditUser = async (updates: Partial<User>) => {
+    if (!editingUser) return;
+    setLoading(true);
+    try {
+      const { apiService } = await import('../../services/api');
+      const response = await apiService.updateUser(editingUser.id.toString(), updates as any) as { success: boolean };
+      if (response.success) {
+        setEditingUser(null);
+        await fetchUsers();
+      } else {
+        alert('Failed to update user.');
+      }
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      alert('Failed to update user. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    setLoading(true);
+    try {
+      const { apiService } = await import('../../services/api');
+      const response = await apiService.deleteUser(userToDelete.id.toString()) as { success: boolean };
+      if (response.success) {
+        setUserToDelete(null);
+        setSelectedUser(null);
+        await fetchUsers();
+      } else {
+        alert('Failed to delete user.');
+      }
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+      alert('Failed to delete user. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
   };
 
   const handleExport = () => {
@@ -223,10 +352,18 @@ const UserManagement: React.FC = () => {
                       >
                         <Eye size={14} />
                       </button>
-                      <button className="p-1 text-gray-600 hover:bg-gray-50 rounded" title="Edit">
+                      <button
+                        onClick={() => setEditingUser(user)}
+                        className="p-1 text-gray-600 hover:bg-gray-50 rounded"
+                        title="Edit"
+                      >
                         <Edit size={14} />
                       </button>
-                      <button className="p-1 text-red-600 hover:bg-red-50 rounded" title="Delete">
+                      <button
+                        onClick={() => setUserToDelete(user)}
+                        className="p-1 text-red-600 hover:bg-red-50 rounded"
+                        title="Delete"
+                      >
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -305,12 +442,14 @@ const UserManagement: React.FC = () => {
                           <Eye size={16} />
                         </button>
                         <button
+                          onClick={() => setEditingUser(user)}
                           className="p-1 text-gray-600 hover:bg-gray-50 rounded"
                           title="Edit"
                         >
                           <Edit size={16} />
                         </button>
                         <button
+                          onClick={() => setUserToDelete(user)}
                           className="p-1 text-red-600 hover:bg-red-50 rounded"
                           title="Delete"
                         >
@@ -326,8 +465,134 @@ const UserManagement: React.FC = () => {
         </div>
       </div>
 
+      {/* Add User Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">{addSuccess ? 'User Created' : 'Add User'}</h3>
+              <button
+                onClick={() => { setShowAddModal(false); setAddSuccess(null); }}
+                className="text-gray-400 hover:text-gray-600 p-1"
+                aria-label="Close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            {addSuccess ? (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">Save this information securely. The secret code and recovery link cannot be shown again.</p>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Secret Code</p>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 px-3 py-2 bg-gray-100 rounded-lg font-mono text-sm">{addSuccess.secretCode}</code>
+                    <button
+                      onClick={() => copyToClipboard(addSuccess.secretCode, 'code')}
+                      className="p-2 text-gray-600 hover:bg-gray-100 rounded"
+                      title="Copy"
+                    >
+                      {copiedField === 'code' ? <Check size={16} /> : <Copy size={16} />}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Recovery Link</p>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 px-3 py-2 bg-gray-100 rounded-lg text-xs break-all">{addSuccess.surveyLink}</code>
+                    <button
+                      onClick={() => copyToClipboard(addSuccess.surveyLink, 'link')}
+                      className="p-2 text-gray-600 hover:bg-gray-100 rounded flex-shrink-0"
+                      title="Copy"
+                    >
+                      {copiedField === 'link' ? <Check size={16} /> : <Copy size={16} />}
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setShowAddModal(false); setAddSuccess(null); }}
+                  className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">Create a new user account. A secret code and recovery link will be generated.</p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleAddUser}
+                    disabled={loading}
+                    className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {loading ? 'Creating...' : 'Generate User'}
+                  </button>
+                  <button
+                    onClick={() => setShowAddModal(false)}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Edit User #{editingUser.id}</h3>
+              <button
+                onClick={() => setEditingUser(null)}
+                className="text-gray-400 hover:text-gray-600 p-1"
+                aria-label="Close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <EditUserForm
+              user={editingUser}
+              onSave={(updates) => handleEditUser(updates)}
+              onCancel={() => setEditingUser(null)}
+              loading={loading}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {userToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete User</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Delete user #{userToDelete.id}? This cannot be undone. The user will lose access to their account.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleDeleteUser}
+                disabled={loading}
+                className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {loading ? 'Deleting...' : 'Delete'}
+              </button>
+              <button
+                onClick={() => setUserToDelete(null)}
+                disabled={loading}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* User Detail Modal */}
-      {selectedUser && (
+      {selectedUser && !editingUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">

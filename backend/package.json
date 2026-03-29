@@ -1,0 +1,49 @@
+{
+  "name": "repro-plan-backend",
+  "version": "1.0.0",
+  "description": "REPRO PLAN Backend - Rehana AI, Auth, Email",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn src/index.ts",
+    "lint": "tsc --noEmit && echo 'TypeScript check passed'",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@google/genai": "^1.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/qrcode": "^1.5.6",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^4.73.0",
+    "pg": "^8.13.0",
+    "pino": "^9.4.0",
+    "pino-pretty": "^11.3.0",
+    "qrcode": "^1.5.4",
+    "resend": "^4.0.0",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.14.0",
+    "@types/pg": "^8.11.6",
+    "@types/uuid": "^10.0.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

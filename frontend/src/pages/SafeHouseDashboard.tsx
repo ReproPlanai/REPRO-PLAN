@@ -3,6 +3,7 @@ import {
   Home, 
   Users, 
   Shield, 
+  CheckCircle,
   Search,
   Eye,
   Phone,
@@ -17,7 +18,6 @@ import {
   ClipboardList,
   BookOpen,
   LifeBuoy,
-  Calendar,
   TrendingUp,
   Users as UsersIcon,
   Globe2,
@@ -33,8 +33,6 @@ import {
   BarChart4,
   UserPlus,
   BellRing,
-  Users,
-  BookOpen,
   MessageSquarePlus,
   Book
 } from 'lucide-react';
@@ -42,6 +40,7 @@ import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
 import { dataSecurityManager } from '../utils/dataSecurity';
 import { useStakeholderAPI } from '../hooks/useStakeholderAPI';
+import { apiService } from '../services/api';
 // import InterRoleMessaging from '../components/Dashboard/InterRoleMessaging'; // Reserved for future use
 import ResidentIntake from './safehouse/ResidentIntake';
 import SecurityPreferences from '../components/Settings/SecurityPreferences';
@@ -82,10 +81,33 @@ interface SafeHouseDashboardProps {
   onLogout: () => void;
 }
 
+interface AccessLog {
+  id: number;
+  user: string;
+  action: string;
+  time: string;
+  location: string;
+  status: string;
+}
+
+interface Resident {
+  id: string | number;
+  name: string;
+  checkIn: string;
+  status: string;
+  room: string;
+  needs: string;
+  emergencyContact?: string;
+  caseId?: string | number;
+}
+
 const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLogout }) => {
   const [activeTab, setActiveTab] = useState('residents');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [residents, setResidents] = useState<Resident[]>([]);
+  const [accessLogs, setAccessLogs] = useState<AccessLog[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // Connect to backend API
   const stakeholderAPI = useStakeholderAPI({
@@ -129,9 +151,67 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
       stakeholderAPI.fetchAlerts();
       stakeholderAPI.fetchCases();
       stakeholderAPI.fetchMessages();
+      fetchResidents();
+      fetchAccessLogs();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData?.id]);
+
+  // Fetch residents from API
+  const fetchResidents = async () => {
+    setLoading(true);
+    try {
+      // Fetch cases that are associated with this safe house and transform to resident data
+      const response = await apiService.getCases?.() as { success?: boolean; cases?: any[] };
+      if (response?.success && response.cases) {
+        // Transform cases with safe house placement to resident records
+        const residentData = response.cases
+          .filter((c: any) => c.safeHouseId === userData?.id || c.location?.type === 'safehouse')
+          .map((c: any, index: number) => ({
+            id: c.id || index + 1,
+            name: `Resident ${c.anonymousId || String.fromCharCode(65 + index)}`,
+            checkIn: c.createdAt ? new Date(c.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            status: c.status === 'active' ? 'Safe' : c.status === 'pending' ? 'Monitoring' : 'At Risk',
+            room: `Room ${100 + index + 1}`,
+            needs: c.needs || 'General support',
+            emergencyContact: c.contactPhone || '+233-XXX-XXX-XXXX',
+            caseId: c.id
+          }));
+        setResidents(residentData.length > 0 ? residentData : []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch residents:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch access logs from API
+  const fetchAccessLogs = async () => {
+    try {
+      // Use audit logs API if available, otherwise derive from cases
+      const response = await apiService.getAuditLogs?.() as { success?: boolean; logs?: any[] };
+      if (response?.success && response.logs) {
+        const logData = response.logs
+          .filter((l: any) => l.entityType === 'safehouse' || l.stakeholderType === 'SAFEHOUSE')
+          .slice(0, 10)
+          .map((l: any, index: number) => ({
+            id: l.id || index + 1,
+            user: l.userName || 'System',
+            action: l.action || 'Access',
+            time: l.createdAt ? new Date(l.createdAt).toLocaleString() : 'Unknown',
+            location: l.location || 'Main Entrance',
+            status: l.status || 'success'
+          }));
+        setAccessLogs(logData);
+      } else {
+        setAccessLogs([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch access logs:', error);
+      setAccessLogs([]);
+    }
+  };
 
   // Mock data for demonstration
   const [houseData] = useState({
@@ -141,62 +221,6 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
     securityLevel: safeHouseData.houseMetrics.securityLevel,
     lastInspection: '2024-01-15'
   });
-
-  const [residents] = useState([
-    { 
-      id: 1, 
-      name: 'Anonymous Resident A', 
-      checkIn: '2024-01-10', 
-      status: 'Safe',
-      room: 'Room 101',
-      needs: 'Medical checkup',
-      emergencyContact: '+231-XXX-XXXX'
-    },
-    { 
-      id: 2, 
-      name: 'Anonymous Resident B', 
-      checkIn: '2024-01-12', 
-      status: 'Safe',
-      room: 'Room 102',
-      needs: 'Counseling',
-      emergencyContact: '+231-XXX-XXXX'
-    },
-    { 
-      id: 3, 
-      name: 'Anonymous Resident C', 
-      checkIn: '2024-01-14', 
-      status: 'At Risk',
-      room: 'Room 103',
-      needs: 'Immediate support',
-      emergencyContact: '+231-XXX-XXXX'
-    },
-    {
-      id: 4,
-      name: 'Anonymous Resident D',
-      checkIn: '2024-01-15',
-      status: 'Monitoring',
-      room: 'Room 104',
-      needs: 'Legal assistance',
-      emergencyContact: '+231-XXX-XXXX'
-    },
-    {
-      id: 5,
-      name: 'Anonymous Resident E',
-      checkIn: '2024-01-16',
-      status: 'Safe',
-      room: 'Room 105',
-      needs: 'Counseling follow-up',
-      emergencyContact: '+231-XXX-XXXX'
-    }
-  ]);
-
-  const [accessLogs] = useState([
-    { id: 1, user: 'Anonymous User', action: 'OTP Access Granted', time: '2 min ago', location: 'Main Entrance', status: 'success' },
-    { id: 2, user: 'Anonymous User', action: 'Failed OTP Attempt', time: '15 min ago', location: 'Side Door', status: 'failed' },
-    { id: 3, user: 'Anonymous User', action: 'Emergency Access', time: '1 hour ago', location: 'Emergency Exit', status: 'emergency' },
-    { id: 4, user: 'Anonymous User', action: 'Visitor Check-In', time: '2 hours ago', location: 'Main Entrance', status: 'success' },
-    { id: 5, user: 'Anonymous User', action: 'Access Denied', time: '4 hours ago', location: 'Storage Wing', status: 'failed' }
-  ]);
 
   // Map API alerts to display format
   const securityAlerts = stakeholderAPI.alerts.map(alert => ({
@@ -278,9 +302,9 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 flex flex-col leading-[1]">
                 <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">Safe House Dashboard</h1>
-                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Resident Management & Security</p>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block -mt-2 leading-none">Resident Management & Security</p>
               </div>
             </div>
             
@@ -312,7 +336,7 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
               onClick={() => setIsMenuOpen(false)}
               aria-label="Close menu"
             />
-            <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl p-4">
+            <div className="absolute left-0 top-0 h-full w-64 sm:w-72 bg-white shadow-xl p-4">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-base font-semibold text-gray-900">Menu</span>
                 <button
@@ -358,7 +382,7 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
         )}
 
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+        <div className="hidden lg:block w-56 xl:w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
           <nav className="p-4 space-y-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -855,7 +879,7 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
                   { label: 'High Risk Intake', region: 'Accra', status: 'High' },
                   { label: 'Transfer Watch', region: 'Kumasi', status: 'Elevated' },
                   { label: 'Support Need', region: 'Tamale', status: 'Moderate' },
-                  { label: 'Partner Alert', region: 'Monrovia', status: 'Stable' }
+                  { label: 'Partner Alert', region: 'Accra', status: 'Stable' }
                 ]}
               />
             </div>
@@ -870,7 +894,7 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
                   { title: 'Relocation Support', region: 'Greater Accra', status: 'Active' },
                   { title: 'Safety Assessment', region: 'Ashanti', status: 'Planned' },
                   { title: 'Emergency Intake', region: 'Northern Region', status: 'In Progress' },
-                  { title: 'Partner Escort', region: 'Liberia', status: 'Planned' }
+                  { title: 'Partner Escort', region: 'Ghana', status: 'Planned' }
                 ]}
               />
             </div>
@@ -915,7 +939,7 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
                   { label: 'Capacity Overload Risk', region: 'Accra', level: 'High' },
                   { label: 'Security Staffing Gap', region: 'Kumasi', level: 'Moderate' },
                   { label: 'Emergency Transfer Demand', region: 'Tamale', level: 'Elevated' },
-                  { label: 'Supply Shortage Risk', region: 'Monrovia', level: 'Moderate' }
+                  { label: 'Supply Shortage Risk', region: 'Accra', level: 'Moderate' }
                 ]}
               />
             </div>

@@ -21,6 +21,8 @@ import {
   Video
 } from 'lucide-react';
 
+import { apiService } from '../../services/api';
+
 interface NotificationSettings {
   emergencyAlerts: boolean;
   caseUpdates: boolean;
@@ -104,68 +106,32 @@ const PushNotificationManager: React.FC<PushNotificationManagerProps> = ({
   const [isQuietMode, setIsQuietMode] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // Simulate push notifications
+  // Fetch notifications from API
   useEffect(() => {
-    const sampleNotifications: PushNotification[] = [
-      {
-        id: '1',
-        title: '🚨 Emergency Alert',
-        message: 'Panic button activated in Monrovia Central. Immediate response required.',
-        type: 'emergency',
-        priority: 'critical',
-        timestamp: new Date(Date.now() - 300000).toISOString(),
-        isRead: false,
-        actionRequired: true,
-        data: { location: 'Monrovia Central', userId: 'user_123' }
-      },
-      {
-        id: '2',
-        title: '📋 Case Update',
-        message: 'Case CASE-2024-001 status changed to "Under Investigation"',
-        type: 'case',
-        priority: 'medium',
-        timestamp: new Date(Date.now() - 600000).toISOString(),
-        isRead: false,
-        actionRequired: false,
-        data: { caseId: 'CASE-2024-001' }
-      },
-      {
-        id: '3',
-        title: '🔧 System Maintenance',
-        message: 'Scheduled maintenance will begin in 30 minutes. System may be temporarily unavailable.',
-        type: 'system',
-        priority: 'high',
-        timestamp: new Date(Date.now() - 900000).toISOString(),
-        isRead: true,
-        actionRequired: false
-      },
-      {
-        id: '4',
-        title: '⏰ Reminder',
-        message: 'Daily report due in 2 hours. Please submit your case updates.',
-        type: 'reminder',
-        priority: 'medium',
-        timestamp: new Date(Date.now() - 1200000).toISOString(),
-        isRead: true,
-        actionRequired: true,
-        data: { reportType: 'daily', dueTime: '17:00' }
+    const fetchNotifications = async () => {
+      try {
+        const response = await apiService.getNotifications?.() as {
+          success?: boolean;
+          notifications?: PushNotification[];
+        };
+        
+        if (response?.success && response.notifications) {
+          setNotifications(response.notifications);
+          setUnreadCount(response.notifications.filter(n => !n.isRead).length);
+        } else {
+          setNotifications([]);
+          setUnreadCount(0);
+        }
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+        setNotifications([]);
+        setUnreadCount(0);
       }
-    ];
-
-    setNotifications(sampleNotifications);
-    setUnreadCount(sampleNotifications.filter(n => !n.isRead).length);
-  }, []);
-
-  // Simulate device status updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDeviceStatus(prev => ({
-        ...prev,
-        batteryLevel: Math.max(0, prev.batteryLevel - Math.random() * 2),
-        lastSync: new Date().toISOString()
-      }));
-    }, 30000); // Update every 30 seconds
-
+    };
+    
+    fetchNotifications();
+    // Poll for new notifications every minute
+    const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, []);
 

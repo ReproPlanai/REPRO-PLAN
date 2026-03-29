@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   MapPin, 
   Phone, 
@@ -13,9 +14,14 @@ import {
   Eye,
   Lock,
   Unlock,
-  MessageSquare
+  MessageSquare,
+  Sparkles,
+  ArrowRight,
+  List,
+  Map
 } from 'lucide-react';
 import { offlineStorage } from '../../utils/offlineStorage';
+import { apiService } from '../../services/api';
 import UnifiedVerificationForm from '../Auth/UnifiedVerificationForm';
 
 interface SafeSpace {
@@ -49,7 +55,9 @@ interface EmergencyContact {
 }
 
 const SafeSpaceLocator: React.FC = () => {
+  const navigate = useNavigate();
   const [safeSpaces, setSafeSpaces] = useState<SafeSpace[]>([]);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [filteredSpaces, setFilteredSpaces] = useState<SafeSpace[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
@@ -73,8 +81,8 @@ const SafeSpaceLocator: React.FC = () => {
   const emergencyContacts: EmergencyContact[] = [
     {
       id: '1',
-      name: 'Liberia National Police',
-      phone: '+231-555-9111',
+      name: 'Ghana Police Service',
+      phone: '+233-24-555-9111',
       type: 'police',
       is24Hours: true,
       description: 'Emergency police response'
@@ -105,124 +113,76 @@ const SafeSpaceLocator: React.FC = () => {
     }
   ];
 
-  // Sample safe spaces data (Ghana - starting country)
-  const sampleSafeSpaces: SafeSpace[] = useMemo(() => [
-    {
-      id: '1',
-      name: 'Ghana Women\'s Crisis Center',
-      type: 'crisis_center',
-      address: 'Ring Road, Accra',
-      phone: '+233-24-555-0101',
-      hours: '24/7 Emergency Services',
-      services: ['Crisis Counseling', 'Emergency Shelter', 'Medical Care', 'Legal Support'],
-      rating: 4.8,
-      distance: 1.2,
-      coordinates: { lat: 5.6037, lng: -0.1870 },
-      isOpen: true,
-      isAnonymous: true,
-      is24Hours: true,
-      languages: ['English', 'Twi', 'Ga'],
-      specialFeatures: ['Anonymous Entry', 'Childcare', 'Transportation Assistance'],
-      description: 'Comprehensive crisis support for survivors of gender-based violence',
-      isVerified: true,
-      lastUpdated: '2024-01-15'
-    },
-    {
-      id: '2',
-      name: 'Youth Safe Space',
-      type: 'counseling',
-      address: 'East Legon, Accra',
-      phone: '+233-24-555-0102',
-      hours: 'Mon-Sat: 9AM-6PM',
-      services: ['Youth Counseling', 'Peer Support', 'SRHR Education', 'Mental Health'],
-      rating: 4.6,
-      distance: 2.1,
-      coordinates: { lat: 5.6137, lng: -0.1970 },
-      isOpen: true,
-      isAnonymous: true,
-      is24Hours: false,
-      languages: ['English', 'Twi', 'Ga'],
-      specialFeatures: ['Youth-Friendly', 'Peer Counselors', 'Online Support'],
-      description: 'Safe, confidential space for young people to access support and information',
-      isVerified: true,
-      lastUpdated: '2024-01-10'
-    },
-    {
-      id: '3',
-      name: 'Hope Shelter',
-      type: 'shelter',
-      address: 'Osu, Accra',
-      phone: '+233-24-555-0103',
-      hours: '24/7 Shelter Services',
-      services: ['Emergency Shelter', 'Food & Clothing', 'Counseling', 'Job Training'],
-      rating: 4.7,
-      distance: 3.5,
-      coordinates: { lat: 5.6237, lng: -0.2070 },
-      isOpen: true,
-      isAnonymous: true,
-      is24Hours: true,
-      languages: ['English', 'Twi', 'Ewe'],
-      specialFeatures: ['Long-term Stay', 'Family Units', 'Skills Training'],
-      description: 'Safe haven providing comprehensive support for survivors and their families',
-      isVerified: true,
-      lastUpdated: '2024-01-12'
-    },
-    {
-      id: '4',
-      name: 'Legal Aid Society',
-      type: 'legal_aid',
-      address: 'Adabraka, Accra',
-      phone: '+233-24-555-0104',
-      hours: 'Mon-Fri: 8AM-5PM',
-      services: ['Legal Counseling', 'Court Representation', 'Documentation', 'Restraining Orders'],
-      rating: 4.5,
-      distance: 4.2,
-      coordinates: { lat: 5.6337, lng: -0.2170 },
-      isOpen: false,
-      isAnonymous: false,
-      is24Hours: false,
-      languages: ['English', 'Twi'],
-      specialFeatures: ['Free Services', 'Court Support', 'Documentation Help'],
-      description: 'Free legal assistance for survivors of violence and abuse',
-      isVerified: true,
-      lastUpdated: '2024-01-08'
-    },
-    {
-      id: '5',
-      name: 'Korle Bu Teaching Hospital - GBV Unit',
-      type: 'medical',
-      address: 'Korle Bu, Accra',
-      phone: '+233-24-555-0105',
-      hours: '24/7 Medical Services',
-      services: ['Medical Examination', 'Forensic Evidence', 'STI Testing', 'Emergency Care'],
-      rating: 4.4,
-      distance: 5.1,
-      coordinates: { lat: 5.6437, lng: -0.2270 },
-      isOpen: true,
-      isAnonymous: true,
-      is24Hours: true,
-      languages: ['English', 'Twi', 'Ga'],
-      specialFeatures: ['Forensic Services', 'Confidential Care', 'Evidence Collection'],
-      description: 'Specialized medical care for survivors with trained GBV specialists',
-      isVerified: true,
-      lastUpdated: '2024-01-14'
-    }
-  ], []);
-
+  // Fetch safe spaces from API (admin-configured) or offline storage
   const loadSafeSpaces = useCallback(async () => {
     try {
+      // Try to fetch from backend API first (admin-configured)
+      const response = await apiService.getClinics?.() as { success?: boolean; clinics?: any[] };
+      
+      if (response?.success && response.clinics && response.clinics.length > 0) {
+        // Transform clinics to SafeSpace format
+        const apiSafeSpaces: SafeSpace[] = response.clinics.map((clinic: any) => ({
+          id: clinic.id,
+          name: clinic.name,
+          type: mapClinicType(clinic.type),
+          address: clinic.address,
+          phone: clinic.phone || 'N/A',
+          hours: clinic.hours || 'Contact for hours',
+          services: clinic.services || [],
+          rating: clinic.rating || 4.5,
+          distance: calculateDistance(clinic.coordinates),
+          coordinates: clinic.coordinates || { lat: 5.6037, lng: -0.1870 },
+          isOpen: true,
+          isAnonymous: clinic.type === 'counseling' || clinic.type === 'crisis',
+          is24Hours: clinic.hours?.includes('24/7') || false,
+          languages: clinic.languages || ['English'],
+          specialFeatures: clinic.specialFeatures || [],
+          description: `${clinic.name} - ${clinic.services?.join(', ')}`,
+          isVerified: true,
+          lastUpdated: new Date().toISOString()
+        }));
+        
+        setSafeSpaces(apiSafeSpaces);
+        await offlineStorage.storeData('safe_spaces', apiSafeSpaces);
+      } else {
+        // Fall back to offline storage
+        const storedSpaces = await offlineStorage.getData('safe_spaces');
+        if (storedSpaces && storedSpaces.length > 0) {
+          setSafeSpaces(storedSpaces);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load safe spaces from API:', error);
+      // Fall back to offline storage
       const storedSpaces = await offlineStorage.getData('safe_spaces');
       if (storedSpaces && storedSpaces.length > 0) {
         setSafeSpaces(storedSpaces);
-      } else {
-        setSafeSpaces(sampleSafeSpaces);
-        await offlineStorage.storeData('safe_spaces', sampleSafeSpaces);
       }
-    } catch (error) {
-      console.error('Failed to load safe spaces:', error);
-      setSafeSpaces(sampleSafeSpaces);
     }
-  }, [sampleSafeSpaces]);
+  }, []);
+
+  // Map clinic types to safe space types
+  const mapClinicType = (type: string): SafeSpace['type'] => {
+    const typeMap: Record<string, SafeSpace['type']> = {
+      'clinic': 'medical',
+      'hospital': 'medical',
+      'counseling': 'counseling',
+      'crisis': 'crisis_center',
+      'shelter': 'shelter',
+      'legal': 'legal_aid',
+      'hotline': 'hotline'
+    };
+    return typeMap[type] || 'crisis_center';
+  };
+
+  // Calculate distance from user (simplified)
+  const calculateDistance = (coordinates: { lat: number; lng: number } | undefined): number => {
+    if (!coordinates || !userLocation) return 0;
+    // Simple Euclidean distance for display
+    const latDiff = coordinates.lat - userLocation.lat;
+    const lngDiff = coordinates.lng - userLocation.lng;
+    return Math.round(Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 111 * 10) / 10;
+  };
 
   const getUserLocation = () => {
     if (navigator.geolocation) {
@@ -345,57 +305,59 @@ const SafeSpaceLocator: React.FC = () => {
   }, [filterAndSortSpaces]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Discreet Mode Toggle */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
-          <div className="flex justify-end">
-            <button
-              onClick={() => setShowDiscreetMode(!showDiscreetMode)}
-              className={`p-3 rounded-xl transition-colors ${
-                showDiscreetMode 
-                  ? 'bg-green-100 text-green-600' 
-                  : 'bg-gray-100 text-gray-600'
-              }`}
-              title={showDiscreetMode ? 'Exit discreet mode' : 'Enter discreet mode'}
-            >
-              {showDiscreetMode ? <Unlock size={20} /> : <Lock size={20} />}
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-20 sm:pb-8 space-y-6">
+        {/* Hero */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600 p-6 sm:p-8 shadow-xl">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-white/20 rounded-2xl">
+                <Shield className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="px-2.5 py-0.5 bg-white/25 rounded-full text-xs font-semibold text-white">Safe Spaces</span>
+                  <Sparkles className="w-3.5 h-3.5 text-white/80" />
+                </div>
+                <h1 className="text-xl sm:text-2xl font-bold text-white mb-1">Find Safe Spaces</h1>
+                <p className="text-sm text-white/90">Crisis centers, counseling, shelters, and support services near you.</p>
+              </div>
+            </div>
+            <button onClick={() => setShowDiscreetMode(!showDiscreetMode)} className={`p-2.5 rounded-xl ${showDiscreetMode ? 'bg-white/25' : 'bg-white/10'} transition-colors`} title={showDiscreetMode ? 'Exit discreet mode' : 'Enter discreet mode'}>
+              {showDiscreetMode ? <Unlock size={20} className="text-white" /> : <Lock size={20} className="text-white" />}
             </button>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="bg-red-50 rounded-lg p-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
-                <span className="font-medium text-red-900 text-sm sm:text-base">Safe Spaces</span>
-              </div>
-              <p className="text-xl sm:text-2xl font-bold text-red-600">{safeSpaces.length}</p>
+        {/* Ask Rehana */}
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 shadow-sm">
+          <p className="text-sm text-gray-600 mb-3">Have questions about safe spaces?</p>
+          <button onClick={() => navigate('/chatbot?context=safe-spaces')} className="flex items-center gap-2 py-2.5 px-4 bg-gradient-to-r from-primary-500/10 to-purple-500/10 text-primary-600 rounded-xl font-medium hover:from-primary-500/20 hover:to-purple-500/20 transition-all min-h-[44px]">
+            <Sparkles className="w-4 h-4" />
+            <span>Ask Rehana about safe spaces</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Stats + Map/List toggle */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex gap-3">
+            <div className="rounded-xl bg-white/90 border border-gray-200/80 px-4 py-2">
+              <span className="text-lg font-bold text-primary-600">{safeSpaces.length}</span>
+              <span className="text-xs text-gray-500 ml-1">Spaces</span>
             </div>
-            
-            <div className="bg-green-50 rounded-lg p-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                <span className="font-medium text-green-900 text-sm sm:text-base">24/7 Services</span>
-              </div>
-              <p className="text-xl sm:text-2xl font-bold text-green-600">
-                {safeSpaces.filter(s => s.is24Hours).length}
-              </p>
-            </div>
-            
-            <div className="bg-blue-50 rounded-lg p-4 sm:col-span-2 lg:col-span-1">
-              <div className="flex items-center space-x-2 mb-2">
-                <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                <span className="font-medium text-blue-900 text-sm sm:text-base">Anonymous Access</span>
-              </div>
-              <p className="text-xl sm:text-2xl font-bold text-blue-600">
-                {safeSpaces.filter(s => s.isAnonymous).length}
-              </p>
+            <div className="rounded-xl bg-white/90 border border-gray-200/80 px-4 py-2">
+              <span className="text-lg font-bold text-green-600">{safeSpaces.filter(s => s.is24Hours).length}</span>
+              <span className="text-xs text-gray-500 ml-1">24/7</span>
             </div>
           </div>
-      </div>
+          <div className="flex gap-2">
+            <button onClick={() => setViewMode('list')} className={`p-2 rounded-xl ${viewMode === 'list' ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-600'}`}><List size={18} /></button>
+            <button onClick={() => setViewMode('map')} className={`p-2 rounded-xl ${viewMode === 'map' ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-600'}`}><Map size={18} /></button>
+          </div>
+        </div>
 
-      {/* Emergency Contacts - Always Visible */}
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+      {/* Emergency Contacts */}
+      <div className="rounded-2xl bg-red-50/80 border border-red-200/60 p-4 sm:p-6">
         <div className="flex items-start space-x-3 mb-4">
           <AlertTriangle className="w-6 h-6 text-red-600 mt-1 flex-shrink-0" />
           <div>
@@ -408,7 +370,7 @@ const SafeSpaceLocator: React.FC = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {emergencyContacts.map((contact) => (
-            <div key={contact.id} className="bg-white rounded-lg p-4 border border-red-200">
+            <div key={contact.id} className="rounded-2xl bg-white/90 border border-red-200/60 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h4 className="font-semibold text-gray-900 mb-1">{contact.name}</h4>
@@ -435,78 +397,49 @@ const SafeSpaceLocator: React.FC = () => {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Search Services
-            </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="text"
-                placeholder="Search safe spaces, services, or locations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-field pl-10"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Service Type
-              </label>
-              <select
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                className="input-field"
-              >
-                <option value="all">All Services</option>
-                {spaceTypes.map(type => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Sort By
-              </label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'distance' | 'rating' | 'name')}
-                className="input-field"
-              >
-                <option value="distance">Distance</option>
-                <option value="rating">Rating</option>
-                <option value="name">Name</option>
-              </select>
-            </div>
-          </div>
+      <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 shadow-sm">
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <input type="text" placeholder="Search safe spaces, services..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/80 focus:ring-2 focus:ring-primary-500/20 text-sm" />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)} className="px-3 py-2 rounded-xl border border-gray-200/80 text-sm bg-white">
+            <option value="all">All Services</option>
+            {spaceTypes.map(type => <option key={type.value} value={type.value}>{type.label}</option>)}
+          </select>
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value as 'distance' | 'rating' | 'name')} className="px-3 py-2 rounded-xl border border-gray-200/80 text-sm bg-white">
+            <option value="distance">Distance</option>
+            <option value="rating">Rating</option>
+            <option value="name">Name</option>
+          </select>
         </div>
       </div>
 
-      {/* Safe Spaces List */}
-      <div className="space-y-6">
-        {filteredSpaces.length > 0 ? (
+      {/* Safe Spaces List / Map */}
+      <div className="space-y-4">
+        {viewMode === 'map' ? (
+          <div className="rounded-2xl bg-white/90 border border-gray-200/80 p-8 text-center">
+            <Map className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500 text-sm">Map view coming soon. Showing list.</p>
+            <button onClick={() => setViewMode('list')} className="mt-3 text-primary-600 text-sm font-medium">Switch to list</button>
+          </div>
+        ) : filteredSpaces.length > 0 ? (
           filteredSpaces.map((space: SafeSpace) => {
             const TypeIcon = getTypeIcon(space.type);
             return (
-              <div key={space.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="space-y-4">
-                  {/* Space Header */}
-                  <div className="flex items-start space-x-4">
-                    <div className={`p-3 rounded-xl ${getTypeColor(space.type)} flex-shrink-0`}>
-                      <TypeIcon size={24} />
+              <div key={space.id} className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-lg transition-all">
+                <div className="p-4 sm:p-5">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className={`p-2.5 rounded-xl ${getTypeColor(space.type)} flex-shrink-0`}>
+                      <TypeIcon size={22} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{space.name}</h3>
-                      <p className="text-gray-600 mb-3">{space.description}</p>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-lg font-bold text-gray-900">{space.name}</h3>
+                        {space.isVerified && <span className="px-2 py-0.5 rounded-lg bg-green-100 text-green-700 text-xs font-medium">Verified</span>}
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">{space.description}</p>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
                         <div className="flex items-center space-x-1">
                           <MapPin size={14} />
                           <span>{space.distance} km away</span>
@@ -593,27 +526,17 @@ const SafeSpaceLocator: React.FC = () => {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                    <button
-                      onClick={() => handleCall(space.phone)}
-                      className="flex-1 btn-primary flex items-center justify-center space-x-2"
-                    >
-                      <Phone size={16} />
-                      <span>Call Now</span>
+                  <div className="flex gap-2 pt-4">
+                    <a href={`tel:${space.phone}`} onClick={() => handleCall(space.phone)} className="flex-1 py-2.5 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium flex items-center justify-center gap-2 min-h-[44px]">
+                      <Phone size={18} />
+                      Call
+                    </a>
+                    <button onClick={() => handleDirections(space.coordinates)} className="flex-1 py-2.5 px-4 border-2 border-gray-200 rounded-xl font-medium flex items-center justify-center gap-2 min-h-[44px] hover:border-primary-300">
+                      <Navigation size={18} />
+                      Directions
                     </button>
-                    <button
-                      onClick={() => handleDirections(space.coordinates)}
-                      className="flex-1 btn-outline flex items-center justify-center space-x-2"
-                    >
-                      <Navigation size={16} />
-                      <span>Directions</span>
-                    </button>
-                    <button
-                      onClick={() => handleAccessService(space)}
-                      className="flex-1 btn-outline flex items-center justify-center space-x-2"
-                    >
-                      <MessageSquare size={16} />
-                      <span>More Info</span>
+                    <button onClick={() => handleAccessService(space)} className="py-2.5 px-4 border-2 border-gray-200 rounded-xl font-medium flex items-center justify-center gap-2 min-h-[44px] hover:border-primary-300">
+                      <MessageSquare size={18} />
                     </button>
                   </div>
                 </div>
@@ -621,10 +544,10 @@ const SafeSpaceLocator: React.FC = () => {
             );
           })
         ) : (
-          <div className="text-center py-12">
+          <div className="rounded-2xl bg-white/90 border border-gray-200/80 p-12 text-center">
             <Shield className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No safe spaces found</h3>
-            <p className="text-gray-500">Try adjusting your search or filters</p>
+            <p className="text-gray-500 text-sm">Try adjusting your search or filters</p>
           </div>
         )}
       </div>
@@ -718,7 +641,7 @@ const SafeSpaceLocator: React.FC = () => {
       )}
 
       {/* Safety Tips */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+      <div className="rounded-2xl bg-blue-50/80 border border-blue-200/60 p-4 sm:p-6">
         <div className="flex items-start space-x-3">
           <Shield className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
           <div>
@@ -734,9 +657,9 @@ const SafeSpaceLocator: React.FC = () => {
         </div>
       </div>
 
-      {/* Unified Verification Modal */}
+      {/* Verification Modal */}
       {showVerification && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 z-50">
           <div className="max-w-md w-full max-h-[90vh] overflow-y-auto">
             <UnifiedVerificationForm
               onVerificationComplete={handleVerificationComplete}
@@ -747,7 +670,6 @@ const SafeSpaceLocator: React.FC = () => {
           </div>
         </div>
       )}
-      </div>
     </div>
   );
 };

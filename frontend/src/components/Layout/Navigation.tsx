@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, Link } from 'react-router-dom';
-import { 
+import {
   Home, 
   MessageCircle, 
   MapPin, 
@@ -16,7 +16,6 @@ import {
   WifiOff,
   Play,
   Download,
-  FileText,
   Globe,
   Smartphone,
   Bell,
@@ -27,7 +26,8 @@ import {
   Eye,
   MousePointer,
   Volume2,
-  Brain
+  Brain,
+  Hand
 } from 'lucide-react';
 import { useState } from 'react';
 import { useOffline } from '../../hooks/useOffline';
@@ -43,9 +43,6 @@ const Navigation: React.FC = () => {
     { path: '/', icon: Home, label: t('navigation.home') },
     { path: '/chatbot', icon: MessageCircle, label: t('navigation.chatbot') },
     { path: '/videos', icon: Play, label: 'Videos' },
-    { path: '/articles', icon: FileText, label: 'Articles' },
-    { path: '/sms', icon: Smartphone, label: 'SMS & USSD' },
-    { path: '/sms-alerts', icon: Bell, label: 'SRHR Alerts' },
     { path: '/stories', icon: BookOpen, label: 'Stories' },
     { path: '/clinics', icon: MapPin, label: t('navigation.clinics') },
     { path: '/safe-spaces', icon: Lock, label: 'Safe Spaces' },
@@ -55,10 +52,10 @@ const Navigation: React.FC = () => {
     { path: '/inclusive-support', icon: Users, label: 'Inclusive Support' },
     { path: '/emergency', icon: Shield, label: t('navigation.emergency') },
     { path: '/mentorship', icon: Users, label: t('navigation.mentorship') },
-    { path: '/offline', icon: Download, label: 'Offline Mode' },
     { path: '/visual-accessibility', icon: Eye, label: 'Visual Accessibility' },
     { path: '/motor-accessibility', icon: MousePointer, label: 'Motor Accessibility' },
     { path: '/hearing-accessibility', icon: Volume2, label: 'Hearing Accessibility' },
+    { path: '/sign-language', icon: Hand, label: 'Sign Language (GSL)' },
     { path: '/cognitive-accessibility', icon: Brain, label: 'Easy to Use' },
     { path: '/notifications', icon: Bell, label: 'Notifications' },
     { path: '/tutorial', icon: GraduationCap, label: 'Tutorial' },
@@ -112,9 +109,9 @@ const Navigation: React.FC = () => {
             <div className="w-12 h-12 sm:w-10 sm:h-10 bg-primary-600 rounded-xl flex items-center justify-center shadow-lg">
               <Shield className="w-7 h-7 sm:w-6 sm:h-6 text-white" />
             </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 flex flex-col leading-[1]">
                   <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">REPRO PLAN</h1>
-                  <p className="text-xs text-gray-500 truncate">Your Safe Space for SRHR</p>
+                  <p className="text-xs text-gray-500 truncate -mt-2 leading-none">Your Safe Space for SRHR</p>
                 </div>
           </div>
 
@@ -177,7 +174,7 @@ const Navigation: React.FC = () => {
                   to={item.path}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`
-                    flex items-center space-x-3 px-4 py-4 rounded-xl transition-all duration-200 touch-manipulation
+                    flex items-center space-x-3 px-4 py-4 rounded-xl transition-all duration-200 touch-manipulation focus:outline-none
                     active:scale-98 lg:active:scale-100
                     ${active 
                       ? 'bg-primary-50 text-primary-700 border-r-4 border-primary-600 shadow-sm' 

@@ -25,7 +25,7 @@ const DashboardAccess: React.FC<DashboardAccessProps> = ({ onDashboardAccess }) 
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="w-full h-full">
       {currentStep === 'role-select' && (
         <SecretCodeEntry onCodeVerified={handleCodeVerified} />
       )}

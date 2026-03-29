@@ -16,10 +16,12 @@ export interface AccessibilitySettings {
   simpleLanguage: boolean;
   showProgress: boolean;
   confirmActions: boolean;
+  reduceDistractions: boolean;
   
   // Hearing Accessibility
   visualAlerts: boolean;
   captions: boolean;
+  signLanguage: boolean;
   
   // Rural/Basic Phone Features
   smsMode: boolean;
@@ -46,11 +48,13 @@ const defaultSettings: AccessibilitySettings = {
   keyboardNavigation: false,
   voiceCommands: false,
   largeTouchTargets: false,
-  simpleLanguage: false,
+  simpleLanguage: true,
   showProgress: true,
   confirmActions: false,
+  reduceDistractions: false,
   visualAlerts: false,
   captions: true,
+  signLanguage: false,
   smsMode: false,
   offlineMode: false,
   lowBandwidth: false,
@@ -138,6 +142,30 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ ch
       root.classList.add('low-bandwidth');
     } else {
       root.classList.remove('low-bandwidth');
+    }
+
+    // Hearing: visual alerts and captions
+    if (settings.visualAlerts) {
+      root.classList.add('visual-alerts');
+    } else {
+      root.classList.remove('visual-alerts');
+    }
+    if (settings.captions) {
+      root.classList.add('captions-enabled');
+    } else {
+      root.classList.remove('captions-enabled');
+    }
+
+    // Cognitive: reduce distractions, simple language, visual aids
+    if (settings.reduceDistractions) {
+      root.classList.add('reduce-distractions');
+    } else {
+      root.classList.remove('reduce-distractions');
+    }
+    if (settings.simpleLanguage) {
+      root.classList.add('simple-language');
+    } else {
+      root.classList.remove('simple-language');
     }
   }, [settings]);
 

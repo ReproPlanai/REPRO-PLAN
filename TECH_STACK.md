@@ -33,4 +33,4 @@ Frontend-only stack for the current phase. Backend will be added later.
 - **Types**: `@types/react`, `@types/react-dom`, `@types/node`, `@types/jest`
 
 ### Deployment
-- **Hosting**: Netlify (see `frontend/package.json` scripts)
+- **Hosting**: Vercel (see `frontend/package.json` scripts)

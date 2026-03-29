@@ -53,7 +53,7 @@ Disallow: /admin/private/
 Disallow: /user-data/
 
 # Sitemap location
-Sitemap: https://repro-plan.netlify.app/sitemap.xml
+Sitemap: https://reproplanai.com/sitemap.xml
 
 # Crawl delay for respectful crawling
 Crawl-delay: 1

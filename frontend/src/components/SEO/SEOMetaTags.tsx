@@ -23,8 +23,8 @@ const SEOMetaTags: React.FC<SEOMetaTagsProps> = ({
     'anonymous', 'safe space', 'health education', 'emergency support', 'QR code verification',
     'mobile health', 'PWA', 'offline access', 'privacy', 'confidential', 'safe link'
   ],
-  image = 'https://reproplan.netlify.app/logo512.png',
-  url = 'https://reproplan.netlify.app',
+  image = 'https://reproplanai.com/logo512.png',
+  url = 'https://reproplanai.com',
   type = 'website',
   author = 'REPRO PLAN Team',
   publishedTime,
@@ -33,8 +33,8 @@ const SEOMetaTags: React.FC<SEOMetaTagsProps> = ({
   tags = ['SRHR', 'Youth Health', 'Mobile Health', 'Emergency Support']
 }) => {
   const fullTitle = title.includes('REPRO PLAN') ? title : `${title} | REPRO PLAN`;
-  const fullUrl = url.startsWith('http') ? url : `https://reproplan.netlify.app${url}`;
-  const fullImage = image.startsWith('http') ? image : `https://reproplan.netlify.app${image}`;
+  const fullUrl = url.startsWith('http') ? url : `https://reproplanai.com${url}`;
+  const fullImage = image.startsWith('http') ? image : `https://reproplanai.com${image}`;
 
   return (
     <Helmet>
@@ -128,19 +128,19 @@ const SEOMetaTags: React.FC<SEOMetaTagsProps> = ({
           "author": {
             "@type": "Organization",
             "name": "REPRO PLAN Team",
-            "url": "https://reproplan.netlify.app"
+            "url": "https://reproplanai.com"
           },
           "publisher": {
             "@type": "Organization",
             "name": "REPRO PLAN",
-            "url": "https://reproplan.netlify.app"
+            "url": "https://reproplanai.com"
           },
           "datePublished": publishedTime || "2024-12-19",
           "dateModified": modifiedTime || "2024-12-19",
           "inLanguage": "en",
           "isAccessibleForFree": true,
           "featureList": [
-            "Anonymous SRHR Chatbot",
+            "Rehana AI Assistant",
             "Emergency Support",
             "QR Code Verification",
             "Offline Access",

@@ -3,16 +3,17 @@ import {
   CheckCircle, 
   XCircle, 
   ArrowRight, 
-  ArrowLeft,
   Trophy, 
   Star, 
   RotateCcw,
   BookOpen,
   Target,
   Volume2,
-  VolumeX
+  VolumeX,
+  Loader2
 } from 'lucide-react';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
+import { useOffline } from '../../hooks/useOffline';
 import { voiceCommandService } from '../../services/voiceCommandService';
 import { keyboardNavigationService } from '../../services/keyboardNavigationService';
 
@@ -35,9 +36,18 @@ interface QuizResult {
   category: string;
 }
 
-const AccessibleQuizGame: React.FC = () => {
+const API_URL = process.env.REACT_APP_API_URL?.replace(/\/$/, '');
+
+interface AccessibleQuizGameProps {
+  onBack?: () => void;
+}
+
+const AccessibleQuizGame: React.FC<AccessibleQuizGameProps> = ({ onBack }) => {
   const { settings } = useAccessibility();
+  const { isOnline } = useOffline();
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionsLoading, setQuestionsLoading] = useState(false);
+  const [aiExplanation, setAiExplanation] = useState<string | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -52,51 +62,8 @@ const AccessibleQuizGame: React.FC = () => {
   const questionRef = useRef<HTMLDivElement>(null);
   const optionsRef = useRef<HTMLDivElement>(null);
 
-  // Sample questions
-  const sampleQuestions: Question[] = useMemo(() => [
-    {
-      id: '1',
-      question: 'What is the most effective way to prevent HIV transmission?',
-      options: [
-        'Abstinence only',
-        'Condoms only', 
-        'Both abstinence and consistent condom use',
-        'None of the above'
-      ],
-      correctAnswer: 2,
-      explanation: 'Both abstinence and consistent condom use are effective ways to prevent HIV transmission. The most effective approach combines multiple prevention strategies.',
-      category: 'HIV Prevention',
-      difficulty: 'medium'
-    },
-    {
-      id: '2',
-      question: 'At what age should girls start getting cervical cancer screening?',
-      options: [
-        '18 years old',
-        '21 years old',
-        '25 years old',
-        '30 years old'
-      ],
-      correctAnswer: 1,
-      explanation: 'Cervical cancer screening should begin at age 21 for most women, regardless of when they first have sex.',
-      category: 'Reproductive Health',
-      difficulty: 'easy'
-    },
-    {
-      id: '3',
-      question: 'What is the recommended age for HPV vaccination?',
-      options: [
-        '9-12 years old',
-        '13-15 years old',
-        '16-18 years old',
-        '19-21 years old'
-      ],
-      correctAnswer: 0,
-      explanation: 'HPV vaccination is most effective when given between ages 9-12, before most people are exposed to HPV.',
-      category: 'Vaccination',
-      difficulty: 'medium'
-    }
-  ], []);
+  // Remove sample questions - questions must come from API
+  // Empty questions array until API provides data
 
   const categories = [
     { value: 'all', label: 'All Topics' },
@@ -118,11 +85,56 @@ const AccessibleQuizGame: React.FC = () => {
 
   const readExplanation = useCallback(() => {
     if (questions[currentQuestionIndex] && showResult) {
-      voiceCommandService.speak(questions[currentQuestionIndex].explanation);
+      const text = aiExplanation || questions[currentQuestionIndex].explanation;
+      voiceCommandService.speak(text);
     }
-  }, [questions, currentQuestionIndex, showResult]);
+  }, [questions, currentQuestionIndex, showResult, aiExplanation]);
 
-  const startQuiz = () => {
+  // Fetch questions from API only - no sample data fallback
+  const startQuiz = useCallback(async () => {
+    setQuestionsLoading(true);
+    setAiExplanation(null);
+    try {
+      if (isOnline && API_URL) {
+        const topic = selectedCategory === 'all' ? 'SRHR' : selectedCategory;
+        const res = await fetch(`${API_URL}/ai/quiz-questions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic, difficulty: 'medium', count: 5 }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const qs = Array.isArray(data?.questions) ? data.questions : [];
+          if (qs.length > 0) {
+            const mapped: Question[] = qs.map((q: Record<string, unknown>, i: number) => ({
+              id: String(q.id ?? i + 1),
+              question: String(q.question ?? ''),
+              options: Array.isArray(q.options) ? q.options.map(String) : [],
+              correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
+              explanation: String(q.explanation ?? ''),
+              category: String(q.category ?? topic),
+              difficulty: (q.difficulty as 'easy' | 'medium' | 'hard') || 'medium',
+            })).filter((q: Question) => q.question && q.options.length >= 2);
+            if (mapped.length > 0) {
+              setQuestions(mapped);
+              setQuizStarted(true);
+              setQuizCompleted(false);
+              setCurrentQuestionIndex(0);
+              setScore(0);
+              setSelectedAnswer(null);
+              setShowResult(false);
+              setTimeSpent(0);
+              setQuestionsLoading(false);
+              return;
+            }
+          }
+        }
+      }
+      // No fallback - just set empty questions and show error state
+      setQuestions([]);
+    } catch {
+      setQuestions([]);
+    }
     setQuizStarted(true);
     setQuizCompleted(false);
     setCurrentQuestionIndex(0);
@@ -130,9 +142,10 @@ const AccessibleQuizGame: React.FC = () => {
     setSelectedAnswer(null);
     setShowResult(false);
     setTimeSpent(0);
-  };
+    setQuestionsLoading(false);
+  }, [isOnline, selectedCategory]);
 
-  const handleSubmitAnswer = useCallback(() => {
+  const handleSubmitAnswer = useCallback(async () => {
     if (selectedAnswer === null) return;
     
     const currentQuestion = questions[currentQuestionIndex];
@@ -143,7 +156,29 @@ const AccessibleQuizGame: React.FC = () => {
     }
     
     setShowResult(true);
-  }, [selectedAnswer, questions, currentQuestionIndex]);
+    setAiExplanation(null);
+
+    if (isOnline && API_URL && currentQuestion) {
+      try {
+        const res = await fetch(`${API_URL}/ai/explain`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question: currentQuestion.question,
+            userAnswer: currentQuestion.options[selectedAnswer],
+            correctAnswer: currentQuestion.options[currentQuestion.correctAnswer],
+            context: currentQuestion.category,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.explanation) setAiExplanation(data.explanation);
+        }
+      } catch {
+        // Use built-in explanation
+      }
+    }
+  }, [selectedAnswer, questions, currentQuestionIndex, isOnline]);
 
   const saveUserStats = useCallback(async (result: QuizResult) => {
     try {
@@ -160,6 +195,7 @@ const AccessibleQuizGame: React.FC = () => {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedAnswer(null);
       setShowResult(false);
+      setAiExplanation(null);
     } else {
       setQuizCompleted(true);
       const result: QuizResult = {
@@ -212,7 +248,7 @@ const AccessibleQuizGame: React.FC = () => {
         }
         break;
     }
-  }, [quizStarted, selectedAnswer, showResult, handleNextQuestion, handleSubmitAnswer, readCurrentQuestion, readExplanation]);
+  }, [quizStarted, selectedAnswer, showResult, startQuiz, handleNextQuestion, handleSubmitAnswer, readCurrentQuestion, readExplanation]);
 
   const handleKeyboardAction = useCallback((action: string) => {
     switch (action) {
@@ -242,9 +278,8 @@ const AccessibleQuizGame: React.FC = () => {
   }, [selectedAnswer, showResult, handleNextQuestion, handleSubmitAnswer]);
 
   useEffect(() => {
-    setQuestions(sampleQuestions);
     loadUserStats();
-  }, [sampleQuestions]);
+  }, []);
 
   useEffect(() => {
     if (quizStarted && !quizCompleted) {
@@ -345,23 +380,28 @@ const AccessibleQuizGame: React.FC = () => {
 
   if (!quizStarted) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary-50/30 pb-20 sm:pb-8">
         {skipLinks}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+          {onBack && (
+            <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium">
+              ← Back to Learn & Play
+            </button>
+          )}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-primary-100 rounded-full mb-4">
-              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-primary-600" />
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-purple-500 mb-4 shadow-lg">
+              <BookOpen className="w-7 h-7 text-white" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">SRHR Knowledge Quiz</h1>
             <p className="text-sm sm:text-base text-gray-600">
-              Test your knowledge about sexual and reproductive health and rights
+              AI-generated questions. Test your knowledge and earn scores.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-6">
             {/* Quiz Setup */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Start New Quiz</h2>
+            <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Start New Quiz</h2>
               
               <div className="space-y-4">
                 <div>
@@ -383,13 +423,12 @@ const AccessibleQuizGame: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <h3 className="font-medium text-blue-900 mb-2">Quiz Information</h3>
-                  <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• {selectedCategory === 'all' ? sampleQuestions.length : sampleQuestions.filter(q => q.category === selectedCategory).length} questions</li>
-                    <li>• Multiple choice format</li>
-                    <li>• Explanations provided</li>
-                    <li>• No time limit</li>
+                <div className="rounded-xl bg-primary-50/80 border border-primary-200/50 p-4">
+                  <h3 className="font-medium text-primary-900 mb-2">Quiz Info</h3>
+                  <ul className="text-sm text-primary-800 space-y-1">
+                    <li>• Questions loaded from API</li>
+                    <li>• AI-generated with personalized explanations</li>
+                    <li>• Multiple choice • No time limit</li>
                     {settings.voiceCommands && <li>• Voice commands available</li>}
                     {settings.keyboardNavigation && <li>• Keyboard navigation enabled</li>}
                   </ul>
@@ -397,11 +436,16 @@ const AccessibleQuizGame: React.FC = () => {
 
                 <button
                   onClick={startQuiz}
-                  className="w-full btn-primary flex items-center justify-center space-x-2"
+                  disabled={questionsLoading}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 disabled:opacity-70 flex items-center justify-center gap-2 transition-all"
                   aria-describedby="start-help"
                 >
-                  <Target size={16} />
-                  <span>Start Quiz</span>
+                  {questionsLoading ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Target size={16} />
+                  )}
+                  <span>{questionsLoading ? 'Loading...' : 'Start Quiz'}</span>
                 </button>
                 <p id="start-help" className="text-xs text-gray-500">
                   {settings.voiceCommands && "Say 'start quiz' to begin"}
@@ -411,26 +455,25 @@ const AccessibleQuizGame: React.FC = () => {
             </div>
 
             {/* User Stats */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Progress</h2>
+            <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Progress</h2>
               
               {userStats.length > 0 ? (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-green-50 rounded-lg p-4">
-                      <div className="flex items-center space-x-2 mb-2">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200/50 p-4">
+                      <div className="flex items-center gap-2 mb-2">
                         <Trophy className="w-5 h-5 text-green-600" />
-                        <span className="font-medium text-green-900">Quizzes Taken</span>
+                        <span className="font-medium text-green-900 text-sm">Quizzes</span>
                       </div>
                       <p className="text-2xl font-bold text-green-600">{userStats.length}</p>
                     </div>
-                    
-                    <div className="bg-blue-50 rounded-lg p-4">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Star className="w-5 h-5 text-blue-600" />
-                        <span className="font-medium text-blue-900">Average Score</span>
+                    <div className="rounded-xl bg-gradient-to-br from-primary-50 to-purple-50 border border-primary-200/50 p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Star className="w-5 h-5 text-primary-600" />
+                        <span className="font-medium text-primary-900 text-sm">Avg Score</span>
                       </div>
-                      <p className="text-2xl font-bold text-blue-600">
+                      <p className="text-2xl font-bold text-primary-600">
                         {Math.round(userStats.reduce((acc, stat) => acc + (stat.score / stat.totalQuestions * 100), 0) / userStats.length)}%
                       </p>
                     </div>
@@ -457,9 +500,11 @@ const AccessibleQuizGame: React.FC = () => {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Trophy className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">No quizzes completed yet</p>
-                  <p className="text-gray-400 text-sm">Start your first quiz to see your progress</p>
+                  <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                    <Trophy className="w-7 h-7 text-gray-400" />
+                  </div>
+                  <p className="text-gray-600 font-medium">No quizzes yet</p>
+                  <p className="text-gray-400 text-sm mt-1">Start your first quiz to track progress</p>
                 </div>
               )}
             </div>
@@ -473,48 +518,47 @@ const AccessibleQuizGame: React.FC = () => {
     const percentage = Math.round((score / questions.length) * 100);
     
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary-50/30 pb-20 sm:pb-8">
         {skipLinks}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-4">
-                <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+          <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-6 sm:p-8 text-center shadow-sm">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-500 mb-4 shadow-lg">
+              <Trophy className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Quiz Completed!</h1>
+            <p className="text-gray-600 mb-6">Great job! Here's how you did:</p>
+            
+            <div className="grid grid-cols-3 gap-3 mb-8">
+              <div className="rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200/50 p-4">
+                <div className="text-xl sm:text-2xl font-bold text-green-600">{percentage}%</div>
+                <div className="text-xs text-green-700">Score</div>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Quiz Completed!</h1>
-              <p className="text-gray-600 mb-6">Great job! Here's how you did:</p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                <div className="bg-green-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-green-600">{percentage}%</div>
-                  <div className="text-sm text-green-700">Score</div>
-                </div>
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-blue-600">{score}</div>
-                  <div className="text-sm text-blue-700">Correct</div>
-                </div>
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-purple-600">{timeSpent}s</div>
-                  <div className="text-sm text-purple-700">Time</div>
-                </div>
+              <div className="rounded-xl bg-gradient-to-br from-primary-50 to-purple-50 border border-primary-200/50 p-4">
+                <div className="text-xl sm:text-2xl font-bold text-primary-600">{score}</div>
+                <div className="text-xs text-primary-700">Correct</div>
               </div>
+              <div className="rounded-xl bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200/50 p-4">
+                <div className="text-xl sm:text-2xl font-bold text-purple-600">{timeSpent}s</div>
+                <div className="text-xs text-purple-700">Time</div>
+              </div>
+            </div>
 
-              <div className="space-y-4">
+            <div className="space-y-3">
+              <button
+                onClick={resetQuiz}
+                className="w-full py-3 px-6 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 transition-all flex items-center justify-center gap-2 min-h-[44px]"
+              >
+                <RotateCcw size={18} />
+                <span>Take Another Quiz</span>
+              </button>
+              {onBack && (
                 <button
-                  onClick={resetQuiz}
-                  className="w-full btn-primary flex items-center justify-center space-x-2"
+                  onClick={onBack}
+                  className="w-full py-3 px-6 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all min-h-[44px]"
                 >
-                  <RotateCcw size={16} />
-                  <span>Take Another Quiz</span>
+                  Back to Learn & Play
                 </button>
-                <button
-                  onClick={() => window.location.href = '/games'}
-                  className="w-full btn-outline flex items-center justify-center space-x-2"
-                >
-                  <ArrowLeft size={16} />
-                  <span>Back to Games</span>
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -527,11 +571,11 @@ const AccessibleQuizGame: React.FC = () => {
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary-50/30 pb-20 sm:pb-8">
       {skipLinks}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
         {/* Progress Bar */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 sm:p-6 mb-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 space-y-2 sm:space-y-0">
             <span className="text-sm font-medium text-gray-700">
               Question {currentQuestionIndex + 1} of {questions.length}
@@ -552,7 +596,7 @@ const AccessibleQuizGame: React.FC = () => {
         </div>
 
         {/* Question */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-6 mb-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(currentQuestion.difficulty)}`}>
               {currentQuestion.difficulty}
@@ -615,7 +659,7 @@ const AccessibleQuizGame: React.FC = () => {
           {showResult && (
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <h3 className="font-medium text-blue-900 mb-2">Explanation:</h3>
-              <p className="text-blue-800">{currentQuestion.explanation}</p>
+              <p className="text-blue-800">{aiExplanation || currentQuestion.explanation}</p>
               {settings.voiceCommands && (
                 <button
                   onClick={readExplanation}
@@ -640,7 +684,7 @@ const AccessibleQuizGame: React.FC = () => {
             <button
               onClick={handleSubmitAnswer}
               disabled={selectedAnswer === null}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="py-2.5 px-5 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all min-h-[44px]"
               aria-describedby="submit-help"
             >
               Submit Answer
@@ -648,7 +692,7 @@ const AccessibleQuizGame: React.FC = () => {
           ) : (
             <button
               onClick={handleNextQuestion}
-              className="btn-primary flex items-center space-x-2"
+              className="py-2.5 px-5 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 transition-all flex items-center gap-2 min-h-[44px]"
             >
               <span>{currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}</span>
               <ArrowRight size={16} />

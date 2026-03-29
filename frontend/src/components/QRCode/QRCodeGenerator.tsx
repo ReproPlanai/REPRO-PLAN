@@ -90,112 +90,82 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 max-w-md mx-auto">
-      <div className="text-center mb-6">
-        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <QrCode className="w-8 h-8 text-blue-600" />
+    <div className="rounded-2xl bg-gradient-to-br from-gray-50 to-white border border-gray-200/80 p-6 shadow-sm">
+      <div className="text-center mb-4">
+        <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <QrCode className="w-6 h-6 text-white" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          REPRO PLAN Verification QR Code
-        </h3>
-        <p className="text-sm text-gray-600">
-          Generate a QR code for stakeholder verification
-        </p>
+        <h3 className="font-semibold text-gray-900 text-base">Verification QR Code</h3>
+        <p className="text-xs text-gray-500 mt-0.5">Show to stakeholders for instant verification</p>
       </div>
 
-      {/* Security Notice */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-        <div className="flex items-start space-x-2">
-          <Shield className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-          <div className="text-xs text-yellow-800">
-            <p className="font-medium">Privacy Protected</p>
-            <p>Your identity remains anonymous. Only verification status is shared.</p>
-          </div>
-        </div>
+      <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/60 mb-4">
+        <Shield className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+        <p className="text-xs text-emerald-800">Your identity stays anonymous. Only verification status is shared.</p>
       </div>
 
-      {/* QR Code Display */}
-      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+      <div className="rounded-2xl bg-white border border-gray-200/80 p-6 mb-4">
         {isGenerating ? (
-          <div className="flex items-center justify-center py-8">
-            <RefreshCw className="w-6 h-6 text-blue-600 animate-spin" />
-            <span className="ml-2 text-sm text-gray-600">Generating QR Code...</span>
+          <div className="flex flex-col items-center justify-center py-12">
+            <RefreshCw className="w-10 h-10 text-primary-500 animate-spin mb-3" />
+            <span className="text-sm text-gray-600">Generating secure code...</span>
           </div>
         ) : qrData ? (
           <div className="text-center">
-            <div className="bg-white rounded-lg p-4 mb-3 inline-block">
-              {/* QR Code Placeholder - In production, use a QR code library */}
-              <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center">
-                <QrCode className="w-16 h-16 text-gray-400" />
-              </div>
+            <div className="inline-flex items-center justify-center w-40 h-40 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200/80 p-4">
+              <QrCode className="w-24 h-24 text-primary-400" />
             </div>
-            <p className="text-xs text-gray-500 mb-2">
-              QR Code Generated
-            </p>
             {lastGenerated && (
-              <p className="text-xs text-gray-400">
-                Generated: {lastGenerated.toLocaleTimeString()}
-              </p>
+              <p className="text-xs text-gray-400 mt-3">Generated {lastGenerated.toLocaleTimeString()}</p>
             )}
           </div>
         ) : (
-          <div className="text-center py-8">
-            <QrCode className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">Click "Generate QR Code" to create</p>
+          <div className="text-center py-12">
+            <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-3">
+              <QrCode className="w-10 h-10 text-gray-300" />
+            </div>
+            <p className="text-sm text-gray-500">Ready to generate</p>
           </div>
         )}
       </div>
 
-      {/* Action Buttons */}
       <div className="space-y-3">
         {!isVisible ? (
           <button
             onClick={() => setIsVisible(true)}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+            className="w-full py-3 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 transition-all flex items-center justify-center gap-2"
           >
             <Eye className="w-4 h-4" />
-            <span>Generate QR Code</span>
+            Generate QR Code
           </button>
         ) : (
-          <div className="space-y-2">
+          <>
             <button
               onClick={refreshQRCode}
               disabled={isGenerating}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+              className="w-full py-3 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
             >
               <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
-              <span>Refresh QR Code</span>
+              Refresh Code
             </button>
-            
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={copyToClipboard}
-                className="bg-gray-100 text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-1 text-sm"
+                className="py-2.5 px-4 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
               >
-                <Copy className="w-3 h-3" />
-                <span>Copy</span>
+                <Copy className="w-4 h-4" />
+                Copy
               </button>
               <button
                 onClick={downloadQRCode}
-                className="bg-gray-100 text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-1 text-sm"
+                className="py-2.5 px-4 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
               >
-                <Download className="w-3 h-3" />
-                <span>Save</span>
+                <Download className="w-4 h-4" />
+                Save
               </button>
             </div>
-          </div>
+          </>
         )}
-      </div>
-
-      {/* Usage Instructions */}
-      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-        <h4 className="text-sm font-medium text-blue-900 mb-2">How to use:</h4>
-        <ol className="text-xs text-blue-800 space-y-1">
-          <li>1. Generate your QR code</li>
-          <li>2. Show it to a stakeholder (police, medical, etc.)</li>
-          <li>3. They scan it to verify your REPRO PLAN account</li>
-          <li>4. Your identity remains anonymous</li>
-        </ol>
       </div>
     </div>
   );

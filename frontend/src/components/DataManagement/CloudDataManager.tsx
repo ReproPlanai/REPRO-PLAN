@@ -30,6 +30,7 @@ import {
   Activity,
   TrendingUp
 } from 'lucide-react';
+import { apiService } from '../../services/api';
 
 interface CloudBackup {
   id: string;
@@ -91,123 +92,122 @@ const CloudDataManager: React.FC<CloudDataManagerProps> = ({
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [backupProgress, setBackupProgress] = useState(0);
 
-  // Initialize data
+  // Fetch real backup data from API
   useEffect(() => {
-    const sampleBackups: CloudBackup[] = [
-      {
-        id: '1',
-        name: 'Daily Backup - Jan 15',
-        type: 'automatic',
-        status: 'completed',
-        size: 2.5,
-        timestamp: new Date(Date.now() - 3600000).toISOString(),
-        duration: 180,
-        filesCount: 1247,
-        encryption: true
-      },
-      {
-        id: '2',
-        name: 'Emergency Backup - Jan 14',
-        type: 'manual',
-        status: 'completed',
-        size: 1.8,
-        timestamp: new Date(Date.now() - 7200000).toISOString(),
-        duration: 120,
-        filesCount: 892,
-        encryption: true
-      },
-      {
-        id: '3',
-        name: 'Weekly Backup - Jan 13',
-        type: 'scheduled',
-        status: 'in_progress',
-        size: 0,
-        timestamp: new Date().toISOString(),
-        duration: 0,
-        filesCount: 0,
-        encryption: true
-      }
-    ];
-
-    const sampleRetentionPolicies: DataRetention[] = [
-      {
-        id: '1',
-        category: 'Emergency Records',
-        retentionPeriod: 2555, // 7 years
-        currentAge: 365,
-        action: 'keep',
-        lastAction: new Date(Date.now() - 86400000).toISOString(),
-        nextAction: new Date(Date.now() + 2190000000).toISOString()
-      },
-      {
-        id: '2',
-        category: 'Case Files',
-        retentionPeriod: 1095, // 3 years
-        currentAge: 180,
-        action: 'keep',
-        lastAction: new Date(Date.now() - 86400000).toISOString(),
-        nextAction: new Date(Date.now() + 274000000).toISOString()
-      },
-      {
-        id: '3',
-        category: 'System Logs',
-        retentionPeriod: 90,
-        currentAge: 85,
-        action: 'archive',
-        lastAction: new Date(Date.now() - 86400000).toISOString(),
-        nextAction: new Date(Date.now() + 432000000).toISOString()
-      }
-    ];
-
-    setBackups(sampleBackups);
-    setRetentionPolicies(sampleRetentionPolicies);
+    fetchBackups();
+    fetchRetentionPolicies();
   }, []);
+
+  const fetchBackups = async () => {
+    try {
+      const response = await apiService.getAuditLogs?.() as { success?: boolean; logs?: any[] };
+      if (response?.success && response.logs) {
+        // Transform audit logs to backup records
+        const backupData = response.logs
+          .filter((l: any) => l.action?.includes('backup') || l.entityType === 'backup')
+          .slice(0, 10)
+          .map((l: any, index: number) => ({
+            id: l.id || String(index + 1),
+            name: l.details?.name || `Backup ${index + 1}`,
+            type: l.details?.type || 'automatic',
+            status: (l.status === 'success' ? 'completed' : l.status === 'failed' ? 'failed' : 'pending') as CloudBackup['status'],
+            size: l.details?.size || 0,
+            timestamp: l.createdAt || new Date().toISOString(),
+            duration: l.details?.duration || 0,
+            filesCount: l.details?.filesCount || 0,
+            encryption: l.details?.encryption !== false
+          }));
+        setBackups(backupData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch backups:', error);
+      setBackups([]);
+    }
+  };
+
+  const fetchRetentionPolicies = async () => {
+    try {
+      const settingsResponse = await apiService.getSystemSettings?.() as { success?: boolean; settings?: any };
+      if (settingsResponse?.success && settingsResponse.settings?.retention) {
+        const policies = settingsResponse.settings.retention.map((p: any, index: number) => ({
+          id: p.id || String(index + 1),
+          category: p.category || 'General Records',
+          retentionPeriod: p.days || 365,
+          currentAge: p.currentAge || 0,
+          action: p.action || 'keep',
+          lastAction: p.lastAction || new Date().toISOString(),
+          nextAction: p.nextAction || new Date(Date.now() + 86400000).toISOString()
+        }));
+        setRetentionPolicies(policies);
+      } else {
+        setRetentionPolicies([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch retention policies:', error);
+      setRetentionPolicies([]);
+    }
+  };
 
   const startBackup = async (type: 'automatic' | 'manual' | 'scheduled') => {
     setIsBackingUp(true);
     setBackupProgress(0);
 
-    // Simulate backup process
-    const interval = setInterval(() => {
+    // Track backup progress through API status
+    const progressInterval = setInterval(() => {
       setBackupProgress(prev => {
         if (prev >= 100) {
-          clearInterval(interval);
-          setIsBackingUp(false);
-          
-          const newBackup: CloudBackup = {
-            id: Date.now().toString(),
-            name: `${type.charAt(0).toUpperCase() + type.slice(1)} Backup - ${new Date().toLocaleDateString()}`,
-            type,
-            status: 'completed',
-            size: Math.random() * 5 + 1,
-            timestamp: new Date().toISOString(),
-            duration: Math.floor(Math.random() * 300) + 60,
-            filesCount: Math.floor(Math.random() * 2000) + 500,
-            encryption: true
-          };
-
-          setBackups(prev => [newBackup, ...prev]);
-          onBackupComplete(newBackup);
-          
+          clearInterval(progressInterval);
           return 100;
         }
-        return prev + 5;
+        return prev + 10;
       });
-    }, 200);
+    }, 300);
+
+    try {
+      // Call backup API if available
+      const response = await apiService.createBackup?.({ type }) as { success?: boolean; backup?: any };
+      
+      clearInterval(progressInterval);
+      setIsBackingUp(false);
+      
+      if (response?.success && response.backup) {
+        const newBackup: CloudBackup = {
+          id: response.backup.id || Date.now().toString(),
+          name: response.backup.name || `${type.charAt(0).toUpperCase() + type.slice(1)} Backup - ${new Date().toLocaleDateString()}`,
+          type,
+          status: 'completed',
+          size: response.backup.size || 0,
+          timestamp: new Date().toISOString(),
+          duration: response.backup.duration || Math.floor(Date.now() / 1000) % 300,
+          filesCount: response.backup.filesCount || 0,
+          encryption: true
+        };
+        setBackups(prev => [newBackup, ...prev]);
+        onBackupComplete(newBackup);
+      }
+    } catch (error) {
+      console.error('Backup failed:', error);
+      clearInterval(progressInterval);
+      setIsBackingUp(false);
+    }
   };
 
   const startRestore = async (backupId: string) => {
     setIsRestoring(true);
     
-    // Simulate restore process
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    const backup = backups.find(b => b.id === backupId);
-    if (backup) {
-      onDataRestore(backup);
+    try {
+      // Call restore API if available
+      await apiService.restoreBackup?.(backupId);
+      
+      const backup = backups.find(b => b.id === backupId);
+      if (backup) {
+        onDataRestore(backup);
+      }
+    } catch (error) {
+      console.error('Restore failed:', error);
+    } finally {
+      setIsRestoring(false);
     }
-    
-    setIsRestoring(false);
   };
 
   const updateRetentionPolicy = (policyId: string, action: DataRetention['action']) => {

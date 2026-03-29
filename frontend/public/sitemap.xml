@@ -6,7 +6,7 @@
 
   <!-- Homepage -->
   <url>
-    <loc>https://repro-plan.netlify.app/</loc>
+    <loc>https://reproplanai.com/</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -14,42 +14,48 @@
 
   <!-- Core Features -->
   <url>
-    <loc>https://repro-plan.netlify.app/chatbot</loc>
+    <loc>https://reproplanai.com/chatbot</loc>
+    <lastmod>2026-01-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://reproplanai.com/rehana</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/videos</loc>
+    <loc>https://reproplanai.com/videos</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/articles</loc>
+    <loc>https://reproplanai.com/articles</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/clinics</loc>
+    <loc>https://reproplanai.com/clinics</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/tracker</loc>
+    <loc>https://reproplanai.com/tracker</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/games</loc>
+    <loc>https://reproplanai.com/games</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -57,14 +63,14 @@
 
   <!-- Emergency Features -->
   <url>
-    <loc>https://repro-plan.netlify.app/emergency</loc>
+    <loc>https://reproplanai.com/emergency</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/mentorship</loc>
+    <loc>https://reproplanai.com/mentorship</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -72,14 +78,14 @@
 
   <!-- New Features -->
   <url>
-    <loc>https://repro-plan.netlify.app/medication-order</loc>
+    <loc>https://reproplanai.com/medication-order</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/secure-map</loc>
+    <loc>https://reproplanai.com/secure-map</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -87,14 +93,14 @@
 
   <!-- QR Code Features -->
   <url>
-    <loc>https://repro-plan.netlify.app/qr-verification</loc>
+    <loc>https://reproplanai.com/qr-verification</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/qr-scanner</loc>
+    <loc>https://reproplanai.com/qr-scanner</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -102,14 +108,14 @@
 
   <!-- Settings and Support -->
   <url>
-    <loc>https://repro-plan.netlify.app/settings</loc>
+    <loc>https://reproplanai.com/settings</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/tutorial</loc>
+    <loc>https://reproplanai.com/tutorial</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -117,28 +123,28 @@
 
   <!-- Accessibility Features -->
   <url>
-    <loc>https://repro-plan.netlify.app/visual-accessibility</loc>
+    <loc>https://reproplanai.com/visual-accessibility</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/motor-accessibility</loc>
+    <loc>https://reproplanai.com/motor-accessibility</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/hearing-accessibility</loc>
+    <loc>https://reproplanai.com/hearing-accessibility</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/cognitive-accessibility</loc>
+    <loc>https://reproplanai.com/cognitive-accessibility</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -146,7 +152,7 @@
 
   <!-- Stakeholder Dashboards -->
   <url>
-    <loc>https://repro-plan.netlify.app/dashboard</loc>
+    <loc>https://reproplanai.com/dashboard</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -154,14 +160,14 @@
 
   <!-- PWA Assets -->
   <url>
-    <loc>https://repro-plan.netlify.app/manifest.json</loc>
+    <loc>https://reproplanai.com/manifest.json</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://repro-plan.netlify.app/sw.js</loc>
+    <loc>https://reproplanai.com/sw.js</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAccessibility } from '../contexts/AccessibilityContext';
 import { 
-  ArrowLeft,
   Volume2,
   Eye,
   Vibrate,
@@ -16,16 +16,18 @@ import {
   Heart,
   Shield,
   BookOpen,
-  Zap
+  Zap,
+  Hand
 } from 'lucide-react';
 
 const HearingAccessibility: React.FC = () => {
   const navigate = useNavigate();
-  const [visualAlerts, setVisualAlerts] = useState(false);
+  const { settings, updateSetting } = useAccessibility();
+  const visualAlerts = settings.visualAlerts;
   const [vibration, setVibration] = useState(false);
-  const [captions, setCaptions] = useState(true);
+  const captions = settings.captions;
   const [flashAlerts, setFlashAlerts] = useState(false);
-  const [signLanguage, setSignLanguage] = useState(false);
+  const signLanguage = settings.signLanguage;
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   // Text-to-speech functionality
@@ -65,23 +67,6 @@ const HearingAccessibility: React.FC = () => {
     }
   };
 
-  // Apply accessibility settings
-  useEffect(() => {
-    const root = document.documentElement;
-    
-    if (visualAlerts) {
-      root.classList.add('visual-alerts');
-    } else {
-      root.classList.remove('visual-alerts');
-    }
-    
-    if (captions) {
-      root.classList.add('captions-enabled');
-    } else {
-      root.classList.remove('captions-enabled');
-    }
-  }, [visualAlerts, captions]);
-
   const accessibilityFeatures = [
     {
       id: 'visual-alerts',
@@ -89,7 +74,7 @@ const HearingAccessibility: React.FC = () => {
       description: 'Show visual notifications instead of sound alerts',
       icon: Eye,
       isEnabled: visualAlerts,
-      onToggle: () => setVisualAlerts(!visualAlerts)
+      onToggle: () => updateSetting('visualAlerts', !visualAlerts)
     },
     {
       id: 'vibration',
@@ -105,7 +90,7 @@ const HearingAccessibility: React.FC = () => {
       description: 'Show captions for all video content',
       icon: Subtitles,
       isEnabled: captions,
-      onToggle: () => setCaptions(!captions)
+      onToggle: () => updateSetting('captions', !captions)
     },
     {
       id: 'flash-alerts',
@@ -121,7 +106,7 @@ const HearingAccessibility: React.FC = () => {
       description: 'Show sign language videos for content',
       icon: Volume2,
       isEnabled: signLanguage,
-      onToggle: () => setSignLanguage(!signLanguage)
+      onToggle: () => updateSetting('signLanguage', !signLanguage)
     }
   ];
 
@@ -141,11 +126,11 @@ const HearingAccessibility: React.FC = () => {
       speakText: 'Finding healthcare clinics with visual maps'
     },
     {
-      title: 'Health Articles',
-      description: 'Read health information with visual aids',
+      title: 'Watch Videos',
+      description: 'Watch health information with visual aids',
       icon: BookOpen,
-      action: () => navigate('/articles'),
-      speakText: 'Opening health articles with visual aids'
+      action: () => navigate('/videos'),
+      speakText: 'Opening health videos with visual aids'
     },
     {
       title: 'Emergency Support',
@@ -153,6 +138,13 @@ const HearingAccessibility: React.FC = () => {
       icon: Shield,
       action: () => navigate('/emergency'),
       speakText: 'Accessing emergency support with visual alerts'
+    },
+    {
+      title: 'Ghana Sign Language',
+      description: 'Learn GSL phrases for SRHR and healthcare',
+      icon: Hand,
+      action: () => navigate('/sign-language'),
+      speakText: 'Opening Ghana Sign Language resources'
     }
   ];
 
@@ -162,28 +154,28 @@ const HearingAccessibility: React.FC = () => {
       description: 'Visual guide to birth control options',
       content: 'There are many types of contraception available. Condoms are barrier methods that prevent pregnancy and STIs. Birth control pills are hormonal methods taken daily. IUDs are long-acting reversible contraceptives. Each method has different effectiveness rates and side effects.',
       visualAid: '📊 Effectiveness Chart: Condoms 85%, Pills 91%, IUDs 99%',
-      signLanguage: 'Available in Liberian Sign Language'
+      signLanguage: 'Available in Ghana Sign Language'
     },
     {
       title: 'STI Prevention',
       description: 'Visual guide to protecting yourself',
       content: 'STI prevention includes using condoms consistently, getting regular testing, limiting sexual partners, and vaccination. Early detection through testing is crucial for treatment and preventing transmission to others.',
       visualAid: '🛡️ Protection Methods: Condoms, Testing, Vaccination, Communication',
-      signLanguage: 'Available in Liberian Sign Language'
+      signLanguage: 'Available in Ghana Sign Language'
     },
     {
       title: 'Consent and Boundaries',
       description: 'Understanding consent through visual examples',
       content: 'Consent is clear, enthusiastic, and ongoing agreement. It must be given freely without pressure. You have the right to say no at any time. Visual cues include enthusiastic body language, clear communication, and respect for boundaries.',
       visualAid: '✅ Consent Checklist: Clear, Enthusiastic, Ongoing, Freely Given',
-      signLanguage: 'Available in Liberian Sign Language'
+      signLanguage: 'Available in Ghana Sign Language'
     },
     {
       title: 'Mental Health Support',
       description: 'Visual resources for emotional wellbeing',
       content: 'Mental health is important for overall wellbeing. Signs to watch for include changes in mood, sleep, appetite, or energy. Support is available through counselors, support groups, and mental health professionals.',
       visualAid: '💚 Support Resources: Counselors, Support Groups, Hotlines, Apps',
-      signLanguage: 'Available in Liberian Sign Language'
+      signLanguage: 'Available in Ghana Sign Language'
     }
   ];
 
@@ -205,21 +197,10 @@ const HearingAccessibility: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      {/* Back Button */}
-      <div className="p-4 sm:p-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="w-6 h-6 text-gray-600" />
-        </button>
-      </div>
-
+    <div className="w-full h-full bg-gradient-to-br from-purple-50 via-white to-pink-50 overflow-x-hidden">
       {/* Content */}
       <div className="flex-1 p-4 sm:p-6">
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="space-y-6">
           
           {/* Accessibility Features */}
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
@@ -406,7 +387,7 @@ const HearingAccessibility: React.FC = () => {
                 <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
                   <h4 className="font-semibold text-orange-900 mb-1">Support Resources</h4>
                   <ul className="text-orange-800 text-sm space-y-1">
-                    <li>• Liberian National Association of the Deaf</li>
+                    <li>• Ghana National Association of the Deaf</li>
                     <li>• Sign language interpreters</li>
                     <li>• Visual communication apps</li>
                     <li>• Hearing aid support groups</li>

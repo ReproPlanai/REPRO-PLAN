@@ -4,19 +4,25 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
+    container: {
+      center: true,
+      padding: { DEFAULT: "1rem", sm: "1.5rem", md: "2rem", lg: "2.5rem" },
+      screens: {
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        "2xl": "1400px",
+      },
+    },
     extend: {
       screens: {
-        'xs': '475px',
-        'sm': '640px',
-        'md': '768px',
-        'lg': '1024px',
-        'xl': '1280px',
-        '2xl': '1536px',
-        // Custom breakpoints for better mobile experience
-        'mobile': '480px',
-        'tablet': '768px',
-        'desktop': '1024px',
-        'wide': '1440px',
+        xs: "375px",
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        "2xl": "1400px",
       },
       colors: {
         primary: {

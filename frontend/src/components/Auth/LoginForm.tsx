@@ -131,11 +131,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
+    <div className="min-h-screen min-h-[100dvh] bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-x-hidden">
+      <div className="w-full max-w-md mx-auto sm:max-w-lg md:max-w-xl">
+        <div className="text-center mb-6 sm:mb-8">
           <div 
-            className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 cursor-pointer hover:scale-105 transition-transform shadow-lg ring-4 ring-primary-100"
+            className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-4 cursor-pointer hover:scale-105 transition-transform shadow-lg ring-4 ring-primary-100"
             onClick={handleLogoClick}
             title="Triple click to access stakeholder login"
           >
@@ -145,25 +145,25 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
               className="w-full h-full object-cover rounded-full"
             />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             {t('app.name')}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             {t('auth.subtitle')}
           </p>
         </div>
 
         <div className="card">
-          <div className="text-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <div className="text-center mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
               {t('auth.welcome')}
             </h2>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-600 text-xs sm:text-sm">
               {t('auth.subtitle')}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div>
               <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-2">
                 {t('auth.enterCode')}
@@ -175,7 +175,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
                   value={formatCodeDisplay(code)}
                   onChange={handleCodeChange}
                   placeholder={t('auth.codePlaceholder')}
-                  className="input-field pr-20"
+                  className="input-field pr-20 min-h-[48px] sm:min-h-[52px] text-base"
                   maxLength={9} // 8 chars + 1 space
                   required
                 />
@@ -195,7 +195,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
             <button
               type="submit"
               disabled={isLoading || code.length < 8}
-              className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 min-h-[48px] touch-manipulation"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -210,7 +210,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
 
           {/* Stakeholder Login Section - Hidden by default */}
           {showStakeholderSection && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
               <div className="text-center mb-4">
                 <p className="text-sm text-gray-600 mb-4">
                   Stakeholder Access Portal
@@ -259,7 +259,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
           )}
 
           {/* Create Code and Forget Code Options */}
-          <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
+          <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200 space-y-3 sm:space-y-4">
             <div>
               <p className="text-center text-sm text-gray-600 mb-4">
                 Don't have a secret code?
@@ -285,7 +285,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+          <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 rounded-lg">
             <div className="flex items-start space-x-3">
               <Shield className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div className="text-sm">

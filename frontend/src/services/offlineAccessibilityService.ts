@@ -249,39 +249,18 @@ class OfflineAccessibilityService {
   async autoDownloadContent(): Promise<void> {
     if (!this.settings.autoDownload) return;
 
-    // In a real implementation, this would fetch content from a server
-    const sampleContent: OfflineContent = {
-      id: 'sample-quiz-1',
-      type: 'quiz',
-      title: 'HIV Prevention Basics',
-      content: JSON.stringify({
-        questions: [
-          {
-            question: 'What is the most effective way to prevent HIV?',
-            options: ['Abstinence', 'Condoms', 'Both', 'None'],
-            correctAnswer: 2,
-            explanation: 'Both abstinence and condoms are effective prevention methods.'
-          }
-        ]
-      }),
-      metadata: {
-        language: this.settings.preferredLanguage,
-        category: 'HIV Prevention',
-        difficulty: 'easy',
-        size: 0.1, // 100KB
-        lastUpdated: new Date()
-      },
-      accessibility: {
-        hasAudio: false,
-        hasVideo: false,
-        hasText: true,
-        hasImages: false,
-        screenReaderFriendly: true,
-        voiceCommandCompatible: true
+    try {
+      // Fetch content from server API
+      const response = await fetch('/api/offline-content');
+      if (response.ok) {
+        const content = await response.json();
+        for (const item of content) {
+          await this.downloadContent(item);
+        }
       }
-    };
-
-    await this.downloadContent(sampleContent);
+    } catch (error) {
+      console.error('Failed to fetch offline content:', error);
+    }
   }
 
   // Persistence

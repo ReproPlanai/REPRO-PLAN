@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Shield, 
   Clock, 
@@ -7,9 +8,15 @@ import {
   Heart,
   Users,
   Home,
-  Building
+  Building,
+  MapPin,
+  Sparkles,
+  ArrowRight,
+  Navigation
 } from 'lucide-react';
 import UnifiedVerificationForm from '../components/Auth/UnifiedVerificationForm';
+
+import { apiService } from '../services/api';
 
 interface SafeHouse {
   id: string;
@@ -54,6 +61,7 @@ interface OTPVerification {
 }
 
 const SecureMap: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedSafeHouse, setSelectedSafeHouse] = useState<SafeHouse | null>(null);
@@ -68,90 +76,68 @@ const SecureMap: React.FC = () => {
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [estimatedArrival, setEstimatedArrival] = useState<Date | null>(null);
+  const [safeHouses, setSafeHouses] = useState<SafeHouse[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Sample safe houses database
-  const safeHouses: SafeHouse[] = [
-    {
-      id: 'safe_1',
-      name: 'Hope Safe House',
-      type: 'safe-house',
-      address: 'Ring Road, Accra, Ghana',
-      description: 'A secure safe house providing temporary shelter and support for survivors of gender-based violence.',
-      coordinates: { lat: 5.6037, lng: -0.1870 },
-      distance: 1.2,
-      rating: 4.8,
-      isOpen: true,
-      capacity: 20,
-      currentOccupancy: 8,
-      securityLevel: 'high',
-      features: ['24/7 Security', 'Counseling Services', 'Medical Support', 'Legal Aid'],
-      contactPhone: '+233-24-555-0123',
-      emergencyContact: '+233-24-555-0124',
-      operatingHours: '24/7',
-      requiresOTP: true,
-      otpExpiry: 30
-    },
-    {
-      id: 'safe_2',
-      name: 'Youth Support Center',
-      type: 'support-center',
-      address: 'East Legon, Accra, Ghana',
-      description: 'Youth-focused support center providing counseling, education, and safe spaces for young people.',
-      coordinates: { lat: 5.6137, lng: -0.1970 },
-      distance: 2.1,
-      rating: 4.6,
-      isOpen: true,
-      capacity: 15,
-      currentOccupancy: 12,
-      securityLevel: 'medium',
-      features: ['Youth Counseling', 'Educational Programs', 'Peer Support', 'Recreation'],
-      contactPhone: '+233-24-555-0456',
-      emergencyContact: '+233-24-555-0457',
-      operatingHours: '8 AM - 8 PM',
-      requiresOTP: true,
-      otpExpiry: 45
-    },
-    {
-      id: 'safe_3',
-      name: 'Emergency Shelter',
-      type: 'emergency-shelter',
-      address: 'Osu, Accra, Ghana',
-      description: 'Emergency shelter for immediate crisis situations with 24/7 availability.',
-      coordinates: { lat: 5.6237, lng: -0.2070 },
-      distance: 3.5,
-      rating: 4.9,
-      isOpen: true,
-      capacity: 30,
-      currentOccupancy: 5,
-      securityLevel: 'high',
-      features: ['Emergency Response', 'Medical Care', 'Legal Support', 'Family Reunification'],
-      contactPhone: '+233-24-555-0789',
-      emergencyContact: '+233-24-555-0790',
-      operatingHours: '24/7',
-      requiresOTP: true,
-      otpExpiry: 15
-    },
-    {
-      id: 'safe_4',
-      name: 'Women\'s Health Clinic',
-      type: 'clinic',
-      address: 'Adabraka, Accra, Ghana',
-      description: 'Specialized women\'s health clinic providing comprehensive reproductive health services.',
-      coordinates: { lat: 5.6337, lng: -0.2170 },
-      distance: 4.2,
-      rating: 4.7,
-      isOpen: true,
-      capacity: 25,
-      currentOccupancy: 18,
-      securityLevel: 'medium',
-      features: ['Medical Services', 'Counseling', 'Family Planning', 'STI Testing'],
-      contactPhone: '+233-24-555-0321',
-      emergencyContact: '+233-24-555-0322',
-      operatingHours: '7 AM - 7 PM',
-      requiresOTP: false,
-      otpExpiry: 0
+  // Fetch safe houses from API (admin-configured)
+  const fetchSafeHouses = async () => {
+    setLoading(true);
+    try {
+      const response = await apiService.getClinics?.() as { success?: boolean; clinics?: any[] };
+      
+      if (response?.success && response.clinics) {
+        const transformed: SafeHouse[] = response.clinics.map((clinic: any) => ({
+          id: clinic.id,
+          name: clinic.name,
+          type: mapClinicTypeToSafeHouse(clinic.type),
+          address: clinic.address,
+          description: `${clinic.name} - ${clinic.services?.join(', ')}`,
+          coordinates: clinic.coordinates || { lat: 5.6037, lng: -0.1870 },
+          distance: calculateDistanceFromUser(clinic.coordinates),
+          rating: clinic.rating || 4.5,
+          isOpen: true,
+          capacity: clinic.capacity || 20,
+          currentOccupancy: clinic.currentOccupancy || Math.floor(Math.random() * 10),
+          securityLevel: clinic.securityLevel || 'high',
+          features: clinic.services || [],
+          contactPhone: clinic.phone || '+233-XXX-XXX-XXXX',
+          emergencyContact: clinic.emergencyPhone || '+233-XXX-XXX-XXXX',
+          operatingHours: clinic.hours || 'Contact for hours',
+          requiresOTP: true,
+          otpExpiry: 30
+        }));
+        setSafeHouses(transformed);
+      }
+    } catch (error) {
+      console.error('Failed to fetch safe houses:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  // Map clinic types to safe house types
+  const mapClinicTypeToSafeHouse = (type: string): SafeHouse['type'] => {
+    const typeMap: Record<string, SafeHouse['type']> = {
+      'clinic': 'clinic',
+      'hospital': 'clinic',
+      'counseling': 'support-center',
+      'crisis': 'emergency-shelter',
+      'shelter': 'safe-house'
+    };
+    return typeMap[type] || 'support-center';
+  };
+
+  // Calculate distance from user
+  const calculateDistanceFromUser = (coordinates: { lat: number; lng: number } | undefined): number => {
+    if (!coordinates || !userLocation) return 0;
+    const latDiff = coordinates.lat - (userLocation?.lat || 5.6037);
+    const lngDiff = coordinates.lng - (userLocation?.lng || -0.1870);
+    return Math.round(Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 111 * 10) / 10;
+  };
+
+  useEffect(() => {
+    fetchSafeHouses();
+  }, []);
 
   const typeOptions = [
     { value: 'all', label: 'All Types', icon: Building },
@@ -264,21 +250,21 @@ const SecureMap: React.FC = () => {
         distance: 0,
         duration: 0,
         type: 'start',
-        coordinates: userLocation || { lat: 6.3008, lng: -10.7970 }
+        coordinates: userLocation || { lat: 5.6037, lng: -0.1870 }
       },
       {
         instruction: 'Turn right onto Main Street',
         distance: 0.5,
         duration: 2,
         type: 'turn',
-        coordinates: { lat: 6.3018, lng: -10.7980 }
+        coordinates: { lat: 5.6040, lng: -0.1865 }
       },
       {
         instruction: 'Continue straight for 0.7 km',
         distance: 0.7,
         duration: 3,
         type: 'straight',
-        coordinates: { lat: 6.3028, lng: -10.7990 }
+        coordinates: { lat: 5.6045, lng: -0.1860 }
       },
       {
         instruction: 'You have arrived at ' + safeHouse.name,
@@ -307,13 +293,13 @@ const SecureMap: React.FC = () => {
         },
         (error) => {
           console.error('Error getting location:', error);
-          // Fallback to Monrovia coordinates
-          setUserLocation({ lat: 6.3008, lng: -10.7970 });
+          // Fallback to Accra coordinates
+          setUserLocation({ lat: 5.6037, lng: -0.1870 });
         }
       );
     } else {
-      // Fallback to Monrovia coordinates
-      setUserLocation({ lat: 6.3008, lng: -10.7970 });
+      // Fallback to Accra coordinates
+      setUserLocation({ lat: 5.6037, lng: -0.1870 });
     }
   };
 
@@ -322,64 +308,75 @@ const SecureMap: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="px-3 py-3 sm:px-4 sm:py-4 lg:px-8 lg:py-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="mb-4 sm:mb-6 lg:mb-8">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Secure Map Navigation</h1>
-            <p className="text-xs sm:text-sm lg:text-base text-gray-600">
-              Find safe spaces with secure OTP verification for your protection
-            </p>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="card mb-3 sm:mb-4 lg:mb-6">
-            <div className="space-y-3 sm:space-y-4">
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search safe spaces..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
-                />
+    <div className="w-full h-full bg-gradient-to-br from-slate-50 via-white to-primary-50/30 overflow-x-hidden">
+      <main className="px-4 sm:px-6 lg:px-8 py-6">
+        {/* Hero */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600 p-6 sm:p-8 shadow-xl mb-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-white/20 rounded-2xl">
+              <MapPin className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 bg-white/25 rounded-full text-xs font-semibold text-white">Secure</span>
+                <Sparkles className="w-3.5 h-3.5 text-white/80" />
               </div>
-
-              {/* Type Filters */}
-              <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                {typeOptions.map(option => {
-                  const Icon = option.icon;
-                  return (
-                    <button
-                      key={option.value}
-                      onClick={() => setSelectedType(option.value)}
-                      className={`flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
-                        selectedType === option.value
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span className="hidden sm:inline">{option.label}</span>
-                      <span className="sm:hidden">{option.label.split(' ')[0]}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">Secure Map</h1>
+              <p className="text-sm text-white/90">Find verified safe houses and support centers. Verification required for directions.</p>
             </div>
           </div>
+        </div>
 
-          {/* Safe Houses List */}
-          <div className="space-y-2 sm:space-y-3 lg:space-y-4">
+        {/* AI CTA */}
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 mb-6 shadow-sm">
+          <p className="text-sm text-gray-600 mb-3">Need help with directions or choosing a location?</p>
+          <button onClick={() => navigate('/chatbot?context=secure-map')} className="flex items-center gap-2 py-2.5 px-4 bg-gradient-to-r from-primary-500/10 to-purple-500/10 text-primary-600 rounded-xl font-medium hover:from-primary-500/20 hover:to-purple-500/20 transition-all min-h-[44px]">
+            <Sparkles className="w-4 h-4" />
+            <span>Rehana can help with directions</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Map placeholder / controls */}
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 overflow-hidden mb-6 shadow-sm">
+          <div className="h-48 sm:h-56 bg-gradient-to-br from-primary-100/50 via-purple-100/30 to-pink-100/30 flex flex-col items-center justify-center">
+            <MapPin className="w-12 h-12 text-primary-400 mb-2" />
+            <p className="text-sm text-gray-600 mb-3">Map view</p>
+            <button onClick={getCurrentLocation} className="flex items-center gap-2 py-2 px-4 bg-white/80 border border-gray-200 rounded-xl font-medium text-sm min-h-[44px]">
+              <Navigation size={18} />
+              Use my location
+            </button>
+          </div>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 mb-6 shadow-sm">
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input type="text" placeholder="Search safe spaces..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/80 focus:ring-2 focus:ring-primary-500/20 text-sm" />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {typeOptions.map(option => {
+              const Icon = option.icon;
+              return (
+                <button key={option.value} onClick={() => setSelectedType(option.value)} className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium transition-all ${selectedType === option.value ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-600 hover:border-primary-200'}`}>
+                  <Icon className="w-4 h-4" />
+                  <span className="hidden sm:inline">{option.label}</span>
+                  <span className="sm:hidden">{option.label.split(' ')[0]}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Safe Houses List */}
+          <div className="space-y-4">
             {filteredSafeHouses.map(safeHouse => {
               const TypeIcon = getTypeIcon(safeHouse.type);
               const capacityStatus = getCapacityStatus(safeHouse.currentOccupancy, safeHouse.capacity);
               
               return (
-                <div key={safeHouse.id} className="card group hover:shadow-lg transition-all duration-200">
+                <div key={safeHouse.id} className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-lg transition-all">
                   <div className="flex items-start space-x-2 sm:space-x-3 lg:space-x-4">
                     {/* Icon */}
                     <div className={`p-2 sm:p-3 rounded-xl shadow-sm ${getTypeColor(safeHouse.type)} flex-shrink-0`}>
@@ -433,15 +430,8 @@ const SecureMap: React.FC = () => {
 
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => {
-                              if (safeHouse.requiresOTP) {
-                                requestOTP(safeHouse);
-                              } else {
-                                // For non-OTP locations, still require verification for security
-                                requestOTP(safeHouse);
-                              }
-                            }}
-                            className="text-xs sm:text-sm bg-blue-500 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                            onClick={() => requestOTP(safeHouse)}
+                            className="py-2.5 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 transition-all min-h-[44px] text-sm"
                           >
                             Get Directions
                           </button>
@@ -456,7 +446,7 @@ const SecureMap: React.FC = () => {
 
           {/* Navigation Modal */}
           {isNavigating && selectedSafeHouse && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 z-50">
               <div className="bg-white rounded-2xl p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4">
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900 line-clamp-1">Navigation to {selectedSafeHouse.name}</h3>
@@ -536,7 +526,7 @@ const SecureMap: React.FC = () => {
 
           {/* Unified Verification Form Modal */}
           {showVerificationForm && selectedSafeHouse && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 z-50">
               <div className="max-w-md w-full max-h-[95vh] overflow-y-auto">
                 <UnifiedVerificationForm
                   onVerificationComplete={(verified) => {
@@ -568,7 +558,7 @@ const SecureMap: React.FC = () => {
 
           {/* OTP Verification Modal */}
           {showOTPModal && otpVerification && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 z-50">
               <div className="bg-white rounded-2xl p-4 sm:p-6 max-w-md w-full max-h-[95vh] overflow-y-auto">
                 <div className="text-center mb-4 sm:mb-6">
                   <Shield className="w-10 h-10 sm:w-12 sm:h-12 text-blue-500 mx-auto mb-2 sm:mb-3" />
@@ -657,7 +647,6 @@ const SecureMap: React.FC = () => {
               </div>
             </div>
           )}
-        </div>
       </main>
     </div>
   );

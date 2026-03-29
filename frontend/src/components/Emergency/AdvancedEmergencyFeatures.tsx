@@ -91,8 +91,8 @@ const AdvancedEmergencyFeatures: React.FC<AdvancedEmergencyFeaturesProps> = ({
         id: '1',
         name: 'Emergency Response Team',
         role: 'POLICE',
-        phone: '+231-XXX-XXXX',
-        email: 'emergency@liberia.gov.lr',
+        phone: '+233-24-555-9999',
+        email: 'emergency@ghana.gov.gh',
         isOnline: true,
         lastSeen: new Date(Date.now() - 300000).toISOString(),
         priority: 'critical'
@@ -101,8 +101,8 @@ const AdvancedEmergencyFeatures: React.FC<AdvancedEmergencyFeaturesProps> = ({
         id: '2',
         name: 'Medical Emergency',
         role: 'MEDICAL',
-        phone: '+231-XXX-XXXX',
-        email: 'medical@liberia.gov.lr',
+        phone: '+233-24-555-1930',
+        email: 'medical@ghana.gov.gh',
         isOnline: true,
         lastSeen: new Date(Date.now() - 600000).toISOString(),
         priority: 'high'
@@ -111,8 +111,8 @@ const AdvancedEmergencyFeatures: React.FC<AdvancedEmergencyFeaturesProps> = ({
         id: '3',
         name: 'Safe House Manager',
         role: 'SAFEHOUSE',
-        phone: '+231-XXX-XXXX',
-        email: 'safehouse@liberia.gov.lr',
+        phone: '+233-24-555-8000',
+        email: 'safehouse@ghana.gov.gh',
         isOnline: false,
         lastSeen: new Date(Date.now() - 1800000).toISOString(),
         priority: 'high'
@@ -121,8 +121,8 @@ const AdvancedEmergencyFeatures: React.FC<AdvancedEmergencyFeaturesProps> = ({
         id: '4',
         name: 'NGO Coordinator',
         role: 'NGO',
-        phone: '+231-XXX-XXXX',
-        email: 'ngo@liberia.gov.lr',
+        phone: '+233-24-555-0200',
+        email: 'ngo@ghana.gov.gh',
         isOnline: true,
         lastSeen: new Date(Date.now() - 900000).toISOString(),
         priority: 'medium'

@@ -327,21 +327,15 @@ const TrainingSupportSystem: React.FC<TrainingSupportSystemProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-900">Training & Support</h2>
-            <p className="text-gray-600">Learn, get help, and access resources</p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-              <Settings className="w-5 h-5" />
-            </button>
-            <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-              <HelpCircle className="w-5 h-5" />
-            </button>
-          </div>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-gray-900">Learn, get help, and access resources</h2>
+        <div className="flex items-center space-x-2">
+          <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" aria-label="Settings">
+            <Settings className="w-5 h-5" />
+          </button>
+          <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" aria-label="Help">
+            <HelpCircle className="w-5 h-5" />
+          </button>
         </div>
       </div>
 

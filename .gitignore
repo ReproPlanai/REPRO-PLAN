@@ -108,8 +108,8 @@ docker-compose.override.yml
 # Railway
 .railway/
 
-# Netlify
-.netlify/
+# Vercel
+.vercel/
 
 # Vercel
 .vercel/

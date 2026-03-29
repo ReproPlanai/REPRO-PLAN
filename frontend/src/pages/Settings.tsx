@@ -104,10 +104,9 @@ const Settings: React.FC<SettingsProps> = ({ onLogout }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      
-      <main className="px-3 py-3 sm:px-4 sm:py-4 lg:px-6 lg:py-6">
-        <div className="max-w-4xl mx-auto">
+    <div className="w-full h-full bg-gray-50">
+      <main className="p-3 sm:p-4">
+        <div className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             {/* Tabs - Mobile Responsive */}
             <div className="border-b border-gray-200">
@@ -150,6 +149,12 @@ const Settings: React.FC<SettingsProps> = ({ onLogout }) => {
                           className="w-full px-3 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                         >
                           <option value="en">English</option>
+                          <option value="fr">French (Français)</option>
+                          <option value="tw">Twi</option>
+                          <option value="ga">Ga</option>
+                          <option value="ewe">Ewe</option>
+                          <option value="dag">Dagbani</option>
+                          <option value="fante">Fante</option>
                           <option value="kpelle">Kpelle</option>
                           <option value="bassa">Bassa</option>
                           <option value="kru">Kru</option>
@@ -329,7 +334,6 @@ const Settings: React.FC<SettingsProps> = ({ onLogout }) => {
                           <li>• Interactive educational games</li>
                           <li>• Emergency support and panic button</li>
                           <li>• Peer mentorship system</li>
-                          <li>• SMS/USSD integration for offline access</li>
                         </ul>
                       </div>
                     </div>

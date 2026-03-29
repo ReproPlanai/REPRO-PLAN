@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAccessibility } from '../contexts/AccessibilityContext';
 import { 
-  ArrowLeft,
   Eye,
   Volume2,
   Contrast,
@@ -29,13 +29,20 @@ interface AccessibilityFeature {
   category: 'visual' | 'audio' | 'navigation' | 'content';
 }
 
+const fontSizeToSetting = (px: number): 'normal' | 'large' | 'extra-large' | 'huge' =>
+  px <= 18 ? 'normal' : px <= 22 ? 'large' : px <= 28 ? 'extra-large' : 'huge';
+
+const settingToFontSize = (s: string): number =>
+  s === 'normal' ? 16 : s === 'large' ? 20 : s === 'extra-large' ? 24 : 32;
+
 const VisualAccessibility: React.FC = () => {
   const navigate = useNavigate();
+  const { settings, updateSetting } = useAccessibility();
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [fontSize, setFontSize] = useState(16);
-  const [highContrast, setHighContrast] = useState(false);
   const [screenReader, setScreenReader] = useState(false);
-  const [colorBlindMode, setColorBlindMode] = useState('none');
+  const fontSize = settingToFontSize(settings.fontSize);
+  const highContrast = settings.highContrast;
+  const colorBlindMode = settings.colorBlindMode;
 
   // Text-to-speech functionality
   const speakText = (text: string) => {
@@ -63,27 +70,6 @@ const VisualAccessibility: React.FC = () => {
     }
   };
 
-  // Apply visual accessibility settings
-  useEffect(() => {
-    const root = document.documentElement;
-    
-    // Font size
-    root.style.setProperty('--accessibility-font-size', `${fontSize}px`);
-    
-    // High contrast
-    if (highContrast) {
-      root.classList.add('high-contrast');
-    } else {
-      root.classList.remove('high-contrast');
-    }
-    
-    // Color blind mode
-    root.classList.remove('protanopia', 'deuteranopia', 'tritanopia');
-    if (colorBlindMode !== 'none') {
-      root.classList.add(colorBlindMode);
-    }
-  }, [fontSize, highContrast, colorBlindMode]);
-
   const accessibilityFeatures: AccessibilityFeature[] = [
     {
       id: 'screen-reader',
@@ -100,7 +86,7 @@ const VisualAccessibility: React.FC = () => {
       description: 'Increase contrast between text and background for better visibility',
       icon: Contrast,
       isEnabled: highContrast,
-      onToggle: () => setHighContrast(!highContrast),
+      onToggle: () => updateSetting('highContrast', !highContrast),
       category: 'visual'
     },
     {
@@ -116,11 +102,11 @@ const VisualAccessibility: React.FC = () => {
 
   const quickActions = [
     {
-      title: 'Read Health Articles',
-      description: 'Access articles with screen reader optimization',
+      title: 'Watch Videos',
+      description: 'Access videos with screen reader optimization',
       icon: BookOpen,
-      action: () => navigate('/articles'),
-      speakText: 'Navigate to health articles with screen reader support'
+      action: () => navigate('/videos'),
+      speakText: 'Navigate to health videos with screen reader support'
     },
     {
       title: 'Chat with Assistant',
@@ -173,21 +159,10 @@ const VisualAccessibility: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Back Button */}
-      <div className="p-4 sm:p-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="w-6 h-6 text-gray-600" />
-        </button>
-      </div>
-
+    <div className="w-full h-full bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-x-hidden">
       {/* Content */}
       <div className="flex-1 p-4 sm:p-6">
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="space-y-6">
           
           {/* Accessibility Features */}
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
@@ -238,7 +213,10 @@ const VisualAccessibility: React.FC = () => {
               </label>
               <div className="flex items-center space-x-4">
                 <button
-                  onClick={() => setFontSize(Math.max(12, fontSize - 2))}
+                  onClick={() => {
+                    const next = Math.max(12, fontSize - 4);
+                    updateSetting('fontSize', fontSizeToSetting(next));
+                  }}
                   className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   aria-label="Decrease font size"
                 >
@@ -251,7 +229,10 @@ const VisualAccessibility: React.FC = () => {
                   />
                 </div>
                 <button
-                  onClick={() => setFontSize(Math.min(32, fontSize + 2))}
+                  onClick={() => {
+                    const next = Math.min(32, fontSize + 4);
+                    updateSetting('fontSize', fontSizeToSetting(next));
+                  }}
                   className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   aria-label="Increase font size"
                 >
@@ -267,7 +248,7 @@ const VisualAccessibility: React.FC = () => {
               </label>
               <select
                 value={colorBlindMode}
-                onChange={(e) => setColorBlindMode(e.target.value)}
+                onChange={(e) => updateSetting('colorBlindMode', e.target.value as 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia')}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="none">None</option>
@@ -279,10 +260,10 @@ const VisualAccessibility: React.FC = () => {
 
             <button
               onClick={() => {
-                setFontSize(16);
-                setHighContrast(false);
-                setScreenReader(false);
-                setColorBlindMode('none');
+                updateSetting('fontSize', 'normal');
+                updateSetting('highContrast', false);
+                updateSetting('colorBlindMode', 'none');
+                updateSetting('reducedMotion', false);
                 stopSpeaking();
               }}
               className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"

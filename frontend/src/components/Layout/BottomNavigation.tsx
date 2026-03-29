@@ -1,83 +1,52 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import {
-  Home,
-  FileText,
-  MapPin,
-  Shield,
-  User,
-  MessageCircle
-} from 'lucide-react';
+import { Home, MapPin, Shield, MessageCircle } from 'lucide-react';
 
-interface BottomNavigationProps {
-  isAuthenticated: boolean;
-}
+const navItems = [
+  { path: '/', icon: Home, label: 'Home' },
+  { path: '/clinics', icon: MapPin, label: 'Clinics' },
+  { path: '/emergency', icon: Shield, label: 'Emergency' },
+  { path: '/chatbot', icon: MessageCircle, label: 'Chat' },
+];
 
-const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAuthenticated }) => {
+const BottomNavigation: React.FC = () => {
   const location = useLocation();
 
-  // Only show bottom nav for authenticated users on mobile devices
-  if (!isAuthenticated || window.innerWidth >= 768) {
-    return null;
-  }
-
-  const navigationItems = [
-    { path: '/', icon: Home, label: 'Home', shortLabel: 'Home' },
-    { path: '/health-records', icon: FileText, label: 'Records', shortLabel: 'Records' },
-    { path: '/clinics', icon: MapPin, label: 'Clinics', shortLabel: 'Clinics' },
-    { path: '/emergency', icon: Shield, label: 'Emergency', shortLabel: 'Help' },
-    { path: '/chatbot', icon: MessageCircle, label: 'Chat', shortLabel: 'Chat' },
-    { path: '/profile', icon: User, label: 'Profile', shortLabel: 'Profile' }
-  ];
-
-  const isActive = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/';
-    }
-    return location.pathname.startsWith(path);
-  };
-
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 safe-area-bottom">
-      <div className="flex justify-around items-center px-2 py-2">
-        {navigationItems.map((item) => {
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]"
+      style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
+      aria-label="Main navigation"
+    >
+      <div className="flex items-center justify-around h-16">
+        {navItems.map((item) => {
           const Icon = item.icon;
-          const active = isActive(item.path);
-
+          const isActive =
+            item.path === '/'
+              ? location.pathname === '/'
+              : location.pathname.startsWith(item.path);
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`
-                flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 touch-manipulation
-                min-h-[60px] min-w-[60px]
-                active:scale-95
-                ${active
-                  ? 'text-primary-600 bg-primary-50'
-                  : 'text-gray-500 hover:text-gray-700 active:bg-gray-100'
-                }
-              `}
-              style={{
-                paddingBottom: 'max(8px, env(safe-area-inset-bottom))'
-              }}
+              className={`flex flex-col items-center justify-center flex-1 min-w-0 py-2 px-1 transition-colors touch-manipulation min-h-[48px] ${
+                isActive
+                  ? 'text-primary-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+              aria-current={isActive ? 'page' : undefined}
             >
               <Icon
-                size={20}
-                className={`mb-1 ${active ? 'stroke-2' : ''}`}
+                className="w-6 h-6 flex-shrink-0"
+                strokeWidth={isActive ? 2.5 : 2}
               />
-              <span className="text-xs font-medium leading-tight">
-                {item.shortLabel}
+              <span className="text-xs font-medium mt-0.5 truncate w-full text-center">
+                {item.label}
               </span>
             </Link>
           );
         })}
       </div>
-
-      <style>{`
-        .safe-area-bottom {
-          padding-bottom: max(0px, env(safe-area-inset-bottom));
-        }
-      `}</style>
     </nav>
   );
 };

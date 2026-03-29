@@ -94,10 +94,10 @@ A comprehensive sexual and reproductive health and rights (SRHR) platform design
 ## 🚀 Deployment & Infrastructure
 
 ### Current Status
-- **Frontend**: Netlify (Global CDN, SSL, PWA support)
+- **Frontend**: Vercel (Global CDN, SSL, PWA support)
 
 ### Production Environment
-- **Domain**: reproplan.netlify.app (frontend)
+- **Domain**: reproplanai.com (frontend)
 - **Monitoring**: Built-in health checks and logging
 
 ### Scalability Features

@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { Send, Bot, User, MessageCircle, Sparkles, Mic, MicOff, Upload, Camera, Download, Trash2, Save } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import { Send, MessageCircle, Sparkles, Mic, MicOff, Upload, Camera, Download, Trash2, Save } from 'lucide-react';
 import { offlineStorage } from '../../utils/offlineStorage';
 import { useOffline } from '../../hooks/useOffline';
+import { useSpeechToText } from '../../hooks/useSpeechToText';
 
 interface Message {
   id: string;
@@ -37,8 +39,13 @@ interface ChatInterfaceProps {
   onBack?: () => void;
 }
 
+const REHANA_AVATAR_URL = 'https://static.vecteezy.com/system/resources/previews/035/186/557/large_2x/ai-generated-woman-lady-model-cheerful-happy-beauty-face-person-adult-smile-one-background-pretty-photo.jpg';
+const USER_AVATAR_URL = 'https://api.dicebear.com/7.x/avataaars-neutral/png?seed=user&size=128';
+
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
   const { isOnline } = useOffline();
+  const { startListening, stopListening, isSupported: isSpeechSupported } = useSpeechToText();
+  const voiceTranscriptRef = useRef('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +56,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [showMiniDropdown, setShowMiniDropdown] = useState(false);
   const [hasShownIntroduction, setHasShownIntroduction] = useState(false);
+  const [hasChosenRehanaType, setHasChosenRehanaType] = useState(false);
+  const [rehanaType, setRehanaType] = useState<{ focus: string; tone: string; mode: string }>({
+    focus: 'general',
+    tone: 'friendly',
+    mode: 'text'
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -219,20 +232,32 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
     "help suicidal": "If someone is suicidal, take it seriously, listen without judgment, ask directly about their thoughts, stay with them, and connect them to professional help immediately. Don't keep it a secret."
   };
 
+  const rehanaTypeLabels = {
+    focus: { general: 'General SRHR', contraception: 'Contraception', relationships: 'Relationships', emergency: 'Emergency Support', youth: 'Youth-focused' },
+    tone: { clinical: 'Clinical', friendly: 'Friendly', youthFriendly: 'Youth-friendly', crisis: 'Crisis support' },
+    mode: { text: 'Text-only', voice: 'Voice-enabled', quick: 'Quick answers', detailed: 'Detailed' }
+  };
+
+  const getIntroMessage = () => {
+    const focusLabel = rehanaTypeLabels.focus[rehanaType.focus as keyof typeof rehanaTypeLabels.focus] || 'General SRHR';
+    const toneLabel = rehanaTypeLabels.tone[rehanaType.tone as keyof typeof rehanaTypeLabels.tone] || 'Friendly';
+    return `Hello! I'm Rehana, your REPRO PLAN AI assistant. I'm here to provide you with accurate, confidential, and supportive information about sexual and reproductive health and rights. You've chosen ${focusLabel} focus with a ${toneLabel} approach. I'm completely anonymous and your conversations with me are private. How can I help you today?`;
+  };
+
   useEffect(() => {
-    // Load previous messages from offline storage
     loadPreviousMessages();
-    
-    // Add AI introduction message if no messages exist
-    if (messages.length === 0 && !hasShownIntroduction) {
+  }, []);
+
+  useEffect(() => {
+    if (messages.length === 0 && hasChosenRehanaType && !hasShownIntroduction) {
       const introductionMessage: Message = {
         id: Date.now().toString(),
-        text: "Hello! I'm your REPRO PLAN AI assistant. I'm here to provide you with accurate, confidential, and supportive information about sexual and reproductive health and rights. I'm completely anonymous and your conversations with me are private. How can I help you today?",
+        text: getIntroMessage(),
         isUser: false,
         timestamp: Date.now(),
         suggestions: [
           "Tell me about contraception options",
-          "I have questions about my period", 
+          "I have questions about my period",
           "What should I know about STIs?",
           "I need help with relationships"
         ]
@@ -240,7 +265,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
       setMessages([introductionMessage]);
       setHasShownIntroduction(true);
     }
-  }, [messages.length, hasShownIntroduction]);
+  }, [messages.length, hasChosenRehanaType, hasShownIntroduction, rehanaType.focus, rehanaType.tone, rehanaType.mode]);
 
   useEffect(() => {
     scrollToBottom();
@@ -262,13 +287,26 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
 
   const loadPreviousMessages = async () => {
     try {
-      const chatHistory = await offlineStorage.getData('chat_history');
-      if (chatHistory && chatHistory.messages) {
+      const [chatHistory, savedType] = await Promise.all([
+        offlineStorage.getData('chat_history'),
+        offlineStorage.getData('rehana_type')
+      ]);
+      if (chatHistory && chatHistory.messages && Array.isArray(chatHistory.messages) && chatHistory.messages.length > 0) {
         setMessages(chatHistory.messages);
+        setHasChosenRehanaType(true);
+        setHasShownIntroduction(true);
+      }
+      if (savedType && typeof savedType === 'object' && savedType.focus && savedType.tone && savedType.mode) {
+        setRehanaType(savedType as { focus: string; tone: string; mode: string });
       }
     } catch (error) {
       console.error('Failed to load chat history:', error);
     }
+  };
+
+  const handleRehanaTypeContinue = () => {
+    setHasChosenRehanaType(true);
+    offlineStorage.storeData('rehana_type', rehanaType).catch(() => {});
   };
 
   const saveMessages = async (newMessages: Message[]) => {
@@ -615,15 +653,38 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
       let responseData: { response: string; followUpQuestions?: string[] };
       
       if (isOnline) {
-        // In a real app, this would call an API
-        // For now, we'll use offline responses
-        responseData = getOfflineResponse(inputText, conversationContext);
+        const apiUrl = process.env.REACT_APP_API_URL;
+        if (apiUrl) {
+          try {
+            const history = newMessages
+              .filter((m) => m.text)
+              .map((m) => ({ role: m.isUser ? ('user' as const) : ('assistant' as const), content: m.text }));
+            const res = await fetch(`${apiUrl.replace(/\/$/, '')}/rehana`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ message: inputText.trim(), history, rehanaType }),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              responseData = { response: data.response || '' };
+            } else {
+              throw new Error('API error');
+            }
+          } catch {
+            responseData = getOfflineResponse(inputText, conversationContext);
+          }
+        } else {
+          responseData = getOfflineResponse(inputText, conversationContext);
+        }
       } else {
         responseData = getOfflineResponse(inputText, conversationContext);
       }
 
-      // Add a small delay to simulate thinking
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!responseData.response) {
+        responseData = getOfflineResponse(inputText, conversationContext);
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -645,9 +706,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
       console.error('Failed to get response:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I'm sorry, I'm having trouble responding right now. Please try again or visit a health clinic for immediate assistance.",
+        text: "I'm sorry, Rehana is having trouble responding right now. You can try again, or visit a health clinic for immediate assistance.",
         isUser: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        suggestions: ['Try again', 'What topics can you help with?', 'Find a clinic near me']
       };
       setMessages([...newMessages, errorMessage]);
     } finally {
@@ -673,6 +735,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
   // Voice recording functions
   const startRecording = async () => {
     try {
+      if (isSpeechSupported) {
+        startListening();
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       const chunks: Blob[] = [];
@@ -682,9 +747,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
       };
 
       recorder.onstop = () => {
-        const audioBlob = new Blob(chunks, { type: 'audio/wav' });
-        // Convert voice to text (in a real app, this would use speech recognition API)
-        handleVoiceMessage(audioBlob);
+        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        const transcript = voiceTranscriptRef.current;
+        handleVoiceMessage(audioBlob, transcript);
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -698,16 +763,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
 
   const stopRecording = () => {
     if (mediaRecorder && isRecording) {
+      voiceTranscriptRef.current = isSpeechSupported ? stopListening() : '';
       mediaRecorder.stop();
       setIsRecording(false);
     }
   };
 
-  const handleVoiceMessage = async (audioBlob: Blob) => {
-    // In a real app, this would convert speech to text
+  const handleVoiceMessage = async (audioBlob: Blob, transcript: string) => {
+    let finalTranscript = transcript?.trim() || '';
+    const displayText = finalTranscript || 'Transcribing...';
     const voiceMessage: Message = {
       id: Date.now().toString(),
-      text: "[Voice message - transcription would appear here]",
+      text: displayText,
       isUser: true,
       timestamp: Date.now(),
       isVoice: true,
@@ -715,17 +782,76 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
     };
 
     setMessages(prev => [...prev, voiceMessage]);
-    // Process the voice message and get AI response
-    await processVoiceMessage(audioBlob);
+
+    if (!finalTranscript && isOnline) {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (apiUrl) {
+        try {
+          const formData = new FormData();
+          formData.append('audio', audioBlob, 'voice.webm');
+          const res = await fetch(`${apiUrl.replace(/\/$/, '')}/transcribe`, {
+            method: 'POST',
+            body: formData,
+          });
+          if (res.ok) {
+            const data = await res.json();
+            finalTranscript = (data.transcript || '').trim();
+            if (finalTranscript) {
+              setMessages(prev => prev.map(m => m.id === voiceMessage.id ? { ...m, text: finalTranscript } : m));
+            }
+          }
+        } catch {
+          // Fallback to generic
+        }
+      }
+    }
+
+    if (!finalTranscript) {
+      finalTranscript = 'voice message about sexual health';
+    }
+
+    const messagesWithVoice = [...messages, { ...voiceMessage, text: finalTranscript }];
+    await processVoiceMessage(finalTranscript, messagesWithVoice);
   };
 
-  const processVoiceMessage = async (audioBlob: Blob) => {
+  const processVoiceMessage = async (transcript: string, currentMessages?: Message[]) => {
     setIsLoading(true);
     try {
-      // Simulate voice processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const responseData = getOfflineResponse("voice message about sexual health", conversationContext);
+      let responseData: { response: string; followUpQuestions?: string[] };
+      const msgList = currentMessages ?? messages;
+
+      if (isOnline) {
+        const apiUrl = process.env.REACT_APP_API_URL;
+        if (apiUrl) {
+          try {
+            const history = msgList
+              .filter((m) => m.text && !m.text.startsWith('Transcribing'))
+              .map((m) => ({ role: m.isUser ? ('user' as const) : ('assistant' as const), content: m.text }));
+            const res = await fetch(`${apiUrl.replace(/\/$/, '')}/rehana`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ message: transcript, history, rehanaType }),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              responseData = { response: data.response || '' };
+            } else {
+              throw new Error('API error');
+            }
+          } catch {
+            responseData = getOfflineResponse(transcript, conversationContext);
+          }
+        } else {
+          responseData = getOfflineResponse(transcript, conversationContext);
+        }
+      } else {
+        responseData = getOfflineResponse(transcript, conversationContext);
+      }
+
+      if (!responseData.response) {
+        responseData = getOfflineResponse(transcript, conversationContext);
+      }
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: responseData.response,
@@ -735,7 +861,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
         followUpQuestions: responseData.followUpQuestions
       };
 
-      setMessages(prev => [...prev, aiMessage]);
+      const finalMessages = [...msgList, aiMessage];
+      setMessages(finalMessages);
+      await saveMessages(finalMessages);
+      updateConversationContext(transcript, responseData.response);
     } catch (error) {
       console.error('Error processing voice message:', error);
     } finally {
@@ -818,6 +947,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
       setMessages([]);
       setConversationContext('');
       setHasShownIntroduction(false);
+      setHasChosenRehanaType(false);
     }
   };
 
@@ -829,25 +959,140 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="flex flex-col h-screen-safe bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
+    <div className="flex flex-col h-full min-h-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
 
-      {/* Messages - Modern chat bubbles */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 smooth-scroll">
+      {/* Rehana Type Selector - shown when no messages and not yet chosen */}
+      {messages.length === 0 && !hasChosenRehanaType && (
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div className="max-w-lg mx-auto space-y-6">
+            <div className="text-center mb-6">
+              <img
+                src={REHANA_AVATAR_URL}
+                alt="Rehana"
+                className="w-16 h-16 rounded-2xl object-cover mx-auto mb-4 shadow-lg ring-2 ring-gray-200"
+              />
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Meet Rehana</h2>
+              <p className="text-sm text-gray-600">Your confidential AI assistant for sexual and reproductive health. Choose how you'd like to connect.</p>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Focus area</label>
+                <div className="flex flex-wrap gap-2">
+                  {(['general', 'contraception', 'relationships', 'emergency', 'youth'] as const).map((key) => (
+                    <button
+                      key={key}
+                      onClick={() => setRehanaType((p) => ({ ...p, focus: key }))}
+                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                        rehanaType.focus === key
+                          ? 'bg-primary-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {rehanaTypeLabels.focus[key]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tone</label>
+                <div className="flex flex-wrap gap-2">
+                  {(['clinical', 'friendly', 'youthFriendly', 'crisis'] as const).map((key) => (
+                    <button
+                      key={key}
+                      onClick={() => setRehanaType((p) => ({ ...p, tone: key }))}
+                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                        rehanaType.tone === key
+                          ? 'bg-primary-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {rehanaTypeLabels.tone[key]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Mode</label>
+                <div className="flex flex-wrap gap-2">
+                  {(['text', 'voice', 'quick', 'detailed'] as const).map((key) => (
+                    <button
+                      key={key}
+                      onClick={() => setRehanaType((p) => ({ ...p, mode: key }))}
+                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                        rehanaType.mode === key
+                          ? 'bg-primary-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {rehanaTypeLabels.mode[key]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                onClick={handleRehanaTypeContinue}
+                className="w-full py-3 bg-gradient-to-r from-primary-600 to-purple-600 text-white font-medium rounded-xl hover:from-primary-700 hover:to-purple-700 transition-all"
+              >
+                Start chatting with Rehana
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Messages - Rehana chat with header */}
+      {hasChosenRehanaType && (
+      <>
+      {/* Rehana header - modern professional */}
+      <div className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 py-4 bg-white/95 backdrop-blur-xl border-b border-gray-200/80 shadow-sm">
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <img
+              src={REHANA_AVATAR_URL}
+              alt="Rehana AI"
+              className="w-11 h-11 rounded-2xl object-cover shadow-lg ring-2 ring-gray-100"
+            />
+            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" title="Online" />
+          </div>
+          <div className="flex flex-col gap-0" style={{ marginTop: '-2px' }}>
+            <span className="font-semibold text-gray-900 text-base leading-tight">Rehana</span>
+            <span className="text-xs text-gray-500 leading-tight" style={{ marginTop: '-4px' }}>
+              {rehanaTypeLabels.focus[rehanaType.focus as keyof typeof rehanaTypeLabels.focus]} · {rehanaTypeLabels.tone[rehanaType.tone as keyof typeof rehanaTypeLabels.tone]}
+            </span>
+          </div>
+        </div>
+        <button
+          onClick={() => { setHasChosenRehanaType(false); setMessages([]); setHasShownIntroduction(false); }}
+          className="text-xs font-medium px-4 py-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200 transition-all duration-200 border border-gray-200/60"
+        >
+          Change type
+        </button>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 lg:pb-6 space-y-4 sm:space-y-6 smooth-scroll">
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
           >
             <div className={`flex space-x-3 max-w-[90%] sm:max-w-md lg:max-w-lg ${message.isUser ? 'flex-row-reverse space-x-reverse' : ''}`}>
-              {/* Avatar - Circular for AI */}
-              <div className={`p-3 flex-shrink-0 shadow-lg ${message.isUser 
-                ? 'rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600' 
-                : 'rounded-full bg-gradient-to-br from-purple-500 to-pink-500 w-12 h-12 flex items-center justify-center'
-              }`}>
+              {/* Avatar - Circular for both user and AI */}
+              <div className="flex-shrink-0 w-12 h-12">
                 {message.isUser ? (
-                  <User className="w-5 h-5 text-white" />
+                  <img
+                    src={USER_AVATAR_URL}
+                    alt="You"
+                    className="w-12 h-12 rounded-full object-cover shadow-md"
+                  />
                 ) : (
-                  <Bot className="w-6 h-6 text-white" />
+                  <img
+                    src={REHANA_AVATAR_URL}
+                    alt="Rehana"
+                    className="w-12 h-12 rounded-full object-cover shadow-md"
+                  />
                 )}
               </div>
               
@@ -857,45 +1102,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
                   ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white' 
                   : 'bg-white/90 text-gray-900 border border-gray-200/50'
               }`}>
-                <p className="text-xs sm:text-sm lg:text-base leading-relaxed break-words">{message.text}</p>
-                
-                {/* Follow-up questions with modern design */}
-                {message.followUpQuestions && message.followUpQuestions.length > 0 && (
-                  <div className="mt-4">
-                    <div className="flex items-center space-x-2 mb-3">
-                      <Sparkles className="w-4 h-4 text-purple-500" />
-                      <p className="text-xs font-medium text-gray-600">You might also ask:</p>
-                    </div>
-                    <div className="space-y-2">
-                      {message.followUpQuestions.map((question, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleSuggestionClick(question)}
-                          className="block w-full text-left text-xs sm:text-sm px-3 py-2 rounded-xl transition-all duration-200 touch-manipulation bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 text-gray-700 border border-purple-200 hover:border-purple-300"
-                        >
-                          {question}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* General suggestions with modern design */}
-                {message.suggestions && !message.followUpQuestions && (
-                  <div className="mt-3 space-y-2">
-                    {message.suggestions.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleSuggestionClick(suggestion)}
-                        className={`block w-full text-left text-xs sm:text-sm px-3 py-2 rounded-xl transition-all duration-200 touch-manipulation ${
-                          message.isUser
-                            ? 'bg-white/20 hover:bg-white/30 text-white border border-white/30'
-                            : 'bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 text-gray-700 border border-gray-200'
-                        }`}
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
+                {message.isUser ? (
+                  <p className="text-xs sm:text-sm lg:text-base leading-relaxed break-words">{message.text}</p>
+                ) : (
+                  <div className="text-xs sm:text-sm lg:text-base leading-relaxed break-words [&_p]:my-1 [&_ul]:my-2 [&_li]:my-0 [&_strong]:font-semibold">
+                    <ReactMarkdown>{message.text}</ReactMarkdown>
                   </div>
                 )}
               </div>
@@ -906,9 +1117,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
         {isLoading && (
           <div className="flex justify-start">
             <div className="flex space-x-3">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0 shadow-lg">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
+              <img
+                src={REHANA_AVATAR_URL}
+                alt="Rehana"
+                className="w-12 h-12 rounded-full object-cover flex-shrink-0 shadow-md"
+              />
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg border border-gray-200/50">
                 <div className="flex items-center space-x-3">
                   <div className="flex space-x-1">
@@ -916,7 +1129,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
                     <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                     <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
-                  <span className="text-sm text-gray-600 font-medium">AI is thinking...</span>
+                  <span className="text-sm text-gray-600 font-medium">Rehana is thinking...</span>
                 </div>
               </div>
             </div>
@@ -926,28 +1139,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Enhanced Input Area with Voice and File Upload */}
-      <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200/50 p-3 sm:p-4 flex-shrink-0 shadow-lg" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
-        {/* Quick questions with modern design - Reduced size */}
-        <div className="mb-3">
-          <div className="flex items-center space-x-2 mb-2">
-            <Sparkles className="w-3 h-3 text-purple-500" />
-            <p className="text-xs font-medium text-gray-600">Quick questions:</p>
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {commonQuestions.slice(0, 2).map((question, index) => (
-              <button
-                key={index}
-                onClick={() => handleSuggestionClick(question)}
-                className="text-xs px-3 py-1.5 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 active:scale-95 rounded-full text-gray-700 transition-all duration-200 touch-manipulation border border-gray-200/50 shadow-sm"
-              >
-                {question}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Enhanced Input field with mini dropdown - Mobile Responsive */}
+      {/* Input Area - fixed just above bottom nav on mobile, in flow on desktop */}
+      <div className="flex-shrink-0 bg-white/95 backdrop-blur-sm border-t border-gray-200/50 p-3 sm:p-4 shadow-lg lg:static fixed bottom-[4.5rem] left-0 right-0 lg:bottom-auto lg:left-auto lg:right-auto">
+        {/* Input field with mini dropdown */}
         <div className="flex space-x-2">
           {/* Mini Dropdown for AI Tools */}
           <div className="relative">
@@ -1066,6 +1260,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
           className="hidden"
         />
       </div>
+      </>
+      )}
 
       {/* Chat History Panel - Mobile Responsive */}
       {showChatHistory && (

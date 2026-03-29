@@ -13,7 +13,7 @@ import {
   Users,
   Search
 } from 'lucide-react';
-
+import PageContainer from '../components/Layout/PageContainer';
 interface Notification {
   id: string;
   type: 'success' | 'warning' | 'error' | 'info' | 'reminder';
@@ -156,7 +156,12 @@ const Notifications: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <PageContainer 
+      gradient 
+      gradientFrom="from-blue-50" 
+      gradientVia="via-white" 
+      gradientTo="to-purple-50"
+    >
 
       {/* Search and Filter Bar */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-3 sm:px-4 py-3 sm:py-4">
@@ -214,7 +219,7 @@ const Notifications: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="space-y-2 sm:space-y-3 max-h-[calc(100vh-180px)] sm:max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 pr-1 sm:pr-2">
+          <div className="space-y-2 sm:space-y-3 max-h-[calc(100dvh-220px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 pr-1 sm:pr-2">
             {filteredNotifications.map((notification) => {
               const Icon = getNotificationIcon(notification.type, notification.category);
               
@@ -291,7 +296,7 @@ const Notifications: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

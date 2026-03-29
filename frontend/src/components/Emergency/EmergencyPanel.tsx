@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Shield, 
   Phone, 
@@ -10,7 +11,9 @@ import {
   Clock,
   CheckCircle,
   Send,
-  Navigation
+  Navigation,
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 import { offlineStorage } from '../../utils/offlineStorage';
 import { locationService, LocationData } from '../../utils/locationService';
@@ -35,6 +38,7 @@ interface EmergencyLog {
 }
 
 const EmergencyPanel: React.FC = () => {
+  const navigate = useNavigate();
   const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([]);
   const [emergencyLogs, setEmergencyLogs] = useState<EmergencyLog[]>([]);
   const [userLocation, setUserLocation] = useState<LocationData | null>(null);
@@ -44,40 +48,40 @@ const EmergencyPanel: React.FC = () => {
   const [showLocationShare, setShowLocationShare] = useState(false);
   const [isSharingLocation, setIsSharingLocation] = useState(false);
 
-  // Liberian emergency contacts
+  // Ghana emergency contacts
   const defaultEmergencyContacts: EmergencyContact[] = useMemo(() => [
     {
       id: '1',
-      name: 'Liberia National Police',
-      phone: '+231-886-551-357',
+      name: 'Ghana Police Service',
+      phone: '+233-191',
       type: 'police',
       available: true
     },
     {
       id: '2',
-      name: 'Ministry of Health Emergency',
-      phone: '+231-886-551-356',
+      name: 'National Ambulance Service',
+      phone: '+233-193',
       type: 'medical',
       available: true
     },
     {
       id: '3',
       name: 'GBV Support Services',
-      phone: '+231-886-551-358',
+      phone: '+233-0800-800-800',
       type: 'gbv',
       available: true
     },
     {
       id: '4',
-      name: 'Fire & Rescue Services',
-      phone: '+231-886-551-355',
+      name: 'Ghana National Fire Service',
+      phone: '+233-192',
       type: 'emergency',
       available: true
     },
     {
       id: '5',
       name: 'Mental Health Support',
-      phone: '+231-886-551-359',
+      phone: '+233-020-000-0000',
       type: 'counseling',
       available: true
     }
@@ -119,7 +123,7 @@ const EmergencyPanel: React.FC = () => {
         // Set default location to Accra, Ghana
         setUserLocation({
           latitude: 5.6037,
-          longitude: -10.7972,
+          longitude: -0.1870,
           accuracy: 0,
           timestamp: new Date().toISOString()
         });
@@ -187,8 +191,9 @@ const EmergencyPanel: React.FC = () => {
     try {
       // Create emergency alert in backend
       const alertData = {
-        alertType: 'panic',
-        priority: 'critical',
+        alertType: 'panic' as const,
+        priority: 'critical' as const,
+        status: 'active' as const,
         location: userLocation ? {
           coordinates: { lat: userLocation.latitude, lng: userLocation.longitude },
           address: 'User location',
@@ -202,12 +207,7 @@ const EmergencyPanel: React.FC = () => {
         userId: (() => {
           const rawUserId = secretCodeManager.getUserId();
           if (rawUserId === undefined) return undefined;
-          if (typeof rawUserId === 'number') return rawUserId;
-          if (typeof rawUserId === 'string') {
-            const num = Number(rawUserId);
-            return isNaN(num) ? undefined : num;
-          }
-          return undefined;
+          return String(rawUserId);
         })()
       };
 
@@ -367,51 +367,72 @@ const EmergencyPanel: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Panic Button */}
-        <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6 sm:p-8 mb-6 text-center">
-          <AlertTriangle className="w-12 h-12 sm:w-16 sm:h-16 text-red-600 mx-auto mb-4" />
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-red-900 mb-2">Emergency Panic Button</h1>
-          <p className="text-sm sm:text-base text-red-800 mb-6 max-w-2xl mx-auto">
-            Press this button if you're in immediate danger or need urgent help
+    <div className="space-y-6">
+        {/* Hero + Panic Button */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-600 via-rose-600 to-pink-600 p-6 sm:p-8 shadow-xl mb-6">
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.08)_100%)]" />
+          <div className="relative text-center">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-white/25 rounded-full text-xs font-semibold text-white mb-4">
+              <Sparkles className="w-3.5 h-3.5" />
+              AI-Powered Support
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">Emergency Support</h1>
+            <p className="text-sm text-white/90 mb-6 max-w-xl mx-auto">
+              Press the button below if you're in immediate danger. Help will be contacted right away.
+            </p>
+            <button
+              onClick={handlePanicButton}
+              className="w-full sm:w-auto px-8 py-4 bg-white text-red-600 rounded-2xl font-bold text-lg shadow-lg hover:bg-red-50 transition-all min-h-[52px]"
+            >
+              🚨 EMERGENCY ALERT 🚨
+            </button>
+          </div>
+        </div>
+
+        {/* Ask Rehana - AI section */}
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 sm:p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-primary-600" />
+            Ask Rehana
+          </h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Not sure what to do? Rehana can provide situation-based guidance and connect you with the right resources.
           </p>
           <button
-            onClick={handlePanicButton}
-            className="w-full sm:w-auto px-6 sm:px-8 py-4 bg-red-600 text-white rounded-lg font-bold text-lg sm:text-xl hover:bg-red-700 transition-colors shadow-lg"
+            onClick={() => navigate('/chatbot?context=emergency')}
+            className="flex items-center gap-2 py-3 px-5 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 transition-all min-h-[44px]"
           >
-            🚨 EMERGENCY ALERT 🚨
+            <span>Chat with Rehana for help</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
-          <p className="text-xs sm:text-sm text-red-700 mt-4 max-w-xl mx-auto">
-            This will immediately contact emergency services and your emergency contacts
-          </p>
         </div>
 
         {/* Emergency Contacts */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Emergency Contacts</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 sm:p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Emergency Contacts</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {emergencyContacts.map((contact) => {
               const Icon = getContactIcon(contact.type);
               return (
-                <div key={contact.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className={`p-2 rounded-lg ${getContactColor(contact.type)} flex-shrink-0`}>
-                      <Icon size={18} />
+                <div key={contact.id} className="rounded-2xl border border-gray-200/80 p-4 hover:border-primary-200 hover:shadow-md transition-all">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`p-2.5 rounded-xl ${getContactColor(contact.type)} flex-shrink-0`}>
+                      <Icon size={20} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{contact.name}</h3>
-                      <p className="text-xs sm:text-sm text-gray-600 truncate">{contact.phone}</p>
+                      <h3 className="font-semibold text-gray-900 truncate">{contact.name}</h3>
+                      <p className="text-sm text-gray-500 truncate">{contact.phone}</p>
                     </div>
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${contact.available ? 'bg-green-500' : 'bg-red-500'}`} />
+                    <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${contact.available ? 'bg-green-500' : 'bg-red-500'}`} />
                   </div>
-                  <button
+                  <a
+                    href={`tel:${contact.phone}`}
                     onClick={() => handleCallContact(contact)}
-                    className="w-full btn-primary flex items-center justify-center space-x-2 text-sm"
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 transition-all min-h-[44px]"
                   >
-                    <Phone size={14} />
+                    <Phone size={18} />
                     <span>Call Now</span>
-                  </button>
+                  </a>
                 </div>
               );
             })}
@@ -419,30 +440,30 @@ const EmergencyPanel: React.FC = () => {
         </div>
 
         {/* Emergency Message */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Send Emergency Message</h2>
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 sm:p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Send Emergency Message</h2>
           <div className="space-y-4">
             <textarea
               value={emergencyMessage}
               onChange={(e) => setEmergencyMessage(e.target.value)}
               placeholder="Describe your emergency situation..."
-              className="w-full input-field resize-none"
+              className="w-full p-3 rounded-xl border border-gray-200/80 resize-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
               rows={4}
             />
             <button
               onClick={handleSendMessage}
               disabled={!emergencyMessage.trim()}
-              className="w-full sm:w-auto btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              className="w-full py-3 px-5 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[44px]"
             >
-              <Send size={16} />
+              <Send size={18} />
               <span>Send Emergency Message</span>
             </button>
           </div>
         </div>
 
         {/* Location Services */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Location Services</h2>
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 sm:p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Location Services</h2>
           <div className="space-y-4">
             <div className="flex items-start space-x-3">
               <MapPin className="w-5 h-5 text-gray-600 flex-shrink-0 mt-1" />
@@ -463,9 +484,9 @@ const EmergencyPanel: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={getUserLocation}
-                className="btn-outline flex items-center justify-center space-x-2 flex-1 sm:flex-none"
+                className="py-3 px-5 border-2 border-gray-200 rounded-xl font-medium hover:border-primary-300 flex items-center justify-center gap-2 min-h-[44px]"
               >
-                <Navigation size={16} />
+                <Navigation size={18} />
                 <span>Update Location</span>
               </button>
               {userLocation && (
@@ -473,17 +494,17 @@ const EmergencyPanel: React.FC = () => {
                   <button
                     onClick={() => shareLocationWithEmergency('police')}
                     disabled={isSharingLocation}
-                    className="btn-primary flex items-center justify-center space-x-2 text-sm flex-1"
+                    className="py-3 px-5 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-50"
                   >
-                    <Shield size={14} />
+                    <Shield size={18} />
                     <span>Share with Police</span>
                   </button>
                   <button
                     onClick={() => shareLocationWithEmergency('medical')}
                     disabled={isSharingLocation}
-                    className="btn-primary flex items-center justify-center space-x-2 text-sm flex-1"
+                    className="py-3 px-5 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-50"
                   >
-                    <Heart size={14} />
+                    <Heart size={18} />
                     <span>Share with Medical</span>
                   </button>
                 </div>
@@ -493,7 +514,7 @@ const EmergencyPanel: React.FC = () => {
         </div>
 
       {/* Emergency Log */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 sm:p-6 shadow-sm">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Emergency Activity Log</h2>
         {emergencyLogs.length > 0 ? (
           <div className="space-y-3">
@@ -533,7 +554,7 @@ const EmergencyPanel: React.FC = () => {
         </div>
 
         {/* Safety Tips */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4 sm:p-6">
+        <div className="rounded-2xl bg-blue-50/80 border border-blue-200/60 p-4 sm:p-6">
           <h3 className="font-semibold text-blue-900 mb-3 text-sm sm:text-base">Safety Tips</h3>
           <ul className="text-blue-800 text-xs sm:text-sm space-y-2">
             <li>• Keep your phone charged and with you at all times</li>
@@ -543,7 +564,6 @@ const EmergencyPanel: React.FC = () => {
             <li>• Have a safety plan for different situations</li>
           </ul>
         </div>
-      </div>
     </div>
   );
 };

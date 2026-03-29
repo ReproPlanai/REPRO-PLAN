@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell } from 'lucide-react';
+import { apiService } from '../../services/apiReal';
 
 interface Notification {
   id: string;
@@ -17,67 +18,41 @@ interface Notification {
 const NotificationSystem: React.FC = () => {
   const navigate = useNavigate();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample notifications for SRHR app - simplified for unread count only
-  const sampleNotifications: Notification[] = useMemo(() => [
-    {
-      id: '1',
-      type: 'reminder',
-      title: 'Health Check Reminder',
-      message: 'It\'s time for your monthly health check. Book an appointment with a healthcare provider.',
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-      isRead: false,
-      actionUrl: '/clinics',
-      actionText: 'Find Clinics',
-      category: 'health'
-    },
-    {
-      id: '2',
-      type: 'info',
-      title: 'New Educational Content',
-      message: 'New articles about contraception methods are now available in the Articles section.',
-      timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
-      isRead: false,
-      actionUrl: '/articles',
-      actionText: 'Read Articles',
-      category: 'education'
-    },
-    {
-      id: '3',
-      type: 'success',
-      title: 'Quiz Completed',
-      message: 'Great job! You completed the STI Prevention quiz with a score of 85%.',
-      timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-      isRead: true,
-      actionUrl: '/games',
-      actionText: 'Take More Quizzes',
-      category: 'education'
-    },
-    {
-      id: '4',
-      type: 'warning',
-      title: 'Privacy Reminder',
-      message: 'Remember to clear your browser history if you\'re using a shared device.',
-      timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-      isRead: true,
-      category: 'safety'
-    },
-    {
-      id: '5',
-      type: 'info',
-      title: 'Community Support',
-      message: 'New peer mentors are available for support. Connect with someone who understands your situation.',
-      timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-      isRead: false,
-      actionUrl: '/mentorship',
-      actionText: 'Find Mentors',
-      category: 'community'
-    }
-  ], []);
-
+  // Fetch notifications from API
   useEffect(() => {
-    setUnreadCount(sampleNotifications.filter(n => !n.isRead).length);
-  }, [sampleNotifications]);
+    const fetchNotifications = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.getNotifications?.() as { 
+          success?: boolean; 
+          notifications?: Notification[] 
+        };
+        
+        if (response?.success && response.notifications) {
+          setNotifications(response.notifications);
+          setUnreadCount(response.notifications.filter(n => !n.isRead).length);
+        } else {
+          setNotifications([]);
+          setUnreadCount(0);
+        }
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+        setNotifications([]);
+        setUnreadCount(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
+    
+    // Refresh notifications every 60 seconds
+    const interval = setInterval(fetchNotifications, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleNotificationClick = () => {
     navigate('/notifications');

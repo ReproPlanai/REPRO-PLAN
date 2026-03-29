@@ -27,6 +27,7 @@ import {
   Database,
   X
 } from 'lucide-react';
+import { apiService } from '../../services/api';
 
 interface WorkflowRule {
   id: string;
@@ -81,140 +82,65 @@ const WorkflowAutomation: React.FC<WorkflowAutomationProps> = ({
   const [selectedWorkflow, setSelectedWorkflow] = useState<string | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
 
-  // Initialize sample workflows
+  // Fetch real workflows from API
   useEffect(() => {
-    const sampleWorkflows: WorkflowRule[] = [
-      {
-        id: '1',
-        name: 'Emergency Response Automation',
-        description: 'Automatically notify emergency contacts when panic button is activated',
-        trigger: {
-          type: 'event',
-          condition: 'panic_button_activated'
-        },
-        actions: [
-          {
-            type: 'notification',
-            target: 'police_team',
-            message: 'Emergency alert: Panic button activated in Monrovia Central',
-            priority: 'critical'
-          },
-          {
-            type: 'sms',
-            target: 'emergency_contacts',
-            message: 'URGENT: Emergency assistance needed at current location',
-            priority: 'critical'
-          },
-          {
-            type: 'assign',
-            target: 'nearest_officer',
-            message: 'Assign to Officer Johnson - Priority: Critical',
-            priority: 'high'
-          }
-        ],
-        isActive: true,
-        lastExecuted: new Date(Date.now() - 1800000).toISOString(),
-        executionCount: 23,
-        successRate: 95.7
-      },
-      {
-        id: '2',
-        name: 'Case Escalation',
-        description: 'Automatically escalate cases that have been pending for more than 48 hours',
-        trigger: {
-          type: 'condition',
-          condition: 'case_pending > 48_hours'
-        },
-        actions: [
-          {
-            type: 'email',
-            target: 'supervisor',
-            message: 'Case escalation required: Case has been pending for 48+ hours',
-            priority: 'high'
-          },
-          {
-            type: 'notification',
-            target: 'case_owner',
-            message: 'Your case has been escalated due to extended pending time',
-            priority: 'medium'
-          }
-        ],
-        isActive: true,
-        lastExecuted: new Date(Date.now() - 3600000).toISOString(),
-        executionCount: 8,
-        successRate: 100
-      },
-      {
-        id: '3',
-        name: 'Daily Report Generation',
-        description: 'Generate and send daily activity reports to stakeholders',
-        trigger: {
-          type: 'schedule',
-          condition: 'daily',
-          frequency: '18:00'
-        },
-        actions: [
-          {
-            type: 'email',
-            target: 'stakeholders',
-            message: 'Daily activity report is ready for review',
-            priority: 'low'
-          },
-          {
-            type: 'log',
-            target: 'system',
-            message: 'Daily report generated and distributed',
-            priority: 'low'
-          }
-        ],
-        isActive: true,
-        lastExecuted: new Date(Date.now() - 7200000).toISOString(),
-        executionCount: 156,
-        successRate: 98.1
-      }
-    ];
-
-    setWorkflows(sampleWorkflows);
+    fetchWorkflows();
+    fetchExecutions();
   }, []);
 
-  // Initialize sample executions
-  useEffect(() => {
-    const sampleExecutions: WorkflowExecution[] = [
-      {
-        id: '1',
-        workflowId: '1',
-        workflowName: 'Emergency Response Automation',
-        status: 'completed',
-        startTime: new Date(Date.now() - 1800000).toISOString(),
-        endTime: new Date(Date.now() - 1790000).toISOString(),
-        duration: 10,
-        actionsExecuted: 3,
-        actionsTotal: 3
-      },
-      {
-        id: '2',
-        workflowId: '2',
-        workflowName: 'Case Escalation',
-        status: 'running',
-        startTime: new Date(Date.now() - 300000).toISOString(),
-        actionsExecuted: 1,
-        actionsTotal: 2
-      },
-      {
-        id: '3',
-        workflowId: '3',
-        workflowName: 'Daily Report Generation',
-        status: 'completed',
-        startTime: new Date(Date.now() - 7200000).toISOString(),
-        endTime: new Date(Date.now() - 7195000).toISOString(),
-        duration: 5,
-        actionsExecuted: 2,
-        actionsTotal: 2
+  const fetchWorkflows = async () => {
+    try {
+      const response = await apiService.getSystemSettings?.() as { success?: boolean; settings?: { workflows?: any[] } };
+      if (response?.success && response.settings?.workflows) {
+        const workflowData = response.settings.workflows.map((w: any) => ({
+          id: w.id || String(Math.random()),
+          name: w.name || 'Unnamed Workflow',
+          description: w.description || '',
+          trigger: w.trigger || { type: 'manual', condition: '' },
+          actions: w.actions || [],
+          isActive: w.isActive !== false,
+          lastExecuted: w.lastExecuted || new Date().toISOString(),
+          executionCount: w.executionCount || 0,
+          successRate: w.successRate || 100
+        }));
+        setWorkflows(workflowData);
+      } else {
+        setWorkflows([]);
       }
-    ];
+    } catch (error) {
+      console.error('Failed to fetch workflows:', error);
+      setWorkflows([]);
+    }
+  };
 
-    setExecutions(sampleExecutions);
-  }, []);
+  const fetchExecutions = async () => {
+    try {
+      const response = await apiService.getAuditLogs?.() as { success?: boolean; logs?: any[] };
+      if (response?.success && response.logs) {
+        const executionData = response.logs
+          .filter((l: any) => l.action?.includes('workflow') || l.entityType === 'workflow')
+          .slice(0, 10)
+          .map((l: any, index: number) => ({
+            id: l.id || String(index + 1),
+            workflowId: l.workflowId || 'unknown',
+            workflowName: l.details?.workflowName || 'Unknown Workflow',
+            status: (l.status === 'success' ? 'completed' : l.status === 'failed' ? 'failed' : 'running') as WorkflowExecution['status'],
+            startTime: l.createdAt || new Date().toISOString(),
+            endTime: l.details?.endTime,
+            duration: l.details?.duration,
+            actionsExecuted: l.details?.actionsExecuted || 0,
+            actionsTotal: l.details?.actionsTotal || 0,
+            errorMessage: l.details?.errorMessage
+          }));
+        setExecutions(executionData);
+      } else {
+        setExecutions([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch executions:', error);
+      setExecutions([]);
+    }
+  };
 
   const executeWorkflow = async (workflowId: string) => {
     setIsExecuting(true);
@@ -233,42 +159,58 @@ const WorkflowAutomation: React.FC<WorkflowAutomationProps> = ({
 
     setExecutions(prev => [execution, ...prev]);
 
-    // Simulate workflow execution
-    for (let i = 0; i < workflow.actions.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+    try {
+      // Call workflow execution API
+      const response = await apiService.executeWorkflow?.(workflowId) as { 
+        success?: boolean; 
+        execution?: any 
+      };
+
+      if (response?.success && response.execution) {
+        const completedExecution: WorkflowExecution = {
+          ...execution,
+          status: response.execution.status === 'success' ? 'completed' : 'failed',
+          endTime: response.execution.endTime || new Date().toISOString(),
+          duration: response.execution.duration || workflow.actions.length,
+          actionsExecuted: response.execution.actionsExecuted || workflow.actions.length,
+          errorMessage: response.execution.errorMessage
+        };
+
+        setExecutions(prev => prev.map(exec => 
+          exec.id === execution.id ? completedExecution : exec
+        ));
+
+        // Update workflow stats
+        setWorkflows(prev => prev.map(w => 
+          w.id === workflowId 
+            ? { 
+                ...w, 
+                lastExecuted: new Date().toISOString(),
+                executionCount: w.executionCount + 1,
+                successRate: response.execution.status === 'success' 
+                  ? Math.round(((w.successRate * w.executionCount) + 100) / (w.executionCount + 1))
+                  : Math.round(((w.successRate * w.executionCount)) / (w.executionCount + 1))
+              }
+            : w
+        ));
+
+        onWorkflowExecuted(completedExecution);
+      }
+    } catch (error) {
+      console.error('Workflow execution failed:', error);
+      // Mark as failed
+      const failedExecution: WorkflowExecution = {
+        ...execution,
+        status: 'failed',
+        endTime: new Date().toISOString(),
+        errorMessage: error instanceof Error ? error.message : 'Execution failed'
+      };
       setExecutions(prev => prev.map(exec => 
-        exec.id === execution.id 
-          ? { ...exec, actionsExecuted: i + 1 }
-          : exec
+        exec.id === execution.id ? failedExecution : exec
       ));
+    } finally {
+      setIsExecuting(false);
     }
-
-    // Complete execution
-    const completedExecution: WorkflowExecution = {
-      ...execution,
-      status: 'completed',
-      endTime: new Date().toISOString(),
-      duration: workflow.actions.length
-    };
-
-    setExecutions(prev => prev.map(exec => 
-      exec.id === execution.id ? completedExecution : exec
-    ));
-
-    // Update workflow stats
-    setWorkflows(prev => prev.map(w => 
-      w.id === workflowId 
-        ? { 
-            ...w, 
-            lastExecuted: new Date().toISOString(),
-            executionCount: w.executionCount + 1
-          }
-        : w
-    ));
-
-    onWorkflowExecuted(completedExecution);
-    setIsExecuting(false);
   };
 
   const toggleWorkflow = (workflowId: string) => {
