@@ -265,7 +265,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
       setMessages([introductionMessage]);
       setHasShownIntroduction(true);
     }
-  }, [messages.length, hasChosenRehanaType, hasShownIntroduction, rehanaType.focus, rehanaType.tone, rehanaType.mode]);
+  }, [messages.length, hasChosenRehanaType, hasShownIntroduction, rehanaType.focus, rehanaType.tone, rehanaType.mode, getIntroMessage]);
 
   useEffect(() => {
     scrollToBottom();
@@ -717,6 +717,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSuggestionClick = (suggestion: string) => {
     setInputText(suggestion);
     inputRef.current?.focus();

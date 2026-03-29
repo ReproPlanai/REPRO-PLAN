@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
-  Users, 
   MessageCircle, 
   Shield, 
   Send,
   XCircle,
-  UserPlus
+  UserPlus,
+  Users
 } from 'lucide-react';
 import { offlineStorage } from '../../utils/offlineStorage';
 import { apiService } from '../../services/api';

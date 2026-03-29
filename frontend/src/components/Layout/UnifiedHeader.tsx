@@ -11,7 +11,6 @@ import {
   Users,
   Settings,
   Play,
-  Smartphone,
   Bell,
   Heart,
   BookOpen,

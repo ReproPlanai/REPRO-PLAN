@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Heart, 
   Shield, 
@@ -6,12 +6,7 @@ import {
   MessageCircle, 
   Phone, 
   MapPin, 
-  BookOpen, 
-  Lock,
-  Eye,
-  CheckCircle,
-  Info,
-  ExternalLink,
+  BookOpen,
   Search,
   Calendar
 } from 'lucide-react';

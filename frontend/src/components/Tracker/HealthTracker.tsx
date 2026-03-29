@@ -303,8 +303,7 @@ const HealthTracker: React.FC = () => {
       avgCycleLength: avg,
       regularityScore: regularity,
       symptomFrequency: Object.entries(symptomCount).sort((a, b) => b[1] - a[1]).slice(0, 8),
-      chartData,
-      moodTrendData
+      chartData
     };
   }, [cycleData.entries, cycleData.cycleLength]);
 

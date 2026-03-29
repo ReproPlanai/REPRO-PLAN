@@ -173,21 +173,6 @@ const ClinicFinder: React.FC = () => {
     }
   };
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'clinic':
-        return 'bg-blue-100 text-blue-600';
-      case 'hospital':
-        return 'bg-red-100 text-red-600';
-      case 'counseling':
-        return 'bg-green-100 text-green-600';
-      case 'emergency':
-        return 'bg-orange-100 text-orange-600';
-      default:
-        return 'bg-gray-100 text-gray-600';
-    }
-  };
-
   const handleCall = (phone: string) => {
     window.open(`tel:${phone}`, '_self');
   };
