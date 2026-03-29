@@ -8,7 +8,6 @@ import {
   X,
   Bell, 
   Download,
-  Eye,
   AlertTriangle,
   CheckCircle,
   TrendingUp,

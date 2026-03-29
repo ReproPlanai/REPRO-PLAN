@@ -486,7 +486,6 @@ const SafetyCheckModal: React.FC<SafetyCheckModalProps> = ({
 const SafetyCheckManager: React.FC = () => {
   const [showCheckModal, setShowCheckModal] = useState(false);
   const [currentPeriod, setCurrentPeriod] = useState<'morning' | 'afternoon' | 'evening'>('morning');
-  const [lastCheck, setLastCheck] = useState<SafetyCheck | null>(null);
   const [checkHistory, setCheckHistory] = useState<SafetyCheck[]>([]);
   const [streak, setStreak] = useState(0);
 
@@ -554,7 +553,6 @@ const SafetyCheckManager: React.FC = () => {
   }, [getCurrentPeriod, isCheckDue]);
 
   const handleCheckComplete = (check: SafetyCheck) => {
-    setLastCheck(check);
     setCheckHistory(prev => [check, ...prev]);
     setShowCheckModal(false);
     

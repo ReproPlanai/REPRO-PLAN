@@ -121,6 +121,7 @@ const DirectMessages: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const markAsRead = async (messageId: string) => {
     try {
       await apiService.markMessageRead?.(messageId);
