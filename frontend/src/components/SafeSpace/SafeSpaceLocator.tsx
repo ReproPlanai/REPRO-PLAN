@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   MapPin, 
@@ -113,6 +113,29 @@ const SafeSpaceLocator: React.FC = () => {
     }
   ];
 
+  // Map clinic types to safe space types
+  const mapClinicType = (type: string): SafeSpace['type'] => {
+    const typeMap: Record<string, SafeSpace['type']> = {
+      'clinic': 'medical',
+      'hospital': 'medical',
+      'counseling': 'counseling',
+      'crisis': 'crisis_center',
+      'shelter': 'shelter',
+      'legal': 'legal_aid',
+      'hotline': 'hotline'
+    };
+    return typeMap[type] || 'crisis_center';
+  };
+
+  // Calculate distance from user (simplified)
+  const calculateDistance = useCallback((coordinates: { lat: number; lng: number } | undefined): number => {
+    if (!coordinates || !userLocation) return 0;
+    // Simple Euclidean distance for display
+    const latDiff = coordinates.lat - userLocation.lat;
+    const lngDiff = coordinates.lng - userLocation.lng;
+    return Math.round(Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 111 * 10) / 10;
+  }, [userLocation]);
+
   // Fetch safe spaces from API (admin-configured) or offline storage
   const loadSafeSpaces = useCallback(async () => {
     try {
@@ -159,30 +182,7 @@ const SafeSpaceLocator: React.FC = () => {
         setSafeSpaces(storedSpaces);
       }
     }
-  }, []);
-
-  // Map clinic types to safe space types
-  const mapClinicType = (type: string): SafeSpace['type'] => {
-    const typeMap: Record<string, SafeSpace['type']> = {
-      'clinic': 'medical',
-      'hospital': 'medical',
-      'counseling': 'counseling',
-      'crisis': 'crisis_center',
-      'shelter': 'shelter',
-      'legal': 'legal_aid',
-      'hotline': 'hotline'
-    };
-    return typeMap[type] || 'crisis_center';
-  };
-
-  // Calculate distance from user (simplified)
-  const calculateDistance = (coordinates: { lat: number; lng: number } | undefined): number => {
-    if (!coordinates || !userLocation) return 0;
-    // Simple Euclidean distance for display
-    const latDiff = coordinates.lat - userLocation.lat;
-    const lngDiff = coordinates.lng - userLocation.lng;
-    return Math.round(Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 111 * 10) / 10;
-  };
+  }, [calculateDistance, mapClinicType]);
 
   const getUserLocation = () => {
     if (navigator.geolocation) {
