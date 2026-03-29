@@ -1,4 +1,20 @@
 import 'dotenv/config';
+
+// Early startup logging
+console.log('[STARTUP] Starting REPRO PLAN Server...');
+console.log('[STARTUP] NODE_ENV:', process.env.NODE_ENV);
+console.log('[STARTUP] PORT:', process.env.PORT);
+
+try {
+  // Validate env early with safe fallback
+  if (!process.env.JWT_SECRET) {
+    console.warn('[STARTUP] JWT_SECRET not set, using fallback');
+    process.env.JWT_SECRET = 'fallback-jwt-secret-min-32-chars-long-for-dev-only-123456';
+  }
+} catch (error) {
+  console.error('[STARTUP] Env validation error:', error);
+}
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
