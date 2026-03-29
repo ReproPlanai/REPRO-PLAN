@@ -77,6 +77,7 @@ const SecureMap: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [estimatedArrival, setEstimatedArrival] = useState<Date | null>(null);
   const [safeHouses, setSafeHouses] = useState<SafeHouse[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(false);
 
   // Fetch safe houses from API (admin-configured)
@@ -137,6 +138,7 @@ const SecureMap: React.FC = () => {
 
   useEffect(() => {
     fetchSafeHouses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const typeOptions = [

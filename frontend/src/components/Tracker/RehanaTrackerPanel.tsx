@@ -54,6 +54,7 @@ const RehanaTrackerPanel: React.FC<RehanaTrackerPanelProps> = ({
       sendMessage(initialPrompt);
       onPromptSent?.();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialPrompt, isExpanded]);
 
   const buildContext = (): string => {
