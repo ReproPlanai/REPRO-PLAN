@@ -135,13 +135,6 @@ export class OfflineStorage {
       return { used: 0, available: 0 };
     }
   }
-
-  // Seed mock data for testing (DISABLED - now using real API data)
-  async seedMockData(): Promise<void> {
-    // This function is disabled as we now use real data from the API
-    // All data is fetched from backend APIs instead of mock data
-    return;
-  }
 }
 
 export const offlineStorage = OfflineStorage.getInstance();

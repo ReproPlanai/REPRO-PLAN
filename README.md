@@ -1,156 +1,274 @@
-# REPRO PLAN
+# REPRO PLAN v3.0
 
-**REPRO PLAN** - Anonymous, Inclusive & Scalable SRHR Platform for Youth across Africa
+**Anonymous, Inclusive & Scalable SRHR Platform for Youth across Africa**
 
-A comprehensive sexual and reproductive health and rights (SRHR) platform designed for youth across Africa. Starting in Ghana, expanding to West Africa, and serving all of Africa. Focus on anonymity, accessibility, and offline functionality.
+A comprehensive sexual and reproductive health and rights (SRHR) platform designed for youth. Focus on anonymity, accessibility, and offline functionality. Built with React PWA frontend and Node.js/Express backend.
 
-## 🎯 Mission & Vision
+## 🎯 Mission
 
-**Empowering youth with anonymous access to sexual and reproductive health information and services through technology that works offline and respects privacy.**
+Empowering youth with anonymous access to sexual and reproductive health information and services through technology that works offline and respects privacy.
 
-### Core Principles
-- 🔒 **Complete Anonymity** - No personal data collection or storage
-- 🌍 **Offline-First** - Works without internet connection
-- 📱 **Progressive Web App** - App-like experience on any device
-- 🎨 **Inclusive Design** - Accessible to all users regardless of ability
-- 🚀 **Scalable Architecture** - Built for millions of users across Africa
+## 🏗️ Architecture
 
-## 🏗️ Architecture Overview
-
-### System Architecture
 ```
 ┌───────────────────────────────────────────┐
-│               React PWA                  │
-│               Frontend                   │
+│          React 18 PWA Frontend            │
+│  TypeScript • Tailwind CSS • Workbox PWA  │
 │                                           │
-│ • Offline Mode     • Local Storage        │
-│ • PWA Install      • Service Worker       │
-│ • Push Notifs      • Accessibility        │
+│ • Offline Storage    • Service Worker     │
+│ • Multi-language     • Accessibility      │
+│ • Role Dashboards    • QR Verification    │
+└───────────────────────────────────────────┘
+                     │
+                     │ REST API + WebSocket
+                     ▼
+┌───────────────────────────────────────────┐
+│       Node.js + Express Backend             │
+│  TypeScript • PostgreSQL • JWT Auth        │
+│                                           │
+│ • AI Chat (Gemini)   • Email (Resend)     │
+│ • Rate Limiting      • Helmet Security    │
+│ • File Uploads       • QR Generation      │
 └───────────────────────────────────────────┘
 ```
 
-### Technology Stack
+## 💻 Technology Stack
 
-#### Frontend (React PWA)
-- **Framework**: React 18.2.0 with TypeScript
-- **Styling**: Tailwind CSS with custom design system
-- **State**: React hooks with local storage persistence
-- **PWA**: Service Worker, Web App Manifest, offline support
-- **Accessibility**: WCAG 2.1 AA compliant
-- **Internationalization**: Multi-language support ready
+### Frontend (React PWA v3.0.0)
+- **Framework**: React 18.2.0 + TypeScript 4.9
+- **Routing**: React Router DOM 6.8
+- **Styling**: Tailwind CSS 3.3 + PostCSS + Autoprefixer
+- **State**: React Hooks + LocalForage (offline storage)
+- **Icons**: Lucide React
+- **Charts**: Recharts 3.2
+- **PWA**: Workbox Webpack Plugin 7.0 + Workbox Window 6.5
+- **Internationalization**: i18next 23 + react-i18next 13
+- **Markdown**: React Markdown 9.0
+- **Analytics**: Vercel Analytics 2.0
+- **Utilities**: date-fns, uuid, idb
 
-## 📋 Core Features
+### Backend (Node.js API v1.0.0)
+- **Runtime**: Node.js ≥20
+- **Framework**: Express 4.21 + TypeScript 5.5
+- **Database**: PostgreSQL (pg 8.13)
+- **AI Providers**: 
+  - Google Gemini (@google/genai ^1.0.0)
+  - OpenAI (^4.73.0)
+  - Anthropic (^0.32.1)
+- **Authentication**: JWT (jsonwebtoken ^9.0.2) + bcryptjs ^3.0.3
+- **Email**: Resend ^4.0.0
+- **Security**: Helmet ^7.1.0 + express-rate-limit ^7.4.0 + CORS
+- **Validation**: Zod ^3.23.8
+- **Files**: Multer ^1.4.5-lts.1 + QRCode ^1.5.4
+- **Logging**: Pino ^9.4.0 + pino-pretty ^11.3.0
+- **Dev**: ts-node-dev ^2.0.0
 
-### 🔐 Anonymous User Experience
-- **Secret Code Authentication**: One-time use codes for access
-- **No Personal Data**: Zero PII collection or storage
-- **Survey Link Recovery**: Optional recovery mechanism
-- **Offline Access**: Full functionality without internet
-- **Emergency Mode**: Panic button with instant alerts
+### Infrastructure
+- **Frontend Hosting**: Vercel (Global CDN, SSL, PWA)
+- **Backend Hosting**: Railway (Docker deployment)
+- **Database**: Railway PostgreSQL
+- **Container**: Docker + Node 22 Alpine
 
-### 👥 Multi-Role Stakeholder System
-- **ADMIN**: System administration and user management
-- **POLICE**: Emergency response coordination
-- **SAFEHOUSE**: Shelter and protection services
-- **MEDICAL**: Healthcare and clinic management
-- **NGO**: Community outreach and support
+## 📱 Core Pages & Features
 
-### 🔳 QR Code Verification
-- **User QR Codes**: Users generate time-limited QR codes for anonymous verification
-- **Stakeholder Scans**: Police/Medical/NGO roles scan to verify access without revealing identity
-- **Security**: QR codes expire automatically and are safe to share only with authorized staff
+### Public Pages
+| Page | Route | Description |
+|------|-------|-------------|
+| Home | `/` | Landing page with feature overview, app download, tutorial access |
+| Tutorial | `/tutorial` | Interactive onboarding walkthrough |
+| Settings | `/settings` | App preferences, accessibility, security settings |
+| Portal Login | `/portal-login` | Role-based stakeholder login |
+| Secret Code Entry | `/secret-code-entry` | Anonymous user access via secret codes |
+| Dashboard Access | `/dashboard-access` | Dashboard selection after authentication |
 
-### 🏥 Health & Clinic Management
-- **Clinic Directory**: Location-based service finder
-- **Health Records**: Anonymous medical history tracking
-- **Emergency Alerts**: Real-time crisis response system
-- **Resource Locator**: Find nearby support services
-- **Offline Maps**: Cached location data
+### User Dashboards (Role-Based)
+| Dashboard | Route | Role | Features |
+|-----------|-------|------|----------|
+| Admin Dashboard | `/admin-dashboard` | ADMIN | User management, system settings, analytics, audit logs |
+| Medical Dashboard | `/medical-dashboard` | MEDICAL | Patient records, appointments, health tracking |
+| Police Dashboard | `/police-dashboard` | POLICE | Emergency response, case management |
+| NGO Dashboard | `/ngo-dashboard` | NGO | Programs, events, impact tracking |
+| Safe House Dashboard | `/safehouse-dashboard` | SAFEHOUSE | Resident management, resources |
 
-### 💬 Communication System
-- **Inter-Role Messaging**: Secure communication between stakeholders
-- **Case Management**: Coordinated response workflows
-- **Notification Center**: Push notifications and alerts
-- **Audit Trail**: Complete activity logging
+### Feature Pages
+| Page | Route | Features |
+|------|-------|----------|
+| QR Verification | `/qr-verification` | Generate/scan anonymous QR codes |
+| Health Records | `/health-records` | View and manage health data |
+| Resources Library | `/resources-library` | SRHR documents, videos, downloads |
+| Support Groups | `/support-groups` | Find and join support communities |
+| Secure Map | `/secure-map` | Locate safe spaces, clinics |
+| Direct Messages | `/direct-messages` | Inter-stakeholder messaging |
+| Notifications | `/notifications` | Alert center |
+| Audit Logs | `/audit-logs` | Activity tracking (Admin only) |
+| Workflow Manager | `/workflow-manager` | Automation workflows |
+| Medication Order | `/medication-order` | Pharmacy ordering system |
+| Biometric Page | `/biometric` | Health tracking integration |
+| Live Tracking | `/live-tracking` | Real-time location sharing |
 
-## 🔒 Security & Privacy
+### Accessibility Pages
+| Page | Route | Features |
+|------|-------|----------|
+| Visual Accessibility | `/visual-accessibility` | High contrast, font size, screen reader |
+| Hearing Accessibility | `/hearing-accessibility` | Sign language, captions |
+| Cognitive Accessibility | `/cognitive-accessibility` | Simplified UI, reading aids |
+| Motor Accessibility | `/motor-accessibility` | Large touch targets, voice control |
+| Sign Language | `/sign-language` | GSL (Ghana Sign Language) guide |
 
-### Authentication
-- **Secret Codes**: One-time use authentication (frontend-only in testing)
-- **Role-Based Access**: Granular permissions per stakeholder type
+### Games & Education
+| Page/Component | Features |
+|----------------|----------|
+| Games Hub | `/games` |
+| AIGamesPlatform | AI-powered educational games |
+| AccessibleQuizGame | Inclusive quiz with screen reader support |
+| ConsentScenarioGame | Consent education scenarios |
+| KnowledgeRace | Competitive quiz game |
+| SRHRMythBuster | Myth-busting quiz |
+| DailyChallenge | Daily SRHR challenges |
+| Storytelling | User stories sharing |
 
-### Data Protection
-- **Zero PII**: No personal identifiable information stored
-- **End-to-End Encryption**: All data encrypted at rest and in transit
-- **Anonymous Operations**: All user actions are unlinkable
-- **Audit Logging**: Complete activity tracking for compliance
+### Supporting Components
+- **Emergency**: Emergency panel, panic button, safety check manager
+- **Chatbot**: Rehana AI chat interface (offline + online)
+- **Clinics**: Clinic finder with map integration
+- **Mentorship**: Mentorship system matching
+- **Tracker**: Health tracker with Rehana AI panel
+- **Videos**: Video library with offline support
 
-### Infrastructure Security
-- **HTTPS Only**: All connections encrypted
-- **CORS Protection**: Restricted to authorized domains
-- **Helmet Security**: XSS, CSRF, and injection protection
-- **Input Validation**: Comprehensive request sanitization
+## 🔐 Authentication Flows
 
-## 🚀 Deployment & Infrastructure
+### Anonymous User Flow
+1. **Home** → Click "Get Started"
+2. **Tutorial** (optional) → Learn app features
+3. **Secret Code Entry** → Enter anonymous code or generate new
+4. **Dashboard Access** → Access appropriate role dashboard
 
-### Current Status
-- **Frontend**: Vercel (Global CDN, SSL, PWA support)
+### Stakeholder Login Flow
+1. **Portal Login** → Select role (Admin/Police/Medical/NGO/SafeHouse)
+2. **Credentials** → Enter username/password
+3. **JWT Token** → Stored in localStorage
+4. **Role Dashboard** → Redirect to appropriate dashboard
 
-### Production Environment
-- **Domain**: reproplanai.com (frontend)
-- **Monitoring**: Built-in health checks and logging
+### QR Code Verification
+1. **User** generates time-limited QR code at `/qr-verification`
+2. **Stakeholder** scans using QR scanner in their dashboard
+3. **Anonymous Verification** → Confirms access without revealing identity
+4. **Audit Trail** → Logged for compliance
 
-### Scalability Features
-- **CDN Distribution**: Global content delivery
-- **Caching**: PWA with service worker caching
-- **Offline Support**: PWA with service worker caching
+## 🎨 Design System
 
-## 📊 Performance & Monitoring
+### Colors
+- Primary: Indigo/Purple gradient (`#4F46E5` → `#7C3AED`)
+- Success: Green (`#10B981`)
+- Warning: Yellow (`#F59E0B`)
+- Error: Red (`#EF4444`)
+- Background: Gray 50 (`#F9FAFB`)
 
-### PWA Capabilities
-- **Offline Mode**: Full functionality without internet
-- **Background Sync**: Data synchronization when online
-- **Push Notifications**: Emergency alerts and updates
-- **App Installation**: Add to home screen on mobile/desktop
-- **Service Worker**: Intelligent caching and updates
+### Typography
+- Font: System default (responsive)
+- Sizes: Mobile-first (xs: 12px, sm: 14px, base: 16px, lg: 18px, xl: 20px)
 
-### Monitoring & Analytics
-- **Health Checks**: Automated endpoint monitoring
-- **Error Tracking**: Comprehensive error logging
-- **Performance Metrics**: Response times and throughput
-- **User Analytics**: Anonymous usage patterns
-- **Security Auditing**: Real-time threat detection
+### Accessibility
+- WCAG 2.1 AA compliant
+- Screen reader support
+- Keyboard navigation
+- High contrast mode
+- Reduced motion support
+- Font size adjustment (normal, large, extra-large, huge)
 
-## 🧪 Testing & Mock Data
+## 🚀 Deployment
 
-Added persistent mock data for key role workflows and modal-heavy areas by seeding offline storage at app startup.
+### Frontend (Vercel)
+```bash
+cd frontend
+npm run build
+vercel --prod
+```
 
-What’s now seeded for full feature/modals testing:
-- SRHR alerts (`srhr_alerts`)
-- Chatbot history (`chat_history`)
-- Quiz stats (`quiz_stats`)
-- Consent game stats (`consent_game_stats`)
-- Cycle tracker data (`cycle_data`)
-- Mentorship requests & chat (`mentorship_requests`, `chat_messages`)
+Required env vars in Vercel:
+- `REACT_APP_API_URL` - Railway backend URL
+- `REACT_APP_ENVIRONMENT=production`
+- `REACT_APP_ENABLE_AI=true`
+- `REACT_APP_ENABLE_PWA=true`
 
-Additional seeded datasets for broader role coverage:
-- Safe spaces (`safe_spaces`)
-- Emergency contacts/logs (`emergency_contacts`, `emergency_logs`)
-- Inclusive services/resources/support groups (`inclusive_services`, `inclusive_resources`, `support_groups`)
-- Storytelling posts (`srhr_stories`)
-- QR verification history (`repro-plan-verification-history`)
+### Backend (Railway)
+```bash
+cd backend
+# Railway auto-deploys on git push
+```
 
-QR verification testing:
-- Generate codes in `QR Verification` (`/qr-verification`)
-- Stakeholders can scan and review verification history
+Required env vars in Railway:
+- `DATABASE_URL` - PostgreSQL connection
+- `JWT_SECRET` - 32+ char random string
+- `SESSION_SECRET` - 32+ char random string
+- `GEMINI_API_KEY` - Google Gemini API
+- `RESEND_API_KEY` - Email service
+- `FRONTEND_URL` - Vercel frontend URL
+- `CORS_ORIGINS` - Allowed origins
 
-Changes:
-- `frontend/src/utils/offlineStorage.ts` now handles array storage correctly and includes `seedMockData()`.
-- `frontend/src/App.tsx` calls `offlineStorage.seedMockData()` during initialization.
+### Local Development
+```bash
+# Backend
+cd backend
+npm install
+npm run dev
 
-If you want more seeded datasets (e.g., Safe Space entries, Emergency logs, QR verification history), tell me which ones and I’ll add them.
+# Frontend  
+cd frontend
+npm install
+npm start
+```
+
+## 📂 Project Structure
+
+```
+REPRO-Plan/
+├── frontend/                 # React PWA
+│   ├── public/              # Static assets, manifest
+│   ├── src/
+│   │   ├── components/      # React components
+│   │   │   ├── Accessibility/
+│   │   │   ├── Auth/
+│   │   │   ├── Dashboard/
+│   │   │   ├── Emergency/
+│   │   │   ├── Games/
+│   │   │   ├── Layout/
+│   │   │   ├── QRCode/
+│   │   │   ├── Settings/
+│   │   │   └── ...
+│   │   ├── contexts/        # React contexts
+│   │   ├── hooks/           # Custom hooks
+│   │   ├── pages/           # Page components
+│   │   ├── services/        # API services
+│   │   ├── utils/           # Utilities
+│   │   ├── App.tsx
+│   │   └── index.tsx
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── backend/                  # Node.js API
+│   ├── src/
+│   │   ├── config/          # DB, env config
+│   │   ├── middleware/      # Auth, rate limiting
+│   │   ├── routes/          # API routes
+│   │   ├── services/        # Business logic
+│   │   │   ├── ai/          # AI providers
+│   │   │   └── email/
+│   │   └── index.ts         # Entry point
+│   ├── Dockerfile
+│   ├── railway.json
+│   └── package.json
+│
+├── README.md
+├── .gitignore
+└── TECH_STACK.md
+```
+
+## 📄 License
+
+MIT License - REPRO PLAN Team
 
 ---
 
-**REPRO PLAN v3.0** - Building a safer, more accessible future for youth sexual and reproductive health across Africa.
+**REPRO PLAN v3.0** - Built for youth sexual and reproductive health across Africa.
 
