@@ -79,8 +79,8 @@
   "author": "REPRO PLAN Team",
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=11.0.0"
+    "node": "20.x",
+    "npm": ">=10.0.0"
   },
   "overrides": {
     "serialize-javascript": ">=6.0.2"
