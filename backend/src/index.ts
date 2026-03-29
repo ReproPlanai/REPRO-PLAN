@@ -167,20 +167,41 @@ app.use('/ai', aiRoutes);
 app.use(errorHandler);
 
 const port = env.PORT;
-app.listen(port, async () => {
-  // Initialize database on startup
+
+// Wrap startup in try-catch to catch initialization errors
+const startServer = async () => {
   try {
-    if (env.DATABASE_URL) {
-      await initializeDatabase();
-      logger.info('Database initialized and tables created');
-    }
+    const server = app.listen(port, async () => {
+      // Initialize database on startup
+      try {
+        if (env.DATABASE_URL) {
+          await initializeDatabase();
+          logger.info('Database initialized and tables created');
+        }
+      } catch (error) {
+        logger.error({ error }, 'Database initialization failed - continuing without DB');
+      }
+      
+      // Run and log Fortune 500 diagnostics
+      try {
+        const diagnostics = await serverDiagnostics.runDiagnostics();
+        serverDiagnostics.logStartup(diagnostics);
+      } catch (error) {
+        logger.error({ error }, 'Diagnostics failed');
+      }
+      
+      logger.info({ port, env: env.NODE_ENV }, 'Server started successfully');
+    });
+
+    // Handle server errors
+    server.on('error', (error) => {
+      logger.error({ error }, 'Server error');
+      process.exit(1);
+    });
   } catch (error) {
-    logger.error({ error }, 'Database initialization failed - continuing in mock mode');
+    logger.error({ error }, 'Fatal startup error');
+    process.exit(1);
   }
-  
-  // Run and log Fortune 500 diagnostics
-  const diagnostics = await serverDiagnostics.runDiagnostics();
-  serverDiagnostics.logStartup(diagnostics);
-  
-  logger.info({ port, env: env.NODE_ENV }, 'Server started successfully');
-});
+};
+
+startServer();
