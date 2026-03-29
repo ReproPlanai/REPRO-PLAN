@@ -24,12 +24,12 @@
     "react-i18next": "^13.0.0",
     "react-markdown": "^9.0.1",
     "react-router-dom": "^6.8.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^0.0.0",
     "recharts": "^3.2.1",
     "tailwindcss": "^3.3.0",
     "typescript": "^4.9.0",
     "uuid": "^9.0.0",
-    "workbox-webpack-plugin": "^7.0.0",
+    "workbox-webpack-plugin": "^7.4.0",
     "workbox-window": "^6.5.0"
   },
   "scripts": {
@@ -77,5 +77,12 @@
     "offline-first"
   ],
   "author": "REPRO PLAN Team",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=11.0.0"
+  },
+  "overrides": {
+    "serialize-javascript": ">=6.0.2"
+  }
 }

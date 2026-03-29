@@ -157,7 +157,7 @@ const WorkflowManager: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white p-4 rounded-xl shadow-sm border">
             <div className="flex items-center gap-2 mb-2">
-              <Workflow className="w-5 h-5 text-indigo-600" />
+              <WorkflowIcon className="w-5 h-5 text-indigo-600" />
               <span className="text-sm text-gray-600">Total Workflows</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">{workflows.length}</p>
@@ -199,7 +199,7 @@ const WorkflowManager: React.FC = () => {
             </div>
           ) : workflows.length === 0 ? (
             <div className="p-8 text-center">
-              <Workflow className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+              <WorkflowIcon className="w-16 h-16 mx-auto mb-4 text-gray-300" />
               <p className="text-gray-500 mb-2">No workflows yet</p>
               <p className="text-sm text-gray-400 mb-4">Create your first automation workflow</p>
               <button
