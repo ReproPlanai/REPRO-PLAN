@@ -18,32 +18,24 @@ interface Notification {
 const NotificationSystem: React.FC = () => {
   const navigate = useNavigate();
   const [unreadCount, setUnreadCount] = useState(0);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Fetch notifications from API
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        setLoading(true);
         const response = await apiService.getNotifications?.() as { 
           success?: boolean; 
           notifications?: Notification[] 
         };
         
         if (response?.success && response.notifications) {
-          setNotifications(response.notifications);
           setUnreadCount(response.notifications.filter(n => !n.isRead).length);
         } else {
-          setNotifications([]);
           setUnreadCount(0);
         }
       } catch (error) {
         console.error('Failed to fetch notifications:', error);
-        setNotifications([]);
         setUnreadCount(0);
-      } finally {
-        setLoading(false);
       }
     };
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Workflow,
   Plus,
   Play,
   Pause,
@@ -48,6 +47,7 @@ const WorkflowManager: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedWorkflow, setSelectedWorkflow] = useState<Workflow | null>(null);
 
   useEffect(() => {
