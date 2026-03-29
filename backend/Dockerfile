@@ -6,8 +6,8 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy package files explicitly (package-lock.json required for npm ci)
+COPY package.json package-lock.json ./
 
 # Install dependencies (including devDependencies for TypeScript compilation)
 RUN npm ci
@@ -26,8 +26,8 @@ WORKDIR /app
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
 
-# Copy package files
-COPY package*.json ./
+# Copy package files explicitly
+COPY package.json package-lock.json ./
 
 # Install production dependencies only
 RUN npm ci --omit=dev && npm cache clean --force
