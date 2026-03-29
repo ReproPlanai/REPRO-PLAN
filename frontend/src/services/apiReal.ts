@@ -170,7 +170,7 @@ class RealAPIService {
   // Auth - User
   async registerUser(demographics?: User['demographics']) {
     const secretCode = secretCodeManager.generateSecretCode();
-    const response = await apiRequest('/users/register', {
+    const response = await apiRequest('/api/users/register', {
       method: 'POST',
       body: JSON.stringify({ secretCode, demographics })
     });
@@ -178,7 +178,7 @@ class RealAPIService {
   }
 
   async loginUser(secretCode: string) {
-    return apiRequest('/users/login', {
+    return apiRequest('/api/users/login', {
       method: 'POST',
       body: JSON.stringify({ secretCode })
     });
@@ -186,7 +186,7 @@ class RealAPIService {
 
   async forgetCode(surveyLink: string) {
     const newCode = secretCodeManager.generateSecretCode();
-    return apiRequest('/users/reset-code', {
+    return apiRequest('/api/users/reset-code', {
       method: 'POST',
       body: JSON.stringify({ surveyLink, newCode })
     });
@@ -201,14 +201,14 @@ class RealAPIService {
     organization?: string;
     email?: string;
   }) {
-    return apiRequest('/stakeholders/register', {
+    return apiRequest('/api/stakeholders/register', {
       method: 'POST',
       body: JSON.stringify(data)
     });
   }
 
   async loginStakeholder(secretCode: string | undefined, phoneNumber: string, role?: string) {
-    return apiRequest('/stakeholders/login', {
+    return apiRequest('/api/stakeholders/login', {
       method: 'POST',
       body: JSON.stringify({ secretCode, phoneNumber, role })
     });
@@ -216,44 +216,44 @@ class RealAPIService {
 
   // Users
   async getUsers() {
-    return apiRequest('/users');
+    return apiRequest('/api/users');
   }
 
   async getUser(id: string) {
-    return apiRequest(`/users/${id}`);
+    return apiRequest(`/api/users/${id}`);
   }
 
   async updateUser(id: string, updates: Partial<User>) {
-    return apiRequest(`/users/${id}`, {
+    return apiRequest(`/api/users/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates)
     });
   }
 
   async deleteUser(id: string) {
-    return apiRequest(`/users/${id}`, {
+    return apiRequest(`/api/users/${id}`, {
       method: 'DELETE'
     });
   }
 
   // Stakeholders
   async getStakeholders() {
-    return apiRequest('/stakeholders');
+    return apiRequest('/api/stakeholders');
   }
 
   async getStakeholder(id: string) {
-    return apiRequest(`/stakeholders/${id}`);
+    return apiRequest(`/api/stakeholders/${id}`);
   }
 
   async updateStakeholder(id: string, updates: Partial<Stakeholder>) {
-    return apiRequest(`/stakeholders/${id}`, {
+    return apiRequest(`/api/stakeholders/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates)
     });
   }
 
   async deleteStakeholder(id: string) {
-    return apiRequest(`/stakeholders/${id}`, {
+    return apiRequest(`/api/stakeholders/${id}`, {
       method: 'DELETE'
     });
   }
@@ -265,18 +265,18 @@ class RealAPIService {
     if (stakeholderId) params.append('stakeholderId', stakeholderId);
     if (filters?.status) params.append('status', filters.status);
     if (filters?.priority) params.append('priority', filters.priority);
-    return apiRequest(`/alerts?${params.toString()}`);
+    return apiRequest(`/api/alerts?${params.toString()}`);
   }
 
   async createAlert(alertData: Omit<Alert, 'id' | 'createdAt' | 'updatedAt'>) {
-    return apiRequest('/alerts', {
+    return apiRequest('/api/alerts', {
       method: 'POST',
       body: JSON.stringify(alertData)
     });
   }
 
   async updateAlert(id: string, updates: Partial<Alert>) {
-    return apiRequest(`/alerts/${id}`, {
+    return apiRequest(`/api/alerts/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates)
     });
@@ -289,18 +289,18 @@ class RealAPIService {
     if (stakeholderId) params.append('stakeholderId', stakeholderId);
     if (filters?.status) params.append('status', filters.status);
     if (filters?.priority) params.append('priority', filters.priority);
-    return apiRequest(`/cases?${params.toString()}`);
+    return apiRequest(`/api/cases?${params.toString()}`);
   }
 
   async createCase(caseData: Omit<Case, 'id' | 'caseNumber' | 'createdAt' | 'updatedAt'>) {
-    return apiRequest('/cases', {
+    return apiRequest('/api/cases', {
       method: 'POST',
       body: JSON.stringify(caseData)
     });
   }
 
   async updateCase(id: string, updates: Partial<Case>) {
-    return apiRequest(`/cases/${id}`, {
+    return apiRequest(`/api/cases/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates)
     });
@@ -308,29 +308,29 @@ class RealAPIService {
 
   // Clinics
   async getClinics() {
-    return apiRequest('/clinics');
+    return apiRequest('/api/clinics');
   }
 
   async getClinic(id: string) {
-    return apiRequest(`/clinics/${id}`);
+    return apiRequest(`/api/clinics/${id}`);
   }
 
   async createClinic(data: Omit<Clinic, 'id'>) {
-    return apiRequest('/clinics', {
+    return apiRequest('/api/clinics', {
       method: 'POST',
       body: JSON.stringify(data)
     });
   }
 
   async updateClinic(id: string, updates: Partial<Clinic>) {
-    return apiRequest(`/clinics/${id}`, {
+    return apiRequest(`/api/clinics/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates)
     });
   }
 
   async deleteClinic(id: string) {
-    return apiRequest(`/clinics/${id}`, {
+    return apiRequest(`/api/clinics/${id}`, {
       method: 'DELETE'
     });
   }
@@ -360,11 +360,11 @@ class RealAPIService {
 
   // Stories (Community Content)
   async getStories() {
-    return apiRequest('/stories');
+    return apiRequest('/api/stories');
   }
 
   async createStory(storyData: any) {
-    return apiRequest('/stories', {
+    return apiRequest('/api/stories', {
       method: 'POST',
       body: JSON.stringify(storyData)
     });
@@ -386,32 +386,32 @@ class RealAPIService {
 
   // Workflows
   async executeWorkflow(workflowId: string) {
-    return apiRequest(`/workflows/${workflowId}/execute`, {
+    return apiRequest(`/api/workflows/${workflowId}/execute`, {
       method: 'POST'
     });
   }
 
   async getWorkflows(params?: { category?: string; isActive?: boolean; triggerType?: string }) {
     const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
-    return apiRequest(`/workflows${queryParams}`);
+    return apiRequest(`/api/workflows${queryParams}`);
   }
 
   async createWorkflow(workflowData: any) {
-    return apiRequest('/workflows', {
+    return apiRequest('/api/workflows', {
       method: 'POST',
       body: JSON.stringify(workflowData)
     });
   }
 
   async updateWorkflow(workflowId: string, updates: any) {
-    return apiRequest(`/workflows/${workflowId}`, {
+    return apiRequest(`/api/workflows/${workflowId}`, {
       method: 'PUT',
       body: JSON.stringify(updates)
     });
   }
 
   async deleteWorkflow(workflowId: string) {
-    return apiRequest(`/workflows/${workflowId}`, {
+    return apiRequest(`/api/workflows/${workflowId}`, {
       method: 'DELETE'
     });
   }
@@ -435,19 +435,19 @@ class RealAPIService {
   // Audit Logs
   async getAuditLogs(params?: { userId?: string; action?: string; entityType?: string; limit?: string }) {
     const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
-    return apiRequest(`/audit-logs${queryParams}`);
+    return apiRequest(`/api/audit-logs${queryParams}`);
   }
 
   // Biometrics
   async registerBiometric(data: any) {
-    return apiRequest('/biometrics/register', {
+    return apiRequest('/api/biometrics/register', {
       method: 'POST',
       body: JSON.stringify(data)
     });
   }
 
   async updateBiometric(biometricId: string, updates: any) {
-    return apiRequest(`/biometrics/${biometricId}`, {
+    return apiRequest(`/api/biometrics/${biometricId}`, {
       method: 'PUT',
       body: JSON.stringify(updates)
     });
@@ -455,7 +455,7 @@ class RealAPIService {
 
   // Support Groups
   async joinSupportGroup(groupId: string) {
-    return apiRequest(`/support-groups/${groupId}/join`, {
+    return apiRequest(`/api/support-groups/${groupId}/join`, {
       method: 'POST'
     });
   }
@@ -463,11 +463,11 @@ class RealAPIService {
   // Health Records
   async getHealthRecords(userId?: string | null) {
     const params = userId ? `?userId=${userId}` : '';
-    return apiRequest(`/health-records${params}`);
+    return apiRequest(`/api/health-records${params}`);
   }
 
   async createHealthRecord(recordData: any) {
-    return apiRequest('/health-records', {
+    return apiRequest('/api/health-records', {
       method: 'POST',
       body: JSON.stringify(recordData)
     });
@@ -476,18 +476,18 @@ class RealAPIService {
   // Messages
   async getMessages(params?: { toStakeholderId?: string; isRead?: boolean }) {
     const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
-    return apiRequest(`/messages${queryParams}`);
+    return apiRequest(`/api/messages${queryParams}`);
   }
 
   async createMessage(messageData: any) {
-    return apiRequest('/messages', {
+    return apiRequest('/api/messages', {
       method: 'POST',
       body: JSON.stringify(messageData)
     });
   }
 
   async markMessageRead(messageId: string) {
-    return apiRequest(`/messages/${messageId}/read`, {
+    return apiRequest(`/api/messages/${messageId}/read`, {
       method: 'PUT'
     });
   }
@@ -495,29 +495,29 @@ class RealAPIService {
   // Conversations
   async getConversations(params?: { stakeholderId?: string }) {
     const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
-    return apiRequest(`/chat/conversations${queryParams}`);
+    return apiRequest(`/api/chat/conversations${queryParams}`);
   }
   async getMentors() {
-    return apiRequest('/mentors');
+    return apiRequest('/api/mentors');
   }
 
   // Resources
   async getResources() {
-    return apiRequest('/resources');
+    return apiRequest('/api/resources');
   }
 
   // Support Groups
   async getSupportGroups() {
-    return apiRequest('/support-groups');
+    return apiRequest('/api/support-groups');
   }
 
   // External Data Integration
   async getExternalData() {
-    return apiRequest('/external-data');
+    return apiRequest('/api/external-data');
   }
 
   async syncExternalConnection(connectionId: string) {
-    return apiRequest(`/external-data/sync/${connectionId}`, {
+    return apiRequest(`/api/external-data/sync/${connectionId}`, {
       method: 'POST'
     });
   }
@@ -576,7 +576,7 @@ class RealAPIService {
   }
 
   async getNotifications() {
-    return apiRequest('/notifications');
+    return apiRequest('/api/notifications');
   }
 
   async getGameAnalytics(params?: { timeRange?: string; gameType?: string }) {
@@ -586,60 +586,60 @@ class RealAPIService {
 
   async getChatRooms(userRole?: string) {
     const params = userRole ? `?role=${userRole}` : '';
-    return apiRequest(`/chat/rooms${params}`);
+    return apiRequest(`/api/chat/rooms${params}`);
   }
 
   async generateQRCode() {
-    return apiRequest('/qr/generate', {
+    return apiRequest('/api/qr/generate', {
       method: 'POST'
     });
   }
 
   async verifyQRCode(code: string) {
-    return apiRequest('/qr/verify', {
+    return apiRequest('/api/qr/verify', {
       method: 'POST',
       body: JSON.stringify({ code })
     });
   }
 
   async getBiometrics() {
-    return apiRequest('/biometrics');
+    return apiRequest('/api/biometrics');
   }
 
   async authenticateBiometric(type: string) {
-    return apiRequest('/biometrics/authenticate', {
+    return apiRequest('/api/biometrics/authenticate', {
       method: 'POST',
       body: JSON.stringify({ type })
     });
   }
 
   async submitSafetyCheck(check: any) {
-    return apiRequest('/safety-checks', {
+    return apiRequest('/api/safety-checks', {
       method: 'POST',
       body: JSON.stringify(check)
     });
   }
 
   async getSafetyCheckHistory() {
-    return apiRequest('/safety-checks/history');
+    return apiRequest('/api/safety-checks/history');
   }
 
   // Ecommerce - Products
   async getProducts(params?: { category?: string; search?: string; inStock?: boolean; sortBy?: string }) {
     const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
-    return apiRequest(`/products${queryParams}`);
+    return apiRequest(`/api/products${queryParams}`);
   }
 
   async getProduct(id: string) {
-    return apiRequest(`/products/${id}`);
+    return apiRequest(`/api/products/${id}`);
   }
 
   async getProductCategories() {
-    return apiRequest('/products/categories/list');
+    return apiRequest('/api/products/categories/list');
   }
 
   async addProductReview(productId: string, review: { rating: number; comment?: string }) {
-    return apiRequest(`/products/${productId}/reviews`, {
+    return apiRequest(`/api/products/${productId}/reviews`, {
       method: 'POST',
       body: JSON.stringify(review)
     });
@@ -647,31 +647,31 @@ class RealAPIService {
 
   // Ecommerce - Cart
   async getCart(userId: string) {
-    return apiRequest(`/cart?userId=${userId}`);
+    return apiRequest(`/api/cart?userId=${userId}`);
   }
 
   async addToCart(userId: string, productId: string, quantity: number = 1) {
-    return apiRequest('/cart/items', {
+    return apiRequest('/api/cart/items', {
       method: 'POST',
       body: JSON.stringify({ userId, productId, quantity })
     });
   }
 
   async updateCartItem(itemId: string, quantity: number) {
-    return apiRequest(`/cart/items/${itemId}`, {
+    return apiRequest(`/api/cart/items/${itemId}`, {
       method: 'PUT',
       body: JSON.stringify({ quantity })
     });
   }
 
   async removeFromCart(itemId: string) {
-    return apiRequest(`/cart/items/${itemId}`, {
+    return apiRequest(`/api/cart/items/${itemId}`, {
       method: 'DELETE'
     });
   }
 
   async clearCart(userId: string) {
-    return apiRequest(`/cart/clear?userId=${userId}`, {
+    return apiRequest(`/api/cart/clear?userId=${userId}`, {
       method: 'DELETE'
     });
   }
@@ -679,11 +679,11 @@ class RealAPIService {
   // Ecommerce - Orders
   async getOrders(params?: { userId?: string; status?: string; limit?: number; offset?: number }) {
     const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
-    return apiRequest(`/orders${queryParams}`);
+    return apiRequest(`/api/orders${queryParams}`);
   }
 
   async getOrder(id: string) {
-    return apiRequest(`/orders/${id}`);
+    return apiRequest(`/api/orders/${id}`);
   }
 
   async createOrder(orderData: {
@@ -695,21 +695,21 @@ class RealAPIService {
     prescriptionUrl?: string;
     notes?: string;
   }) {
-    return apiRequest('/orders', {
+    return apiRequest('/api/orders', {
       method: 'POST',
       body: JSON.stringify(orderData)
     });
   }
 
   async cancelOrder(orderId: string, reason?: string) {
-    return apiRequest(`/orders/${orderId}/cancel`, {
+    return apiRequest(`/api/orders/${orderId}/cancel`, {
       method: 'POST',
       body: JSON.stringify({ reason })
     });
   }
 
   async getOrderReceipt(orderId: string) {
-    return apiRequest(`/orders/${orderId}/receipt`);
+    return apiRequest(`/api/orders/${orderId}/receipt`);
   }
 
   // Clear auth
