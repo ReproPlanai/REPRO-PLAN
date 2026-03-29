@@ -81,6 +81,9 @@ const MapTracking: React.FC<MapTrackingProps> = ({
               lastSeen: alert.updatedAt || new Date().toISOString()
             }));
 
+          // Update locations state with fetched data
+          setLocations(locationData);
+
           // Update locations via parent callback if provided
           if (locationData.length > 0 && onLocationSelect) {
             // Find the most recently updated location

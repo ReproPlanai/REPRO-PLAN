@@ -121,7 +121,6 @@ const DirectMessages: React.FC = () => {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const markAsRead = async (messageId: string) => {
     try {
       await apiService.markMessageRead?.(messageId);
@@ -202,7 +201,11 @@ const DirectMessages: React.FC = () => {
                     {filteredConversations.map((conv) => (
                       <button
                         key={conv.id}
-                        onClick={() => setSelectedConversation(conv.id)}
+                        onClick={() => {
+                          setSelectedConversation(conv.id);
+                          // Mark unread messages as read when opening conversation
+                          messages.filter(m => !m.isRead && m.toStakeholderId === stakeholderId).forEach(m => markAsRead(m.id));
+                        }}
                         className={`w-full p-4 flex items-start gap-3 hover:bg-gray-50 transition-colors text-left ${
                           selectedConversation === conv.id ? 'bg-indigo-50 border-r-2 border-indigo-600' : ''
                         }`}

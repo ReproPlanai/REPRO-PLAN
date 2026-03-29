@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Send, MessageCircle, Sparkles, Mic, MicOff, Upload, Camera, Download, Trash2, Save } from 'lucide-react';
 import { offlineStorage } from '../../utils/offlineStorage';
@@ -232,17 +232,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
     "help suicidal": "If someone is suicidal, take it seriously, listen without judgment, ask directly about their thoughts, stay with them, and connect them to professional help immediately. Don't keep it a secret."
   };
 
-  const rehanaTypeLabels = {
+  const rehanaTypeLabels = useMemo(() => ({
     focus: { general: 'General SRHR', contraception: 'Contraception', relationships: 'Relationships', emergency: 'Emergency Support', youth: 'Youth-focused' },
     tone: { clinical: 'Clinical', friendly: 'Friendly', youthFriendly: 'Youth-friendly', crisis: 'Crisis support' },
     mode: { text: 'Text-only', voice: 'Voice-enabled', quick: 'Quick answers', detailed: 'Detailed' }
-  };
+  }), []);
 
-  const getIntroMessage = () => {
+  const getIntroMessage = useCallback(() => {
     const focusLabel = rehanaTypeLabels.focus[rehanaType.focus as keyof typeof rehanaTypeLabels.focus] || 'General SRHR';
     const toneLabel = rehanaTypeLabels.tone[rehanaType.tone as keyof typeof rehanaTypeLabels.tone] || 'Friendly';
     return `Hello! I'm Rehana, your REPRO PLAN AI assistant. I'm here to provide you with accurate, confidential, and supportive information about sexual and reproductive health and rights. You've chosen ${focusLabel} focus with a ${toneLabel} approach. I'm completely anonymous and your conversations with me are private. How can I help you today?`;
-  };
+  }, [rehanaType.focus, rehanaType.tone, rehanaTypeLabels]);
 
   useEffect(() => {
     loadPreviousMessages();
@@ -717,7 +717,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSuggestionClick = (suggestion: string) => {
     setInputText(suggestion);
     inputRef.current?.focus();
@@ -1108,6 +1107,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
                 ) : (
                   <div className="text-xs sm:text-sm lg:text-base leading-relaxed break-words [&_p]:my-1 [&_ul]:my-2 [&_li]:my-0 [&_strong]:font-semibold">
                     <ReactMarkdown>{message.text}</ReactMarkdown>
+                    {/* Suggestion buttons */}
+                    {message.suggestions && message.suggestions.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-3 pt-2 border-t border-gray-200/50">
+                        {message.suggestions.map((suggestion, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleSuggestionClick(suggestion)}
+                            className="px-3 py-1.5 bg-primary-50 hover:bg-primary-100 text-primary-700 text-xs rounded-full transition-colors"
+                          >
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

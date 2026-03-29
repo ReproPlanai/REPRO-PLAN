@@ -48,7 +48,6 @@ const WorkflowManager: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedWorkflow, setSelectedWorkflow] = useState<Workflow | null>(null);
 
   useEffect(() => {
@@ -301,6 +300,70 @@ const WorkflowManager: React.FC = () => {
                   </span>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Create Workflow Modal */}
+        {showCreateModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-gray-900">Create Workflow</h3>
+                  <button onClick={() => setShowCreateModal(false)} className="text-gray-400 hover:text-gray-600">
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <form className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Workflow Name</label>
+                    <input type="text" placeholder="Enter workflow name..." className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea rows={3} placeholder="Describe what this workflow does..." className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <button type="button" onClick={() => setShowCreateModal(false)} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="button" onClick={() => setShowCreateModal(false)} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Create Workflow</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Workflow Modal */}
+        {selectedWorkflow && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-gray-900">Edit Workflow</h3>
+                  <button onClick={() => setSelectedWorkflow(null)} className="text-gray-400 hover:text-gray-600">
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <form className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Workflow Name</label>
+                    <input type="text" defaultValue={selectedWorkflow.name} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea rows={3} defaultValue={selectedWorkflow.description} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <button type="button" onClick={() => setSelectedWorkflow(null)} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="button" onClick={() => setSelectedWorkflow(null)} className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Changes</button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         )}

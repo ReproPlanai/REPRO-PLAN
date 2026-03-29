@@ -12,7 +12,8 @@ import {
   MapPin,
   Sparkles,
   ArrowRight,
-  Navigation
+  Navigation,
+  RefreshCw
 } from 'lucide-react';
 import UnifiedVerificationForm from '../components/Auth/UnifiedVerificationForm';
 
@@ -74,10 +75,8 @@ const SecureMap: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isNavigating, setIsNavigating] = useState(false);
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [estimatedArrival, setEstimatedArrival] = useState<Date | null>(null);
   const [safeHouses, setSafeHouses] = useState<SafeHouse[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(false);
 
   // Fetch safe houses from API (admin-configured)
@@ -373,7 +372,12 @@ const SecureMap: React.FC = () => {
 
         {/* Safe Houses List */}
           <div className="space-y-4">
-            {filteredSafeHouses.map(safeHouse => {
+            {loading && (
+              <div className="p-8 flex justify-center">
+                <RefreshCw className="w-8 h-8 animate-spin text-primary-600" />
+              </div>
+            )}
+            {!loading && filteredSafeHouses.map(safeHouse => {
               const TypeIcon = getTypeIcon(safeHouse.type);
               const capacityStatus = getCapacityStatus(safeHouse.currentOccupancy, safeHouse.capacity);
               

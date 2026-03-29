@@ -4,10 +4,8 @@ import {
   Shield, 
   AlertTriangle, 
   CheckCircle, 
-  XCircle,
   Phone,
   MessageCircle,
-  Clock,
   Sun,
   Sunset,
   Moon,
@@ -16,9 +14,7 @@ import {
   Activity,
   ArrowRight,
   X,
-  ExternalLink,
-  MapPin,
-  Sparkles
+  MapPin
 } from 'lucide-react';
 import { apiService } from '../../services/api';
 import { offlineStorage } from '../../utils/offlineStorage';

@@ -33,7 +33,8 @@ import {
   UserPlus,
   BellRing,
   MessageSquarePlus,
-  Book
+  Book,
+  RefreshCw
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
@@ -469,7 +470,12 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                   {/* Mobile Card View */}
                   <div className="block sm:hidden">
                     <div className="p-3 space-y-3">
-                      {programs.map((program) => (
+                      {loading && (
+                        <div className="p-8 flex justify-center">
+                          <RefreshCw className="w-8 h-8 animate-spin text-orange-600" />
+                        </div>
+                      )}
+                      {!loading && programs.map((program) => (
                         <div key={program.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
                           <div className="flex items-start justify-between">
                             <div>
@@ -522,7 +528,14 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        {programs.map((program) => (
+                        {loading && (
+                          <tr>
+                            <td colSpan={7} className="px-4 py-8 text-center">
+                              <RefreshCw className="w-8 h-8 animate-spin text-orange-600 mx-auto" />
+                            </td>
+                          </tr>
+                        )}
+                        {!loading && programs.map((program) => (
                           <tr key={program.id} className="hover:bg-gray-50">
                             <td className="px-4 py-3 text-sm font-medium text-gray-900">{program.name}</td>
                             <td className="px-4 py-3 text-sm text-gray-600">{program.location}</td>

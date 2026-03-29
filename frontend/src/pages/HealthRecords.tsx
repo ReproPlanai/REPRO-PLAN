@@ -39,8 +39,8 @@ const HealthRecords: React.FC = () => {
   const [records, setRecords] = useState<HealthRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
   const [selectedType, setSelectedType] = useState<string>('all');
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     fetchRecords();
@@ -251,6 +251,77 @@ const HealthRecords: React.FC = () => {
                 }).length}
               </p>
               <p className="text-sm text-gray-500">Records added</p>
+            </div>
+          </div>
+        )}
+
+        {/* Add Record Modal */}
+        {showAddModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl shadow-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-gray-900">Add Health Record</h3>
+                  <button
+                    onClick={() => setShowAddModal(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <span className="sr-only">Close</span>
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <form className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Record Type</label>
+                    <select className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                      <option value="cycle">Cycle Tracking</option>
+                      <option value="symptom">Symptom</option>
+                      <option value="appointment">Appointment</option>
+                      <option value="medication">Medication</option>
+                      <option value="note">Note</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input
+                      type="date"
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Add any additional details..."
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddModal(false)}
+                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowAddModal(false);
+                      }}
+                      className="flex-1 px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700"
+                    >
+                      Save Record
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         )}

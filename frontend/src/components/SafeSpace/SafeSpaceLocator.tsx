@@ -114,7 +114,7 @@ const SafeSpaceLocator: React.FC = () => {
   ];
 
   // Map clinic types to safe space types
-  const mapClinicType = (type: string): SafeSpace['type'] => {
+  const mapClinicType = useCallback((type: string): SafeSpace['type'] => {
     const typeMap: Record<string, SafeSpace['type']> = {
       'clinic': 'medical',
       'hospital': 'medical',
@@ -125,7 +125,7 @@ const SafeSpaceLocator: React.FC = () => {
       'hotline': 'hotline'
     };
     return typeMap[type] || 'crisis_center';
-  };
+  }, []);
 
   // Calculate distance from user (simplified)
   const calculateDistance = useCallback((coordinates: { lat: number; lng: number } | undefined): number => {
