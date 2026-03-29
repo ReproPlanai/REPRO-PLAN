@@ -8,7 +8,12 @@ import {
   MapPin, 
   BookOpen,
   Search,
-  Calendar
+  Calendar,
+  Eye,
+  Lock,
+  ExternalLink,
+  Info,
+  CheckCircle
 } from 'lucide-react';
 import { offlineStorage } from '../../utils/offlineStorage';
 import { apiService } from '../../services/api';
