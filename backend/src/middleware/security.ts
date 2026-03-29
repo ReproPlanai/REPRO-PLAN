@@ -81,9 +81,9 @@ export const securityHeaders = (req: Request, res: Response, next: NextFunction)
   res.setHeader('Content-Security-Policy',
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' https://repro-plan.vercel.app; " +
-    "style-src 'self' 'unsafe-inline'; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "font-src 'self' https://fonts.gstatic.com; " +
     "img-src 'self' data: https:; " +
-    "font-src 'self'; " +
     "connect-src 'self' https://repro-plan.vercel.app https://*.railway.app; " +
     "frame-ancestors 'none';"
   );

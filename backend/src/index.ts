@@ -74,9 +74,19 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false, // Allow embedded resources
 }));
 
-// 4. CORS - only allow frontend
+// 4. CORS - only allow frontend (normalize URL to prevent trailing slash mismatch)
+const normalizeOrigin = (url: string): string => url.replace(/\/$/, '');
 app.use(cors({ 
-  origin: env.FRONTEND_URL, 
+  origin: (origin, callback) => {
+    const allowedOrigin = normalizeOrigin(env.FRONTEND_URL || '');
+    const requestOrigin = origin ? normalizeOrigin(origin) : '';
+    // Allow requests with no origin (mobile apps, curl, etc)
+    if (!origin) return callback(null, true);
+    if (requestOrigin === allowedOrigin || allowedOrigin.includes(requestOrigin)) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
