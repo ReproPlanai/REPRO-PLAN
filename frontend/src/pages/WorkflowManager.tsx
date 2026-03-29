@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Workflow,
+  Workflow as WorkflowIcon,
   Plus,
   Play,
   Pause,
@@ -127,7 +127,7 @@ const WorkflowManager: React.FC = () => {
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div className="flex items-center gap-3">
-                <Workflow className="w-8 h-8 text-indigo-600" />
+                <WorkflowIcon className="w-8 h-8 text-indigo-600" />
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">Workflow Manager</h1>
                   <p className="text-sm text-gray-500">Automate tasks and processes</p>
