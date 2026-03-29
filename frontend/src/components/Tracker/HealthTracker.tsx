@@ -262,7 +262,7 @@ const HealthTracker: React.FC = () => {
   };
 
   // Cycle regularity and analytics
-  const { cycleLengths, avgCycleLength, regularityScore, symptomFrequency, chartData, moodTrendData } = useMemo(() => {
+  const { cycleLengths, avgCycleLength, regularityScore, symptomFrequency, chartData } = useMemo(() => {
     const periodEntries = cycleData.entries
       .filter(e => e.isPeriod)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -292,10 +292,6 @@ const HealthTracker: React.FC = () => {
       energy: e.energyLevel || 3,
       sleep: e.sleepHours || 0,
       flow: e.flow === 'heavy' ? 4 : e.flow === 'medium' ? 3 : e.flow === 'light' ? 2 : 0
-    }));
-    const moodTrendData = last12Entries.map(e => ({
-      date: format(new Date(e.date), 'MMM d'),
-      value: ['sad', 'neutral', 'happy', 'anxious', 'energetic'].indexOf(e.mood) + 1
     }));
 
     return {
