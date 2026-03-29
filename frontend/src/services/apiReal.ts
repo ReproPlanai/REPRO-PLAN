@@ -214,6 +214,22 @@ class RealAPIService {
     });
   }
 
+  // Tier 3 Authentication - Verify User
+  async verifyUser(secretCode: string) {
+    return apiRequest('/api/users/verify', {
+      method: 'POST',
+      body: JSON.stringify({ secretCode })
+    });
+  }
+
+  // Tier 3 Authentication - Verify Stakeholder
+  async verifyStakeholder(secretCode: string, phoneNumber: string, role: string) {
+    return apiRequest('/api/stakeholders/verify', {
+      method: 'POST',
+      body: JSON.stringify({ secretCode, phoneNumber, role })
+    });
+  }
+
   // Users
   async getUsers() {
     return apiRequest('/api/users');
@@ -680,6 +696,38 @@ class RealAPIService {
   async getOrders(params?: { userId?: string; status?: string; limit?: number; offset?: number }) {
     const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
     return apiRequest(`/api/orders${queryParams}`);
+  }
+
+  // Medication/E-commerce Admin Methods
+  async getMedications() {
+    return apiRequest('/api/products');
+  }
+
+  async createMedication(medData: any) {
+    return apiRequest('/api/products', {
+      method: 'POST',
+      body: JSON.stringify(medData)
+    });
+  }
+
+  async updateMedication(id: string, medData: any) {
+    return apiRequest(`/api/products/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(medData)
+    });
+  }
+
+  async deleteMedication(id: string) {
+    return apiRequest(`/api/products/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async submitReview(review: any) {
+    return apiRequest('/api/reviews', {
+      method: 'POST',
+      body: JSON.stringify(review)
+    });
   }
 
   async getOrder(id: string) {

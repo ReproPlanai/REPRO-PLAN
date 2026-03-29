@@ -13,10 +13,13 @@ import {
   Play,
   Download,
   Smartphone,
-  QrCode
+  QrCode,
+  Sparkles,
+  Lock
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import PWAInstallPrompt from '../components/PWAInstallPrompt';
+import PageContainer from '../components/Layout/PageContainer';
 
 const Home: React.FC = () => {
   const { t } = useTranslation();
@@ -96,168 +99,170 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <div className="w-full h-full bg-gray-50 overflow-x-hidden">
-      
-      <main className="p-4 sm:p-6">
-        <div className="space-y-6">
-          {/* Hero section - Enhanced for mobile */}
-          <div className="bg-gradient-to-br from-primary-600 to-secondary-600 rounded-2xl p-6 sm:p-8 text-white mb-6 sm:mb-8 shadow-xl">
-              <div className="flex items-center space-x-3 sm:space-x-4 mb-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-white/30">
-                  <img 
-                    src={LogoCircular} 
-                    alt="REPRO PLAN Logo" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h2 className="text-xl sm:text-2xl font-bold">REPRO PLAN</h2>
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-primary-50/20"
+    >
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Hero */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600 p-6 sm:p-8 shadow-2xl shadow-primary-500/20 mb-6">
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.05)_100%)]" />
+          <div className="relative flex items-start gap-4">
+            <div className="flex-shrink-0 p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+              <img 
+                src={LogoCircular} 
+                alt="REPRO PLAN" 
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover ring-2 ring-white/30"
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 bg-white/25 rounded-full text-xs font-semibold text-white uppercase tracking-wide">Welcome</span>
+                <Sparkles className="w-3.5 h-3.5 text-white/80" />
               </div>
-            <p className="text-base sm:text-lg opacity-90 mb-6 leading-relaxed">
-              Your anonymous companion for sexual and reproductive health and rights. 
-              Get accurate information, find services, and connect with support - all while maintaining complete privacy.
-            </p>
-            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
-              <div className="flex items-center space-x-2">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="text-sm sm:text-base">100% Anonymous</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="text-sm sm:text-base">Evidence-Based</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span className="text-sm sm:text-base">24/7 Available</span>
-              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">REPRO PLAN</h1>
+              <p className="text-sm text-white/90 leading-relaxed">
+                Your anonymous companion for sexual and reproductive health and rights. Get accurate information, find services, and connect with support.
+              </p>
             </div>
           </div>
+        </div>
 
-          {/* App Download Prompt */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
-            <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Smartphone className="w-6 h-6 text-white" />
+        {/* Features */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+          {[
+            { icon: Lock, title: '100%', desc: 'Anonymous', color: 'from-emerald-500 to-teal-500' },
+            { icon: BookOpen, title: 'Expert', desc: 'Verified Info', color: 'from-blue-500 to-cyan-500' },
+            { icon: Phone, title: '24/7', desc: 'Available', color: 'from-purple-500 to-indigo-500' },
+            { icon: Shield, title: 'Secure', desc: 'Encrypted', color: 'from-amber-500 to-orange-500' }
+          ].map(({ icon: Icon, title, desc, color }) => (
+            <div key={desc} className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/60 shadow-sm">
+              <div className={`p-2 rounded-xl bg-gradient-to-br ${color}`}>
+                <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Get the REPRO PLAN App</h3>
-                <p className="text-gray-600 mb-4 text-sm sm:text-base">
-                  Download our app for the best experience with offline access, push notifications, and enhanced security.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button 
-                    onClick={() => setShowInstallPrompt(true)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center justify-center space-x-2 text-sm font-medium"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>Download App</span>
-                  </button>
-                  <button className="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-sm">
-                    Learn More
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Access - Enhanced mobile grid */}
-          <div className="mb-6 sm:mb-8">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
-              {t('home.quickAccess')}
-            </h3>
-            <div className="mobile-grid">
-              {quickAccessItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className="card hover:shadow-xl transition-all duration-300 group active:scale-98 touch-manipulation"
-                  >
-                    <div className="flex items-start space-x-3 sm:space-x-4">
-                      <div className={`p-3 sm:p-4 rounded-xl ${item.color} group-hover:scale-110 transition-transform duration-200 flex-shrink-0`}>
-                        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className={`font-semibold ${item.textColor} mb-1 text-sm sm:text-base`}>
-                          {item.title}
-                        </h4>
-                        <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-                          {item.description}
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Recent Activity - Enhanced mobile layout */}
-          <div className="mb-6 sm:mb-8">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
-              {t('home.recentActivity')}
-            </h3>
-            <div className="card">
-              {recentActivities.length > 0 ? (
-                <div className="space-y-4 sm:space-y-6">
-                  {recentActivities.map((activity, index) => {
-                    const Icon = activity.icon;
-                    return (
-                      <div key={index} className="flex items-center space-x-3 sm:space-x-4">
-                        <div className="p-2 sm:p-3 bg-gray-100 rounded-lg flex-shrink-0">
-                          <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-gray-900 font-medium text-sm sm:text-base truncate">{activity.text}</p>
-                          <p className="text-gray-500 text-xs sm:text-sm">{activity.time}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-8 sm:py-12">
-                  <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500 text-sm sm:text-base">No recent activity</p>
-                    <p className="text-gray-400 text-xs sm:text-sm">Start exploring REPRO PLAN features</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Privacy Notice - Enhanced mobile layout */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 sm:p-6">
-            <div className="flex items-start space-x-3 sm:space-x-4">
-              <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 mt-1 flex-shrink-0" />
               <div className="min-w-0">
-                <h4 className="font-semibold text-blue-900 mb-2 text-sm sm:text-base">Your Privacy is Protected</h4>
-                  <p className="text-blue-800 text-xs sm:text-sm mb-3 leading-relaxed">
-                    REPRO PLAN uses secret codes to ensure your complete anonymity. No personal information is required or stored. 
-                    Your conversations, health data, and activities remain private and secure.
-                  </p>
-                <ul className="text-blue-700 text-xs sm:text-sm space-y-1">
-                  <li>• No phone numbers or names required</li>
-                  <li>• All data encrypted and stored locally</li>
-                  <li>• Anonymous usage analytics only</li>
-                  <li>• No tracking or profiling</li>
-                </ul>
+                <p className="font-bold text-gray-900 text-sm">{title}</p>
+                <p className="text-xs text-gray-500">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* App Download */}
+        <div className="rounded-2xl bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200/60 p-5 sm:p-6 mb-6">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 p-3 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl">
+              <Smartphone className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-gray-900 mb-1">Get the REPRO PLAN App</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Download for offline access, push notifications, and enhanced security.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button 
+                  onClick={() => setShowInstallPrompt(true)}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </button>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Quick Access */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-primary-600" />
+            {t('home.quickAccess')}
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            {quickAccessItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-gray-200/60 shadow-sm hover:shadow-md hover:border-primary-200 transition-all group"
+                >
+                  <div className={`p-2.5 rounded-xl ${item.color} flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className={`font-semibold ${item.textColor} text-sm mb-0.5`}>
+                      {item.title}
+                    </h4>
+                    <p className="text-gray-500 text-xs leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            {t('home.recentActivity')}
+          </h3>
+          <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-4">
+            {recentActivities.length > 0 ? (
+              <div className="space-y-4">
+                {recentActivities.map((activity, index) => {
+                  const Icon = activity.icon;
+                  return (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="p-2 bg-gray-100 rounded-lg flex-shrink-0">
+                        <Icon className="w-4 h-4 text-gray-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-gray-900 font-medium text-sm truncate">{activity.text}</p>
+                        <p className="text-gray-500 text-xs">{activity.time}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <BookOpen className="w-10 h-10 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 text-sm">No recent activity</p>
+                <p className="text-gray-400 text-xs">Start exploring REPRO PLAN features</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Privacy Notice */}
+        <div className="rounded-2xl bg-blue-50/80 border border-blue-200/60 p-4 sm:p-5">
+          <div className="flex items-start gap-3">
+            <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <h4 className="font-semibold text-blue-900 text-sm">Your Privacy is Protected</h4>
+              <p className="text-blue-800 text-xs mt-1 leading-relaxed">
+                REPRO PLAN uses secret codes to ensure your complete anonymity. No personal information is required or stored.
+              </p>
+            </div>
+          </div>
+        </div>
       </main>
-      
+
       {/* PWA Install Prompt */}
       <PWAInstallPrompt
         isOpen={showInstallPrompt}
         onClose={() => setShowInstallPrompt(false)}
         onInstall={() => {
-          // Handle manual installation instructions
           alert('To install REPRO PLAN as an app:\n\n1. Open this page in your browser\n2. Look for "Add to Home Screen" in your browser menu\n3. Tap "Add" to install the app');
           setShowInstallPrompt(false);
         }}
       />
-    </div>
+    </PageContainer>
   );
 };
 

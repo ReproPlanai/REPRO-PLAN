@@ -12,9 +12,12 @@ import {
   Headphones,
   ExternalLink,
   Bookmark,
-  Share2
+  Share2,
+  Sparkles,
+  Library
 } from 'lucide-react';
 import { apiService } from '../services/api';
+import PageContainer from '../components/Layout/PageContainer';
 
 interface Resource {
   id: string;
@@ -88,33 +91,34 @@ const ResourcesLibrary: React.FC = () => {
   const featuredResources = resources.filter(r => r.isFeatured);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate(-1)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div className="flex items-center gap-3">
-                <BookOpen className="w-8 h-8 text-indigo-600" />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Resources Library</h1>
-                  <p className="text-sm text-gray-500">Educational materials and guides</p>
-                </div>
-              </div>
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-indigo-50/20"
+    >
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Header with back button */}
+        <div className="flex items-center gap-3 mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 bg-white border border-gray-200/60 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-600" />
+          </button>
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl">
+              <Library className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Resources Library</h1>
+              <p className="text-xs sm:text-sm text-gray-500">Educational materials and guides</p>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-red-700">
             <AlertTriangle className="w-5 h-5" />
             {error}
           </div>
@@ -122,19 +126,22 @@ const ResourcesLibrary: React.FC = () => {
 
         {/* Featured Resources */}
         {featuredResources.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Featured Resources</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="mb-6">
+            <h2 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              Featured Resources
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {featuredResources.slice(0, 3).map((resource) => (
-                <div key={resource.id} className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white p-6 rounded-xl shadow-lg">
+                <div key={resource.id} className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white p-5 sm:p-6 rounded-2xl shadow-xl shadow-indigo-500/20">
                   <div className="flex items-start justify-between mb-4">
                     {getTypeIcon(resource.type)}
-                    <Bookmark className="w-5 h-5" />
+                    <Bookmark className="w-5 h-5 text-white/70" />
                   </div>
-                  <h3 className="font-semibold mb-2">{resource.title}</h3>
-                  <p className="text-sm text-indigo-100 line-clamp-2">{resource.description}</p>
-                  <button className="mt-4 text-sm font-medium hover:underline">
-                    View Resource →
+                  <h3 className="font-semibold mb-2 text-sm sm:text-base">{resource.title}</h3>
+                  <p className="text-sm text-indigo-100 line-clamp-2 mb-4">{resource.description}</p>
+                  <button className="text-sm font-medium text-white/90 hover:text-white flex items-center gap-1">
+                    View Resource <span className="text-lg">→</span>
                   </button>
                 </div>
               ))}
@@ -143,8 +150,8 @@ const ResourcesLibrary: React.FC = () => {
         )}
 
         {/* Filters */}
-        <div className="bg-white p-4 rounded-xl shadow-sm border mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
+        <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -152,31 +159,33 @@ const ResourcesLibrary: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search resources..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-            >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>
-                  {cat === 'all' ? 'All Categories' : cat}
-                </option>
-              ))}
-            </select>
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-            >
-              {types.map(type => (
-                <option key={type} value={type}>
-                  {type === 'all' ? 'All Types' : type.charAt(0).toUpperCase() + type.slice(1)}
-                </option>
-              ))}
-            </select>
+            <div className="flex gap-2">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>
+                    {cat === 'all' ? 'All Categories' : cat}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {types.map(type => (
+                  <option key={type} value={type}>
+                    {type === 'all' ? 'All Types' : type.charAt(0).toUpperCase() + type.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -186,20 +195,21 @@ const ResourcesLibrary: React.FC = () => {
             <RefreshCw className="w-8 h-8 animate-spin text-indigo-600" />
           </div>
         ) : filteredResources.length === 0 ? (
-          <div className="text-center py-12">
-            <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <p className="text-gray-500">No resources found</p>
+          <div className="text-center py-12 sm:py-16 bg-white rounded-2xl border border-gray-200/60">
+            <BookOpen className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No resources found</h3>
+            <p className="text-sm text-gray-500">Try adjusting your search or filters</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredResources.map((resource) => (
-              <div key={resource.id} className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow">
-                <div className="p-6">
+              <div key={resource.id} className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden hover:shadow-lg hover:border-indigo-200 transition-all">
+                <div className="p-5">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-gray-100 rounded-lg">
+                    <div className="p-2.5 bg-indigo-50 rounded-xl">
                       {getTypeIcon(resource.type)}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1">
                       <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                         <Bookmark className="w-4 h-4 text-gray-400" />
                       </button>
@@ -209,22 +219,22 @@ const ResourcesLibrary: React.FC = () => {
                     </div>
                   </div>
 
-                  <h3 className="font-semibold text-gray-900 mb-2">{resource.title}</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{resource.title}</h3>
                   <p className="text-sm text-gray-600 mb-4 line-clamp-2">{resource.description}</p>
 
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                    <span className="px-2 py-1 bg-gray-100 rounded-full text-xs">
+                  <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
+                    <span className="px-2.5 py-1 bg-gray-100 rounded-lg text-xs font-medium">
                       {resource.category}
                     </span>
-                    {resource.fileSize && <span>{resource.fileSize}</span>}
-                    {resource.duration && <span>{resource.duration}</span>}
+                    {resource.fileSize && <span className="text-xs">{resource.fileSize}</span>}
+                    {resource.duration && <span className="text-xs">{resource.duration}</span>}
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-xs text-gray-500">
                       {resource.downloadCount} downloads
                     </span>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors">
                       <Download className="w-4 h-4" />
                       Access
                     </button>
@@ -234,8 +244,8 @@ const ResourcesLibrary: React.FC = () => {
             ))}
           </div>
         )}
-      </div>
-    </div>
+      </main>
+    </PageContainer>
   );
 };
 

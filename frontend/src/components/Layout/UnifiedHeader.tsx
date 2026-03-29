@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import {
+  LogOut,
   Home,
   MessageCircle,
   MapPin,
@@ -129,6 +130,12 @@ const UnifiedHeader: React.FC = () => {
     navigate(path);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
   return (
     <>
       <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50 overflow-visible">
@@ -220,6 +227,15 @@ const UnifiedHeader: React.FC = () => {
                             </button>
                           );
                         })}
+                        {menu.title === 'Tools & Settings' && (
+                          <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 touch-manipulation min-h-[48px] text-left text-red-600 hover:bg-red-50"
+                          >
+                            <LogOut className="w-5 h-5 flex-shrink-0" />
+                            <span className="text-sm font-medium">Logout</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
@@ -268,6 +284,15 @@ const UnifiedHeader: React.FC = () => {
                       </button>
                     );
                   })}
+                  {menu.title === 'Tools & Settings' && (
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 text-left text-red-600 hover:bg-red-50"
+                    >
+                      <LogOut className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-sm font-medium">Logout</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );

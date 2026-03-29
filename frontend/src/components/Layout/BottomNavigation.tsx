@@ -1,9 +1,11 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Home, MapPin, Shield, MessageCircle } from 'lucide-react';
+import { Home, MapPin, Shield, MessageCircle, Heart, ShoppingBag } from 'lucide-react';
 
 const navItems = [
   { path: '/', icon: Home, label: 'Home' },
+  { path: '/daily-safety-check', icon: Heart, label: 'Safety' },
+  { path: '/medication-order', icon: ShoppingBag, label: 'Shop' },
   { path: '/clinics', icon: MapPin, label: 'Clinics' },
   { path: '/emergency', icon: Shield, label: 'Emergency' },
   { path: '/chatbot', icon: MessageCircle, label: 'Chat' },

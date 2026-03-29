@@ -34,7 +34,11 @@ import {
   BellRing,
   MessageSquarePlus,
   Book,
-  UserCheck
+  UserCheck,
+  ShoppingCart,
+  Pill,
+  Store,
+  PlusCircle
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
@@ -300,6 +304,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'verification', label: 'Verification Requests', icon: UserCheck },
+    { id: 'ecommerce', label: 'E-Commerce', icon: Store },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp },
     { id: 'operations', label: 'Operations', icon: ClipboardList },
     { id: 'training', label: 'Training', icon: CheckCircle },
@@ -335,13 +340,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile-First Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+      {/* Modern Header */}
+      <div className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/60 sticky top-0 z-40">
         <div className="px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex items-center justify-center shadow-md ring-2 ring-blue-100">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden flex items-center justify-center shadow-md ring-2 ring-blue-100 bg-gradient-to-br from-blue-500 to-cyan-500">
                 <img 
                   src={LogoCircular} 
                   alt="REPRO PLAN Logo" 
@@ -349,23 +354,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                 />
               </div>
               <div className="min-w-0 flex-1 flex flex-col leading-[1]">
-                <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">Admin Dashboard</h1>
-                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block -mt-2 leading-none">System Administration Portal</p>
+                <h1 className="text-base sm:text-lg font-bold text-gray-900 truncate">Admin Dashboard</h1>
+                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block -mt-2 leading-none">System Administration Portal</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-2 sm:space-x-4">
               <button
                 onClick={() => setIsMenuOpen(true)}
-                className="lg:hidden p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                className="lg:hidden p-2 text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-100 transition-colors"
                 aria-label="Open menu"
               >
                 <Menu size={18} />
               </button>
-              <button className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 relative">
+              <button className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 relative rounded-xl hover:bg-gray-100 transition-colors">
                 <Bell size={18} className="sm:w-5 sm:h-5" />
                 {recentAlerts.filter(alert => alert.status === 'active').length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full"></span>
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse"></span>
                 )}
               </button>
             </div>
@@ -428,7 +433,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
         )}
 
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block w-56 xl:w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+        <div className="hidden lg:block w-56 xl:w-64 bg-white/80 backdrop-blur-sm shadow-sm border-r border-gray-200/60 min-h-screen">
           <nav className="p-4 space-y-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -436,10 +441,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     activeTab === tab.id
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md'
+                      : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700'
                   }`}
                 >
                   <Icon size={18} />
@@ -459,44 +464,52 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                 <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">System Overview</h2>
                 
                 {/* Stats Cards - Mobile Responsive */}
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
-                  <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm text-gray-600 truncate">Total Users</p>
-                        <p className="text-lg sm:text-2xl font-semibold text-gray-900">{dashboardData.totalUsers.toLocaleString()}</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Total Users</p>
+                        <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{dashboardData.totalUsers.toLocaleString()}</p>
                       </div>
-                      <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 flex-shrink-0" />
+                      <div className="p-2.5 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex-shrink-0">
+                        <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm text-gray-600 truncate">Active Users</p>
-                        <p className="text-lg sm:text-2xl font-semibold text-gray-900">{dashboardData.activeUsers.toLocaleString()}</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Active Users</p>
+                        <p className="text-xl sm:text-2xl font-bold text-green-600 mt-1">{dashboardData.activeUsers.toLocaleString()}</p>
                       </div>
-                      <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-green-500 flex-shrink-0" />
+                      <div className="p-2.5 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex-shrink-0">
+                        <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm text-gray-600 truncate">Emergency Alerts</p>
-                        <p className="text-lg sm:text-2xl font-semibold text-gray-900">{dashboardData.emergencyAlerts}</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Emergency Alerts</p>
+                        <p className="text-xl sm:text-2xl font-bold text-red-600 mt-1">{dashboardData.emergencyAlerts}</p>
                       </div>
-                      <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500 flex-shrink-0" />
+                      <div className="p-2.5 bg-gradient-to-br from-red-100 to-red-200 rounded-xl flex-shrink-0">
+                        <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm text-gray-600 truncate">System Health</p>
-                        <p className="text-lg sm:text-2xl font-semibold text-gray-900">{dashboardData.systemHealth}%</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">System Health</p>
+                        <p className="text-xl sm:text-2xl font-bold text-green-600 mt-1">{dashboardData.systemHealth}%</p>
                       </div>
-                      <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-500 flex-shrink-0" />
+                      <div className="p-2.5 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex-shrink-0">
+                        <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -973,6 +986,149 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                     </div>
                   );
                 })()}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'ecommerce' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                    <Store className="w-6 h-6 text-primary-600" />
+                    E-Commerce Management
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1">Manage products, orders, and pharmacy inventory</p>
+                </div>
+                <div className="flex gap-3">
+                  <button 
+                    onClick={() => window.open('/medication-order', '_blank')}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 transition-all shadow-sm"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    Open Store
+                  </button>
+                </div>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Total Products</p>
+                      <p className="text-2xl font-bold text-gray-900 mt-1">-</p>
+                    </div>
+                    <div className="p-2.5 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl">
+                      <Pill className="w-6 h-6 text-blue-600" />
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Orders Today</p>
+                      <p className="text-2xl font-bold text-green-600 mt-1">-</p>
+                    </div>
+                    <div className="p-2.5 bg-gradient-to-br from-green-100 to-green-200 rounded-xl">
+                      <ShoppingCart className="w-6 h-6 text-green-600" />
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Revenue</p>
+                      <p className="text-2xl font-bold text-purple-600 mt-1">-</p>
+                    </div>
+                    <div className="p-2.5 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl">
+                      <DollarSign className="w-6 h-6 text-purple-600" />
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Low Stock Items</p>
+                      <p className="text-2xl font-bold text-amber-600 mt-1">-</p>
+                    </div>
+                    <div className="p-2.5 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">
+                      <Package className="w-6 h-6 text-amber-600" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200/60 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <button 
+                    onClick={() => window.open('/medication-order', '_blank')}
+                    className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 hover:border-primary-300 hover:bg-primary-50/50 transition-all text-left"
+                  >
+                    <div className="p-2 bg-primary-100 rounded-lg">
+                      <PlusCircle className="w-5 h-5 text-primary-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Add Product</p>
+                      <p className="text-sm text-gray-500">Create new medication listing</p>
+                    </div>
+                  </button>
+                  <button 
+                    className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 hover:border-primary-300 hover:bg-primary-50/50 transition-all text-left"
+                  >
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <ClipboardList className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">View Orders</p>
+                      <p className="text-sm text-gray-500">Manage pending orders</p>
+                    </div>
+                  </button>
+                  <button 
+                    className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 hover:border-primary-300 hover:bg-primary-50/50 transition-all text-left"
+                  >
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <Truck className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Pharmacies</p>
+                      <p className="text-sm text-gray-500">Manage pharmacy partners</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Info Banner */}
+              <div className="rounded-2xl bg-gradient-to-r from-primary-50 to-purple-50 border border-primary-200/50 p-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-white rounded-xl shadow-sm">
+                    <Pill className="w-6 h-6 text-primary-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Full Store Management</h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Access the complete medication ordering system to manage products, process orders, 
+                      and configure pharmacy partnerships. The store supports anonymous youth access with 
+                      privacy-preserving features.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-3 py-1 bg-white rounded-full text-xs font-medium text-primary-700 border border-primary-200">
+                        Anonymous Access
+                      </span>
+                      <span className="px-3 py-1 bg-white rounded-full text-xs font-medium text-primary-700 border border-primary-200">
+                        Offline Support
+                      </span>
+                      <span className="px-3 py-1 bg-white rounded-full text-xs font-medium text-primary-700 border border-primary-200">
+                        Privacy Protected
+                      </span>
+                      <span className="px-3 py-1 bg-white rounded-full text-xs font-medium text-primary-700 border border-primary-200">
+                        Tier 3 Security
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}

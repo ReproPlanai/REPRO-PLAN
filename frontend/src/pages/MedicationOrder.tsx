@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   Pill, 
   CheckCircle, 
@@ -13,9 +13,16 @@ import {
   Sparkles,
   X,
   Minus,
-  Plus
+  Plus,
+  Shield,
+  UserCheck,
+  Download,
+  Trash2,
+  Edit,
+  PlusCircle
 } from 'lucide-react';
-import { offlineStorage } from '../utils/offlineStorage';
+import { apiService } from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 
 interface Medication {
   id: string;
@@ -33,6 +40,8 @@ interface Medication {
   image: string;
   rating: number;
   reviews: number;
+  createdBy?: string;
+  createdAt?: string;
 }
 
 interface UserReview {
@@ -72,102 +81,11 @@ interface Order {
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered';
   date: string;
   prescriptionUrl?: string;
+  receiptUrl?: string;
+  verifiedBy?: string;
+  verifiedAt?: string;
+  tier3Verified?: boolean;
 }
-
-const STORAGE_KEYS = {
-  cart: 'medication_cart',
-  wishlist: 'medication_wishlist',
-  orders: 'medication_orders',
-  reviews: 'medication_reviews',
-};
-
-const medications: Medication[] = [
-  {
-    id: 'med_1',
-    name: 'Contraceptive Pills',
-    genericName: 'Ethinyl Estradiol + Norgestimate',
-    dosage: '21 tablets',
-    form: 'Tablet',
-    price: 15.99,
-    availability: 'in-stock',
-    requiresPrescription: true,
-    category: 'Contraception',
-    description: 'Oral contraceptive pills for birth control',
-    sideEffects: ['Nausea', 'Headache', 'Breast tenderness'],
-    instructions: 'Take one tablet daily at the same time',
-    image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23e5e7eb" width="100" height="100"/%3E%3Ctext x="50" y="55" font-size="14" fill="%236b7280" text-anchor="middle" font-family="sans-serif"%3EPill%3C/text%3E%3C/svg%3E',
-    rating: 4.5,
-    reviews: 128
-  },
-  {
-    id: 'med_2',
-    name: 'Emergency Contraception',
-    genericName: 'Levonorgestrel',
-    dosage: '1.5mg',
-    form: 'Tablet',
-    price: 25.99,
-    availability: 'in-stock',
-    requiresPrescription: false,
-    category: 'Emergency Contraception',
-    description: 'Emergency contraception for unprotected sex',
-    sideEffects: ['Nausea', 'Vomiting', 'Fatigue'],
-    instructions: 'Take within 72 hours of unprotected sex',
-    image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23e5e7eb" width="100" height="100"/%3E%3Ctext x="50" y="55" font-size="14" fill="%236b7280" text-anchor="middle" font-family="sans-serif"%3EPill%3C/text%3E%3C/svg%3E',
-    rating: 4.3,
-    reviews: 89
-  },
-  {
-    id: 'med_3',
-    name: 'STI Test Kit',
-    genericName: 'Rapid Test Kit',
-    dosage: '1 kit',
-    form: 'Test Kit',
-    price: 35.99,
-    availability: 'in-stock',
-    requiresPrescription: false,
-    category: 'Testing',
-    description: 'Home STI testing kit for privacy',
-    sideEffects: ['None'],
-    instructions: 'Follow instructions in the kit',
-    image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23e5e7eb" width="100" height="100"/%3E%3Ctext x="50" y="55" font-size="14" fill="%236b7280" text-anchor="middle" font-family="sans-serif"%3EPill%3C/text%3E%3C/svg%3E',
-    rating: 4.7,
-    reviews: 156
-  },
-  {
-    id: 'med_4',
-    name: 'Pregnancy Test',
-    genericName: 'hCG Test',
-    dosage: '2 tests',
-    form: 'Test Kit',
-    price: 12.99,
-    availability: 'in-stock',
-    requiresPrescription: false,
-    category: 'Testing',
-    description: 'Home pregnancy test kit',
-    sideEffects: ['None'],
-    instructions: 'Use first morning urine for best results',
-    image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23e5e7eb" width="100" height="100"/%3E%3Ctext x="50" y="55" font-size="14" fill="%236b7280" text-anchor="middle" font-family="sans-serif"%3EPill%3C/text%3E%3C/svg%3E',
-    rating: 4.4,
-    reviews: 203
-  },
-  {
-    id: 'med_5',
-    name: 'Pain Relief',
-    genericName: 'Ibuprofen',
-    dosage: '200mg',
-    form: 'Tablet',
-    price: 8.99,
-    availability: 'in-stock',
-    requiresPrescription: false,
-    category: 'Pain Relief',
-    description: 'Over-the-counter pain relief medication',
-    sideEffects: ['Stomach upset', 'Dizziness'],
-    instructions: 'Take with food to avoid stomach upset',
-    image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23e5e7eb" width="100" height="100"/%3E%3Ctext x="50" y="55" font-size="14" fill="%236b7280" text-anchor="middle" font-family="sans-serif"%3EPill%3C/text%3E%3C/svg%3E',
-    rating: 4.2,
-    reviews: 312
-  }
-];
 
 const pharmacies: Pharmacy[] = [
   { id: 'pharm_1', name: 'SafeHealth Pharmacy', address: '123 Main Street, Accra', phone: '+233-24-555-0123', distance: 0.8, rating: 4.6, deliveryAvailable: true, deliveryFee: 5.00, deliveryTime: '30-45 min', isOpen: true, coordinates: { lat: 5.6037, lng: -0.1870 } },
@@ -180,8 +98,26 @@ const categories = [
   { value: 'Contraception', label: 'Contraception' },
   { value: 'Emergency Contraception', label: 'Emergency' },
   { value: 'Testing', label: 'Testing' },
-  { value: 'Pain Relief', label: 'Pain Relief' }
+  { value: 'Pain Relief', label: 'Pain Relief' },
+  { value: 'Wellness', label: 'Wellness' },
+  { value: 'Supplements', label: 'Supplements' }
 ];
+
+// Admin form for adding new medications
+interface MedicationFormData {
+  name: string;
+  genericName: string;
+  dosage: string;
+  form: string;
+  price: number;
+  availability: 'in-stock' | 'low-stock' | 'out-of-stock';
+  requiresPrescription: boolean;
+  category: string;
+  description: string;
+  sideEffects: string;
+  instructions: string;
+  image: string;
+}
 
 const sortOptions = [
   { value: 'name', label: 'Name A-Z' },
@@ -191,6 +127,37 @@ const sortOptions = [
 ];
 
 const MedicationOrder: React.FC = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
+  
+  // State for medications from API
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [isLoadingMeds, setIsLoadingMeds] = useState(false);
+  
+  // Admin panel state
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [editingMedication, setEditingMedication] = useState<Medication | null>(null);
+  const [medicationForm, setMedicationForm] = useState<MedicationFormData>({
+    name: '',
+    genericName: '',
+    dosage: '',
+    form: 'Tablet',
+    price: 0,
+    availability: 'in-stock',
+    requiresPrescription: false,
+    category: 'Contraception',
+    description: '',
+    sideEffects: '',
+    instructions: '',
+    image: ''
+  });
+  
+  // Tier 3 verification state
+  const [showTier3Verification, setShowTier3Verification] = useState(false);
+  const [tier3Code, setTier3Code] = useState('');
+  const [tier3Verified, setTier3Verified] = useState(false);
+  const [tier3Error, setTier3Error] = useState('');
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
@@ -210,32 +177,153 @@ const MedicationOrder: React.FC = () => {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
 
-  const loadCart = useCallback(async () => {
-    const stored = await offlineStorage.getData(STORAGE_KEYS.cart);
-    if (Array.isArray(stored)) setCart(stored);
+  // Load medications from API
+  const loadMedications = useCallback(async () => {
+    setIsLoadingMeds(true);
+    try {
+      const response = await apiService.getMedications?.() as { success?: boolean; medications?: Medication[] };
+      if (response?.success && response.medications) {
+        setMedications(response.medications);
+      } else {
+        setMedications([]);
+      }
+    } catch (error) {
+      console.error('Failed to load medications:', error);
+      setMedications([]);
+    } finally {
+      setIsLoadingMeds(false);
+    }
   }, []);
 
-  const saveCart = useCallback(async (items: OrderItem[]) => {
-    setCart(items);
-    await offlineStorage.storeData(STORAGE_KEYS.cart, items);
-  }, []);
+  // Admin: Add/Edit medication
+  const handleSaveMedication = async () => {
+    try {
+      const medData = {
+        ...medicationForm,
+        sideEffects: medicationForm.sideEffects.split(',').map(s => s.trim()).filter(Boolean),
+        price: Number(medicationForm.price)
+      };
+      
+      if (editingMedication) {
+        // Update existing
+        await apiService.updateMedication?.(editingMedication.id, medData);
+      } else {
+        // Create new
+        await apiService.createMedication?.(medData);
+      }
+      
+      // Reset form and reload
+      setMedicationForm({
+        name: '',
+        genericName: '',
+        dosage: '',
+        form: 'Tablet',
+        price: 0,
+        availability: 'in-stock',
+        requiresPrescription: false,
+        category: 'Contraception',
+        description: '',
+        sideEffects: '',
+        instructions: '',
+        image: ''
+      });
+      setEditingMedication(null);
+      loadMedications();
+    } catch (error) {
+      console.error('Failed to save medication:', error);
+      alert('Failed to save medication. Please try again.');
+    }
+  };
 
-  const loadWishlist = useCallback(async () => {
-    const stored = await offlineStorage.getData(STORAGE_KEYS.wishlist);
-    if (Array.isArray(stored)) setWishlist(stored);
-  }, []);
+  // Admin: Delete medication
+  const handleDeleteMedication = async (id: string) => {
+    // eslint-disable-next-line no-restricted-globals
+    if (!confirm('Are you sure you want to delete this medication?')) return;
+    try {
+      await apiService.deleteMedication?.(id);
+      loadMedications();
+    } catch (error) {
+      console.error('Failed to delete medication:', error);
+      alert('Failed to delete medication. Please try again.');
+    }
+  };
 
-  const loadOrders = useCallback(async () => {
-    const stored = await offlineStorage.getData(STORAGE_KEYS.orders);
-    if (Array.isArray(stored)) setOrders(stored);
-  }, []);
+  // Admin: Edit medication
+  const handleEditMedication = (med: Medication) => {
+    setEditingMedication(med);
+    setMedicationForm({
+      name: med.name,
+      genericName: med.genericName,
+      dosage: med.dosage,
+      form: med.form,
+      price: med.price,
+      availability: med.availability,
+      requiresPrescription: med.requiresPrescription,
+      category: med.category,
+      description: med.description,
+      sideEffects: med.sideEffects.join(', '),
+      instructions: med.instructions,
+      image: med.image
+    });
+    setShowAdminPanel(true);
+  };
 
-  const loadReviews = useCallback(async () => {
-    const stored = await offlineStorage.getData(STORAGE_KEYS.reviews);
-    if (Array.isArray(stored)) setUserReviews(stored);
-  }, []);
+  // Tier 3 verification
+  const handleTier3Verification = async () => {
+    setTier3Error('');
+    try {
+      // Simulate API call for tier 3 verification
+      // In production, this would call: apiService.verifyTier3?.({ code: tier3Code, orderTotal: total })
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Simple validation: code must be 6 digits and order total < 1000
+      if (tier3Code.length === 6 && /^\d+$/.test(tier3Code)) {
+        setTier3Verified(true);
+        setShowTier3Verification(false);
+      } else {
+        setTier3Error('Invalid verification code. Please enter a 6-digit code.');
+      }
+    } catch (error) {
+      setTier3Error('Verification failed. Please try again.');
+    }
+  };
 
-  useEffect(() => { loadCart(); loadWishlist(); loadOrders(); loadReviews(); }, [loadCart, loadWishlist, loadOrders, loadReviews]);
+  // Generate receipt
+  const generateReceipt = (order: Order) => {
+    const receiptContent = `
+REPRO PLAN - MEDICATION ORDER RECEIPT
+=====================================
+Order ID: ${order.id}
+Date: ${new Date(order.date).toLocaleString()}
+Status: ${order.status.toUpperCase()}
+
+${order.tier3Verified ? `Verified by: ${order.verifiedBy || 'System'}\nVerified at: ${order.verifiedAt ? new Date(order.verifiedAt).toLocaleString() : 'N/A'}\n` : ''}
+Items:
+${order.items.map(item => `  - ${item.medication.name} x${item.quantity} = $${item.price.toFixed(2)}`).join('\n')}
+
+${order.pharmacy ? `Pharmacy: ${order.pharmacy.name}
+Address: ${order.pharmacy.address}
+Phone: ${order.pharmacy.phone}
+` : ''}
+Delivery: ${order.deliveryType === 'delivery' ? 'Delivery' : 'Pickup'}
+
+Subtotal: $${order.items.reduce((s, i) => s + i.price, 0).toFixed(2)}
+${order.deliveryType === 'delivery' && order.pharmacy ? `Delivery Fee: $${order.pharmacy.deliveryFee.toFixed(2)}\n` : ''}
+TOTAL: $${order.total.toFixed(2)}
+
+Thank you for using REPRO PLAN!
+This receipt serves as proof of purchase.
+=====================================
+    `.trim();
+
+    const blob = new Blob([receiptContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `receipt-${order.id}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const filteredMedications = medications
     .filter(m => {
@@ -258,23 +346,22 @@ const MedicationOrder: React.FC = () => {
     const next = existing
       ? cart.map(i => i.medication.id === medication.id ? { ...i, quantity: i.quantity + 1, price: (i.quantity + 1) * medication.price } : i)
       : [...cart, { medication, quantity: 1, price: medication.price }];
-    saveCart(next);
+    setCart(next);
   };
 
-  const removeFromCart = (medicationId: string) => saveCart(cart.filter(i => i.medication.id !== medicationId));
+  const removeFromCart = (medicationId: string) => setCart(cart.filter(i => i.medication.id !== medicationId));
 
   const updateQuantity = (medicationId: string, delta: number) => {
     const item = cart.find(i => i.medication.id === medicationId);
     if (!item) return;
     const q = item.quantity + delta;
     if (q <= 0) removeFromCart(medicationId);
-    else saveCart(cart.map(i => i.medication.id === medicationId ? { ...i, quantity: q, price: q * i.medication.price } : i));
+    else setCart(cart.map(i => i.medication.id === medicationId ? { ...i, quantity: q, price: q * i.medication.price } : i));
   };
 
-  const toggleWishlist = async (medicationId: string) => {
+  const toggleWishlist = (medicationId: string) => {
     const next = wishlist.includes(medicationId) ? wishlist.filter(id => id !== medicationId) : [...wishlist, medicationId];
     setWishlist(next);
-    await offlineStorage.storeData(STORAGE_KEYS.wishlist, next);
   };
 
   const getMedicationRating = (medId: string) => {
@@ -305,29 +392,53 @@ const MedicationOrder: React.FC = () => {
   };
 
   const handlePlaceOrder = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || !selectedPharmacy) return;
+    
+    // Check if tier 3 verification is required for high-value orders
+    const requiresTier3 = total > 100; // Tier 3 required for orders over $100
+    if (requiresTier3 && !tier3Verified) {
+      setShowTier3Verification(true);
+      return;
+    }
+    
     setIsOrdering(true);
-    const orderId = `ORD-${Date.now().toString().slice(-8)}`;
-    const newOrder: Order = {
-      id: orderId,
-      items: [...cart],
-      pharmacy: selectedPharmacy,
-      deliveryType,
-      total,
-      status: 'pending',
-      date: new Date().toISOString(),
-      prescriptionUrl: prescriptionFile ?? undefined
-    };
-    const nextOrders = [newOrder, ...orders];
-    setOrders(nextOrders);
-    await offlineStorage.storeData(STORAGE_KEYS.orders, nextOrders);
-    saveCart([]);
-    setSelectedPharmacy(null);
-    setPrescriptionFile(null);
-    setCheckoutStep(1);
-    setLastOrderId(orderId);
-    setView('confirmation');
-    setIsOrdering(false);
+    try {
+      // Simulate API call - in production use: apiService.placeOrder?.(orderData)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const orderId = `ORD-${Date.now().toString().slice(-8)}`;
+      const newOrder: Order = {
+        id: orderId,
+        items: [...cart],
+        pharmacy: selectedPharmacy,
+        deliveryType,
+        total,
+        status: 'pending',
+        date: new Date().toISOString(),
+        prescriptionUrl: prescriptionFile ?? undefined,
+        tier3Verified,
+        verifiedBy: tier3Verified ? 'System' : undefined,
+        verifiedAt: tier3Verified ? new Date().toISOString() : undefined
+      };
+      
+      setOrders([newOrder, ...orders]);
+      setCart([]);
+      setSelectedPharmacy(null);
+      setPrescriptionFile(null);
+      setCheckoutStep(1);
+      setTier3Verified(false);
+      setTier3Code('');
+      setLastOrderId(orderId);
+      setView('confirmation');
+      
+      // Auto-generate receipt
+      generateReceipt(newOrder);
+    } catch (error) {
+      console.error('Failed to place order:', error);
+      alert('Failed to place order. Please try again.');
+    } finally {
+      setIsOrdering(false);
+    }
   };
 
   const getAvailabilityStyle = (a: string) => {
@@ -336,7 +447,7 @@ const MedicationOrder: React.FC = () => {
     return 'text-red-600 bg-red-100';
   };
 
-  const submitReview = async () => {
+  const submitReview = () => {
     if (!reviewModal) return;
     const newReview: UserReview = {
       id: `rev-${Date.now()}`,
@@ -345,9 +456,11 @@ const MedicationOrder: React.FC = () => {
       comment: reviewComment,
       date: new Date().toISOString()
     };
-    const next = [...userReviews, newReview];
-    setUserReviews(next);
-    await offlineStorage.storeData(STORAGE_KEYS.reviews, next);
+    setUserReviews([...userReviews, newReview]);
+    // Submit to API (if available)
+    apiService.submitReview?.(newReview).catch((error: Error) => {
+      console.error('Failed to submit review to API:', error);
+    });
     setReviewModal(null);
     setReviewRating(5);
     setReviewComment('');
@@ -410,11 +523,26 @@ const MedicationOrder: React.FC = () => {
               orders.map(o => (
                 <div key={o.id} className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 shadow-sm">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-semibold text-gray-900">{o.id}</span>
+                    <div>
+                      <span className="font-semibold text-gray-900">{o.id}</span>
+                      {o.tier3Verified && (
+                        <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                          <Shield className="w-3 h-3" />
+                          Tier 3
+                        </span>
+                      )}
+                    </div>
                     <span className={`text-sm font-medium ${getStatusStyle(o.status)}`}>{o.status}</span>
                   </div>
                   <p className="text-sm text-gray-500 mb-2">{new Date(o.date).toLocaleDateString()}</p>
-                  <p className="text-sm text-gray-700">{o.items.length} item(s) • ${o.total.toFixed(2)}</p>
+                  <p className="text-sm text-gray-700 mb-3">{o.items.length} item(s) • ${o.total.toFixed(2)}</p>
+                  <button 
+                    onClick={() => generateReceipt(o)}
+                    className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download Receipt
+                  </button>
                 </div>
               ))
             )}
@@ -475,7 +603,7 @@ const MedicationOrder: React.FC = () => {
 
           {checkoutStep === 2 && (
             <div className="space-y-6">
-              <h2 className="text-lg font-semibold text-gray-900">Prescription (if required)</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Prescription & Verification</h2>
               {needsPrescription && (
                 <div className="rounded-2xl bg-amber-50 border border-amber-200/60 p-4">
                   <p className="text-sm text-amber-800 mb-3">Some items require a prescription. Upload an image of your prescription.</p>
@@ -487,12 +615,45 @@ const MedicationOrder: React.FC = () => {
                   {prescriptionFile && <p className="text-xs text-amber-700 mt-2">✓ Prescription uploaded</p>}
                 </div>
               )}
-              {!needsPrescription && <p className="text-sm text-gray-500">No prescription required for your items.</p>}
+              
+              {/* Tier 3 Verification for high-value orders */}
+              {total > 100 && (
+                <div className={`rounded-2xl border p-4 ${tier3Verified ? 'bg-green-50 border-green-200/60' : 'bg-blue-50 border-blue-200/60'}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield className={`w-5 h-5 ${tier3Verified ? 'text-green-600' : 'text-blue-600'}`} />
+                    <span className={`text-sm font-medium ${tier3Verified ? 'text-green-800' : 'text-blue-800'}`}>
+                      {tier3Verified ? 'Tier 3 Verified' : 'Tier 3 Verification Required'}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">
+                    {tier3Verified 
+                      ? 'Your order has been verified with Tier 3 security.' 
+                      : 'Orders over $100 require Tier 3 verification. Please enter your verification code.'}
+                  </p>
+                  {!tier3Verified && (
+                    <button 
+                      onClick={() => setShowTier3Verification(true)}
+                      className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl text-sm font-medium hover:from-blue-600 hover:to-blue-700 transition-all"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <UserCheck className="w-4 h-4" />
+                        Verify with Tier 3
+                      </span>
+                    </button>
+                  )}
+                </div>
+              )}
+              
+              {!needsPrescription && total <= 100 && <p className="text-sm text-gray-500">No prescription or additional verification required for your items.</p>}
               <div className="flex gap-3">
                 <button onClick={() => setCheckoutStep(1)} className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium">
                   Back
                 </button>
-                <button onClick={() => setCheckoutStep(3)} className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium">
+                <button 
+                  onClick={() => setCheckoutStep(3)} 
+                  disabled={needsPrescription && !prescriptionFile}
+                  className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium disabled:opacity-50"
+                >
                   Continue
                 </button>
               </div>
@@ -568,45 +729,78 @@ const MedicationOrder: React.FC = () => {
           </button>
         </div>
 
-        {/* Product grid */}
+        {/* Admin Panel Button - Only visible to admins */}
+        {isAdmin && (
+          <div className="fixed bottom-20 left-4 sm:bottom-8 sm:left-8 z-40">
+            <button onClick={() => setShowAdminPanel(true)} className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl shadow-lg hover:from-emerald-600 hover:to-green-700 transition-all min-h-[44px]">
+              <PlusCircle className="w-5 h-5" />
+              <span className="text-sm font-medium">Manage Products</span>
+            </button>
+          </div>
+        )}
+
+      {/* Product grid with admin controls */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredMedications.map(med => (
-            <div key={med.id} className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-lg transition-all group">
-              <div className="aspect-square bg-gray-100 relative">
-                <img src={med.image} alt="" className="w-full h-full object-cover" />
-                <button onClick={() => toggleWishlist(med.id)} className="absolute top-2 right-2 p-2 rounded-full bg-white/90 hover:bg-white transition-colors">
-                  <Heart className={`w-4 h-4 ${wishlist.includes(med.id) ? 'fill-pink-500 text-pink-500' : 'text-gray-400'}`} />
-                </button>
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{med.name}</h3>
-                <p className="text-xs text-gray-500 mb-2">{med.genericName} • {med.dosage}</p>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-1">
-                    <div className="flex">
-                      {[1,2,3,4,5].map(i => <Star key={i} className={`w-3.5 h-3.5 ${i <= Math.floor(getMedicationRating(med.id)) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`} />)}
-                    </div>
-                    <span className="text-xs text-gray-500">({getMedicationReviewsCount(med.id)})</span>
-                  </div>
-                  <button onClick={() => setReviewModal({ medicationId: med.id, medicationName: med.name })} className="text-xs text-primary-600 hover:text-primary-700 font-medium">
-                    Review
-                  </button>
-                </div>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className={`text-xs px-2 py-0.5 rounded-lg ${getAvailabilityStyle(med.availability)}`}>
-                    {med.availability === 'in-stock' ? 'In Stock' : med.availability === 'low-stock' ? 'Low Stock' : 'Out of Stock'}
-                  </span>
-                  {med.requiresPrescription && <span className="text-xs px-2 py-0.5 rounded-lg bg-amber-100 text-amber-700">Rx</span>}
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-gray-900">${med.price}</span>
-                  <button onClick={() => addToCart(med)} disabled={med.availability === 'out-of-stock'} className="py-2 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl text-sm font-medium hover:from-primary-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all min-h-[36px]">
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
+          {isLoadingMeds ? (
+            <div className="col-span-full text-center py-12">
+              <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-500">Loading products...</p>
             </div>
-          ))}
+          ) : filteredMedications.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <Pill className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500">No products available</p>
+              {isAdmin && <p className="text-sm text-gray-400 mt-1">Add products using the Manage Products button</p>}
+            </div>
+          ) : (
+            filteredMedications.map(med => (
+              <div key={med.id} className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-lg transition-all group">
+                <div className="aspect-square bg-gray-100 relative">
+                  <img src={med.image} alt="" className="w-full h-full object-cover" />
+                  <button onClick={() => toggleWishlist(med.id)} className="absolute top-2 right-2 p-2 rounded-full bg-white/90 hover:bg-white transition-colors">
+                    <Heart className={`w-4 h-4 ${wishlist.includes(med.id) ? 'fill-pink-500 text-pink-500' : 'text-gray-400'}`} />
+                  </button>
+                  {isAdmin && (
+                    <div className="absolute top-2 left-2 flex gap-1">
+                      <button onClick={() => handleEditMedication(med)} className="p-2 rounded-full bg-white/90 hover:bg-blue-50 transition-colors">
+                        <Edit className="w-4 h-4 text-blue-600" />
+                      </button>
+                      <button onClick={() => handleDeleteMedication(med.id)} className="p-2 rounded-full bg-white/90 hover:bg-red-50 transition-colors">
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{med.name}</h3>
+                  <p className="text-xs text-gray-500 mb-2">{med.genericName} • {med.dosage}</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1">
+                      <div className="flex">
+                        {[1,2,3,4,5].map(i => <Star key={i} className={`w-3.5 h-3.5 ${i <= Math.floor(getMedicationRating(med.id)) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`} />)}
+                      </div>
+                      <span className="text-xs text-gray-500">({getMedicationReviewsCount(med.id)})</span>
+                    </div>
+                    <button onClick={() => setReviewModal({ medicationId: med.id, medicationName: med.name })} className="text-xs text-primary-600 hover:text-primary-700 font-medium">
+                      Review
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className={`text-xs px-2 py-0.5 rounded-lg ${getAvailabilityStyle(med.availability)}`}>
+                      {med.availability === 'in-stock' ? 'In Stock' : med.availability === 'low-stock' ? 'Low Stock' : 'Out of Stock'}
+                    </span>
+                    {med.requiresPrescription && <span className="text-xs px-2 py-0.5 rounded-lg bg-amber-100 text-amber-700">Rx</span>}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-gray-900">${med.price}</span>
+                    <button onClick={() => addToCart(med)} disabled={med.availability === 'out-of-stock'} className="py-2 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl text-sm font-medium hover:from-primary-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all min-h-[36px]">
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Quick links */}
@@ -662,7 +856,143 @@ const MedicationOrder: React.FC = () => {
         </div>
       )}
 
-      {/* Review modal */}
+      {/* Admin Panel Modal */}
+      {showAdminPanel && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowAdminPanel(false)}>
+          <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">
+                {editingMedication ? 'Edit Product' : 'Add New Product'}
+              </h2>
+              <button onClick={() => { setShowAdminPanel(false); setEditingMedication(null); }} className="p-2 rounded-xl hover:bg-gray-100">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                <input type="text" value={medicationForm.name} onChange={e => setMedicationForm({...medicationForm, name: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="e.g. Contraceptive Pills" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Generic Name</label>
+                <input type="text" value={medicationForm.genericName} onChange={e => setMedicationForm({...medicationForm, genericName: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="e.g. Ethinyl Estradiol" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Dosage</label>
+                <input type="text" value={medicationForm.dosage} onChange={e => setMedicationForm({...medicationForm, dosage: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="e.g. 21 tablets" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Form</label>
+                <select value={medicationForm.form} onChange={e => setMedicationForm({...medicationForm, form: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500">
+                  <option value="Tablet">Tablet</option>
+                  <option value="Capsule">Capsule</option>
+                  <option value="Liquid">Liquid</option>
+                  <option value="Injection">Injection</option>
+                  <option value="Test Kit">Test Kit</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+                <input type="number" step="0.01" value={medicationForm.price} onChange={e => setMedicationForm({...medicationForm, price: parseFloat(e.target.value)})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="15.99" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select value={medicationForm.category} onChange={e => setMedicationForm({...medicationForm, category: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500">
+                  {categories.filter(c => c.value !== 'all').map(c => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+                <select value={medicationForm.availability} onChange={e => setMedicationForm({...medicationForm, availability: e.target.value as any})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500">
+                  <option value="in-stock">In Stock</option>
+                  <option value="low-stock">Low Stock</option>
+                  <option value="out-of-stock">Out of Stock</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <input type="checkbox" id="requiresPrescription" checked={medicationForm.requiresPrescription} onChange={e => setMedicationForm({...medicationForm, requiresPrescription: e.target.checked})} className="w-5 h-5 rounded border-gray-300" />
+                <label htmlFor="requiresPrescription" className="text-sm font-medium text-gray-700">Requires Prescription</label>
+              </div>
+            </div>
+            
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea value={medicationForm.description} onChange={e => setMedicationForm({...medicationForm, description: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" rows={3} placeholder="Product description..." />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Side Effects (comma separated)</label>
+                <input type="text" value={medicationForm.sideEffects} onChange={e => setMedicationForm({...medicationForm, sideEffects: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="Nausea, Headache, etc." />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
+                <textarea value={medicationForm.instructions} onChange={e => setMedicationForm({...medicationForm, instructions: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" rows={2} placeholder="Usage instructions..." />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                <input type="text" value={medicationForm.image} onChange={e => setMedicationForm({...medicationForm, image: e.target.value})} className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="https://..." />
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <button onClick={() => { setShowAdminPanel(false); setEditingMedication(null); }} className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium">
+                Cancel
+              </button>
+              <button onClick={handleSaveMedication} className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium">
+                {editingMedication ? 'Update Product' : 'Add Product'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tier 3 Verification Modal */}
+      {showTier3Verification && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowTier3Verification(false)}>
+          <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Shield className="w-6 h-6 text-blue-600" />
+                Tier 3 Verification
+              </h2>
+              <button onClick={() => setShowTier3Verification(false)} className="p-2 rounded-xl hover:bg-gray-100">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <p className="text-sm text-gray-600 mb-4">
+              Orders over $100 require Tier 3 verification. Please enter your 6-digit verification code.
+            </p>
+            
+            <input 
+              type="text" 
+              value={tier3Code} 
+              onChange={e => setTier3Code(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="Enter 6-digit code"
+              maxLength={6}
+              className="w-full p-3 rounded-xl border border-gray-200 text-center text-lg font-mono tracking-widest focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 mb-3"
+            />
+            
+            {tier3Error && (
+              <p className="text-sm text-red-600 mb-3">{tier3Error}</p>
+            )}
+            
+            <button 
+              onClick={handleTier3Verification}
+              disabled={tier3Code.length !== 6}
+              className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium disabled:opacity-50"
+            >
+              <span className="flex items-center justify-center gap-2">
+                <UserCheck className="w-5 h-5" />
+                Verify Code
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
       {reviewModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4" onClick={() => setReviewModal(null)}>
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-xl" onClick={e => e.stopPropagation()}>

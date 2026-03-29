@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   MessageSquare, 
-  Heart, 
   Shield, 
   Users, 
   Plus,
@@ -11,11 +10,15 @@ import {
   Volume2,
   Flag,
   Mic,
-  MicOff
+  MicOff,
+  Sparkles,
+  BookOpen,
+  Heart
 } from 'lucide-react';
 import { offlineStorage } from '../../utils/offlineStorage';
 import { secretCodeManager } from '../../utils/secretCode';
 import { apiService } from '../../services/api';
+import PageContainer from '../Layout/PageContainer';
 
 interface Story {
   id: string;
@@ -57,13 +60,13 @@ const StorytellingPlatform: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'most_liked'>('newest');
-  const [showAnonymousOnly, setShowAnonymousOnly] = useState(false);
+  const [sortBy] = useState<'newest' | 'oldest' | 'most_liked'>('newest');
+  const [showAnonymousOnly] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [recordedAudio, setRecordedAudio] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<string | null>(null);
-  const [volume, setVolume] = useState(1);
+  const [volume] = useState(1);
 
   const [newStory, setNewStory] = useState<StoryForm>({
     title: '',
@@ -343,59 +346,70 @@ const StorytellingPlatform: React.FC = () => {
   }, [stories, selectedCategory, selectedLanguage, searchTerm, sortBy, showAnonymousOnly, filterAndSortStories]);
 
   return (
-    <div className="max-w-4xl mx-auto p-3 sm:p-4 lg:p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
-        <h2 className="text-lg font-semibold text-gray-900">Share and learn from SRHR experiences</h2>
-        <button
-          onClick={() => setShowCreateForm(true)}
-          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 sm:py-2 rounded-lg flex items-center justify-center space-x-2 touch-target"
-        >
-          <Plus size={16} />
-          <span className="text-sm sm:text-base">Share Story</span>
-        </button>
-      </div>
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-primary-50/20"
+    >
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Hero */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600 p-6 sm:p-8 shadow-2xl shadow-primary-500/20 mb-6">
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.05)_100%)]" />
+          <div className="relative flex items-start gap-4">
+            <div className="flex-shrink-0 p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+              <BookOpen className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 bg-white/25 rounded-full text-xs font-semibold text-white uppercase tracking-wide">Community</span>
+                <Sparkles className="w-3.5 h-3.5 text-white/80" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">Storytelling Platform</h1>
+              <p className="text-sm text-white/90 leading-relaxed">
+                Share your SRHR experiences, read others' stories, and find community support. Your voice matters.
+              </p>
+            </div>
+          </div>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <div className="bg-purple-50 rounded-lg p-3 sm:p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
-              <span className="font-medium text-purple-900 text-sm sm:text-base">Total Stories</span>
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          {[
+            { icon: MessageSquare, title: `${stories.length}`, desc: 'Stories', color: 'from-purple-500 to-indigo-500' },
+            { icon: Heart, title: `${stories.filter(s => s.isApproved).length}`, desc: 'Approved', color: 'from-green-500 to-emerald-500' },
+            { icon: Users, title: `${stories.reduce((sum, s) => sum + s.likes, 0)}`, desc: 'Likes', color: 'from-blue-500 to-cyan-500' }
+          ].map(({ icon: Icon, title, desc, color }) => (
+            <div key={desc} className="flex items-center gap-3 p-4 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/60 shadow-sm">
+              <div className={`p-2.5 rounded-xl bg-gradient-to-br ${color}`}>
+                <Icon className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="font-bold text-gray-900 text-lg">{title}</p>
+                <p className="text-xs text-gray-500">{desc}</p>
+              </div>
             </div>
-            <p className="text-xl sm:text-2xl font-bold text-purple-600">{stories.length}</p>
-          </div>
-          
-          <div className="bg-green-50 rounded-lg p-3 sm:p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-              <span className="font-medium text-green-900 text-sm sm:text-base">Approved Stories</span>
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-green-600">
-              {stories.filter(s => s.isApproved).length}
-            </p>
-          </div>
-          
-          <div className="bg-blue-50 rounded-lg p-3 sm:p-4 sm:col-span-2 lg:col-span-1">
-            <div className="flex items-center space-x-2 mb-2">
-              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-              <span className="font-medium text-blue-900 text-sm sm:text-base">Community Support</span>
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-blue-600">
-              {stories.reduce((sum, s) => sum + s.likes, 0)}
-            </p>
-          </div>
-      </div>
+          ))}
+        </div>
 
-      {/* Filters - Mobile Optimized */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category
-            </label>
+        {/* Search & Filters */}
+        <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-4 mb-6">
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Search stories, tags, or content..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-3">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input"
+              className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="all">All Categories</option>
               {categories.map(category => (
@@ -404,16 +418,11 @@ const StorytellingPlatform: React.FC = () => {
                 </option>
               ))}
             </select>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Language
-            </label>
             <select
               value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value)}
-              className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input"
+              className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="all">All Languages</option>
               {languages.map(lang => (
@@ -422,179 +431,111 @@ const StorytellingPlatform: React.FC = () => {
                 </option>
               ))}
             </select>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Sort By
-            </label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="most_liked">Most Liked</option>
-            </select>
-          </div>
-
-          <div className="flex items-center sm:items-end">
-            <label className="flex items-center space-x-2 touch-target">
-              <input
-                type="checkbox"
-                checked={showAnonymousOnly}
-                onChange={(e) => setShowAnonymousOnly(e.target.checked)}
-                className="rounded w-4 h-4"
-              />
-              <span className="text-sm text-gray-700">Anonymous only</span>
-            </label>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              type="text"
-              placeholder="Search stories, tags, or content..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Stories List - Mobile Optimized */}
-      <div className="space-y-4 sm:space-y-6">
-        {filteredStories.length === 0 ? (
-          <div className="text-center py-8 sm:py-12">
-            <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No stories found</h3>
-            <p className="text-gray-500 mb-4 text-sm sm:text-base">Try adjusting your filters or be the first to share a story</p>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 sm:py-2 rounded-lg mobile-btn"
+              className="ml-auto px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors flex items-center gap-2"
             >
-              Share Your Story
+              <Plus className="w-4 h-4" />
+              Share Story
             </button>
           </div>
-        ) : (
-          filteredStories.map((story) => {
-            const categoryInfo = getCategoryInfo(story.category);
-            const CategoryIcon = categoryInfo.icon;
-            
-            return (
-              <div key={story.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mobile-card">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
-                    <div className={`p-2 sm:p-3 rounded-xl ${categoryInfo.color} flex-shrink-0`}>
-                      <CategoryIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+        </div>
+
+        {/* Stories Grid */}
+        <div className="space-y-4">
+          {filteredStories.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-2xl border border-gray-200/60">
+              <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No stories found</h3>
+              <p className="text-gray-500 mb-4 text-sm">Try adjusting your filters or be the first to share a story</p>
+              <button
+                onClick={() => setShowCreateForm(true)}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+              >
+                Share Your Story
+              </button>
+            </div>
+          ) : (
+            filteredStories.map((story) => {
+              const categoryInfo = getCategoryInfo(story.category);
+              const CategoryIcon = categoryInfo.icon;
+              
+              return (
+                <div key={story.id} className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-5 hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className={`p-2.5 rounded-xl ${categoryInfo.color} flex-shrink-0`}>
+                      <CategoryIcon className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{story.title}</h3>
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 mb-3">
-                        <span className="flex items-center space-x-1">
-                          <span>👤</span>
-                          <span>{story.author}</span>
-                        </span>
-                        <span className="flex items-center space-x-1">
-                          <span>📅</span>
-                          <span>{formatDate(story.timestamp)}</span>
-                        </span>
-                        {story.location && (
-                          <span className="flex items-center space-x-1">
-                            <span>🌍</span>
-                            <span>{story.location}</span>
-                          </span>
-                        )}
-                        <span className="flex items-center space-x-1">
-                          <span>🗣️</span>
-                          <span>{languages.find(l => l.value === story.language)?.label}</span>
-                        </span>
-                        <span className="flex items-center space-x-1">
-                          <span>👥</span>
-                          <span>{story.ageGroup}</span>
-                        </span>
-                      </div>
+                      <h3 className="font-semibold text-gray-900 mb-1">{story.title}</h3>
+                      <p className="text-xs text-gray-500">{story.author} • {formatDate(story.timestamp)}</p>
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-2 flex-shrink-0">
                     <button
                       onClick={() => handleReportStory(story.id)}
-                      className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg touch-target"
+                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                       title="Report story"
                     >
-                      <Flag size={16} />
+                      <Flag className="w-4 h-4" />
                     </button>
                   </div>
-                </div>
 
-                <div className="mb-4">
-                  <p className="text-gray-700 leading-relaxed text-sm sm:text-base mobile-text-responsive">{story.content}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-3 line-clamp-3">{story.content}</p>
                   
                   {story.type === 'audio' && story.audioUrl && (
-                    <div className="mt-4 bg-gray-50 rounded-lg p-3 sm:p-4">
-                      <div className="flex items-center space-x-3 sm:space-x-4">
+                    <div className="mt-3 bg-gray-50 rounded-xl p-3">
+                      <div className="flex items-center gap-3">
                         <button
                           onClick={() => playAudio(story.audioUrl!, story.id)}
-                          className="p-2 sm:p-3 bg-purple-500 hover:bg-purple-600 text-white rounded-full touch-target"
+                          className="p-2 bg-purple-500 hover:bg-purple-600 text-white rounded-full transition-colors"
                         >
-                          {isPlaying === story.id ? <Pause size={16} className="sm:w-5 sm:h-5" /> : <Play size={16} className="sm:w-5 sm:h-5" />}
+                          {isPlaying === story.id ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                         </button>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-2">
-                            <Mic className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
-                            <span className="text-xs sm:text-sm text-gray-600">Audio Story</span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <Mic className="w-3 h-3 text-gray-500" />
+                            <span className="text-xs text-gray-600">Audio Story</span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2 mt-2">
-                            <div className="bg-purple-500 h-1.5 sm:h-2 rounded-full" style={{ width: '0%' }}></div>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1.5">
+                            <div className="bg-purple-500 h-1.5 rounded-full" style={{ width: '0%' }} />
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
-                          <input
-                            type="range"
-                            min="0"
-                            max="1"
-                            step="0.1"
-                            value={volume}
-                            onChange={(e) => setVolume(parseFloat(e.target.value))}
-                            className="w-16 sm:w-20"
-                          />
-                        </div>
+                        <Volume2 className="w-4 h-4 text-gray-400" />
                       </div>
                     </div>
                   )}
-                </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                  <div className="flex flex-wrap gap-2">
-                    {story.tags.map((tag, index) => (
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {story.tags.slice(0, 4).map((tag: string, index: number) => (
                       <span
                         key={index}
-                        className="px-2 sm:px-3 py-1 bg-primary-50 text-primary-700 text-xs sm:text-sm rounded-full border border-primary-200"
+                        className="px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs"
                       >
                         #{tag}
                       </span>
                     ))}
                   </div>
-                  <div className="flex items-center space-x-4">
+
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <Heart className="w-4 h-4" />
+                        {story.likes}
+                      </span>
+                      <span>{languages.find(l => l.value === story.language)?.label}</span>
+                    </div>
                     <button
                       onClick={() => handleLikeStory(story.id)}
-                      className="flex items-center space-x-2 text-gray-600 hover:text-red-500 touch-target"
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                     >
-                      <Heart size={16} />
-                      <span className="text-sm">{story.likes}</span>
+                      <Heart className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+              );
+            })
+          )}
+        </div>
 
       {/* Create Story Modal - Mobile Optimized */}
       {showCreateForm && (
@@ -852,7 +793,8 @@ const StorytellingPlatform: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+      </main>
+    </PageContainer>
   );
 };
 

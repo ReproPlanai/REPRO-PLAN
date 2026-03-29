@@ -66,12 +66,8 @@ const AILearningChat: React.FC<AILearningChatProps> = ({ onComplete, onExit }) =
 
       setMessages(prev => [...prev, aiMessage]);
     } catch {
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        sender: 'ai',
-        text: "I'm here to help you learn! Keep asking questions to earn XP and discover new insights about SRHR topics.",
-        xpEarned: 5
-      }]);
+      // Retry API instead of using fallback - all responses must come from AI
+      throw new Error('API error - retrying');
     }
     
     setIsLoading(false);

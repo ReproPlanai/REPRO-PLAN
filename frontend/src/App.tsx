@@ -21,8 +21,6 @@ import DashboardAccessManager from './components/Dashboard/DashboardAccessManage
 import AppDownloadModal from './components/AppDownloadModal';
 import AppInstallBanner from './components/AppInstallBanner';
 import FloatingDownloadButton from './components/FloatingDownloadButton';
-import SafetyCheckManager from './components/Safety/SafetyCheckManager';
-import NotificationSystem from './components/UI/NotificationSystem';
 
 // Contexts
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
@@ -58,6 +56,7 @@ import HealthRecords from './pages/HealthRecords';
 import ResourcesLibrary from './pages/ResourcesLibrary';
 import DirectMessages from './pages/DirectMessages';
 import LiveTracking from './pages/LiveTracking';
+import DailySafetyCheck from './pages/DailySafetyCheck';
 
 // Utils
 import { secretCodeManager } from './utils/secretCode';
@@ -67,11 +66,9 @@ import { productionResetManager } from './utils/productionReset';
 import { useAppDownloadModal } from './hooks/useAppDownloadModal';
 import { cacheManager } from './utils/cacheManager';
 
-// Layout content with route-based header visibility and mobile-first full screen
 const AppLayoutContent: React.FC<{ children: React.ReactNode; isAuthenticated: boolean }> = ({ children, isAuthenticated }) => {
   const location = useLocation();
   const isDashboardRoute = location.pathname.startsWith('/dashboard');
-  // Show unified header and bottom nav for all main app routes (except dashboard which has its own header)
   const shouldShowMainNavigation = !isDashboardRoute;
 
   return (
@@ -79,9 +76,6 @@ const AppLayoutContent: React.FC<{ children: React.ReactNode; isAuthenticated: b
       {shouldShowMainNavigation && (
         <>
           <UnifiedHeader />
-          <div className="fixed top-4 right-4 z-50">
-            <NotificationSystem />
-          </div>
           <BottomNavigation />
         </>
       )}
@@ -119,31 +113,20 @@ function App() {
   const { showModal, closeModal, handleDownload, openModal } = useAppDownloadModal();
 
   useEffect(() => {
-    // Check for production reset first
-    const isStakeholderUrl = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const role = urlParams.get('role');
-      const validStakeholderRoles = ['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO'];
-
-      return Boolean(role && validStakeholderRoles.includes(role) && window.location.pathname === '/dashboard');
-    };
-
     const initializeApp = async () => {
       try {
         const resetResult = await productionResetManager.checkAndResetForProduction();
 
         if (resetResult.wasReset) {
           console.log('🔄 Production reset completed:', resetResult.reason);
-          // Show user notification about reset
           alert('Welcome to REPRO PLAN v3.0! Your app has been updated for production use.');
         }
 
-        // Check if user has a valid secret code
         const hasValidCode = secretCodeManager.hasValidSecretCode();
         setIsAuthenticated(hasValidCode);
         setIsLoading(false);
 
-        if (!hasValidCode && !isStakeholderUrl()) {
+        if (!hasValidCode) {
           setShowPreAuthLoader(true);
           if (loaderTimeoutRef.current) {
             window.clearTimeout(loaderTimeoutRef.current);
@@ -162,7 +145,6 @@ function App() {
 
     initializeApp();
     
-    // Handle stakeholder URL changes
     const handleStakeholderAccess = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const role = urlParams.get('role');
@@ -170,22 +152,17 @@ function App() {
       
       if (role && validStakeholderRoles.includes(role) && window.location.pathname === '/dashboard') {
         console.log('🔍 Stakeholder URL detected:', role, '- Ensuring Router access');
-        // Force re-render to ensure Router is accessible
         setIsLoading(false);
       }
     };
     
-    // Listen for URL changes
     window.addEventListener('popstate', handleStakeholderAccess);
     
-    // Check initial URL
     handleStakeholderAccess();
 
-    // Initialize cache manager with new features
     cacheManager.initializeCache().then(() => {
       console.log('Cache manager initialized with new features');
 
-      // Check if cache needs update
       if (cacheManager.needsCacheUpdate()) {
         console.log('Cache update available - new features ready');
       }
@@ -201,14 +178,11 @@ function App() {
 
   const handleLogin = async (code: string) => {
     try {
-      // Use API service for production authentication
-      const { apiService } = await import('./services/api');
-      const response = await apiService.loginUser(code) as { success: boolean; message?: string; user?: any };
+      const response = await (await import('./services/api')).apiService.loginUser(code) as { success: boolean; message?: string; user?: any };
 
       if (response.success) {
-        // Store code locally after successful login
-        if (secretCodeManager.validateSecretCode(code)) {
-          secretCodeManager.updateLastUsed();
+        if ((await import('./utils/secretCode')).secretCodeManager.validateSecretCode(code)) {
+          (await import('./utils/secretCode')).secretCodeManager.updateLastUsed();
           setIsAuthenticated(true);
         }
       } else {
@@ -216,9 +190,8 @@ function App() {
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      // Fallback to local validation if API fails
-      if (secretCodeManager.validateSecretCode(code)) {
-        secretCodeManager.updateLastUsed();
+      if ((await import('./utils/secretCode')).secretCodeManager.validateSecretCode(code)) {
+        (await import('./utils/secretCode')).secretCodeManager.updateLastUsed();
         setIsAuthenticated(true);
       } else {
         alert('Invalid secret code. Please try again.');
@@ -336,6 +309,7 @@ function App() {
               <Route path="/resources" element={<ResourcesLibrary />} />
               <Route path="/messages" element={<DirectMessages />} />
               <Route path="/live-tracking" element={<LiveTracking />} />
+              <Route path="/daily-safety-check" element={<DailySafetyCheck />} />
               
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
@@ -352,13 +326,10 @@ function App() {
             <FloatingDownloadButton
               onOpenModal={openModal}
             />
-
-            {/* Safety Check Manager - Daily Wellness Check-ins */}
-            {isAuthenticated && <SafetyCheckManager />}
-        </div>
-      </Router>
-    </AccessibilityProvider>
-  );
+          </div>
+        </Router>
+      </AccessibilityProvider>
+    );
 }
 
 export default App;

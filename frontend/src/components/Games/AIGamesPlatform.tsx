@@ -28,7 +28,6 @@ import {
   Home
 } from 'lucide-react';
 import { apiService } from '../../services/api';
-import { offlineStorage } from '../../utils/offlineStorage';
 import ConsentScenarioGame from './ConsentScenarioGame';
 import SRHRMythBuster from './SRHRMythBuster';
 import KnowledgeRace from './KnowledgeRace';
@@ -139,19 +138,17 @@ const AIGamesPlatform: React.FC = () => {
     }
   ];
 
+  // Note: Game sessions are NOT saved locally - all data comes from API
+  // This ensures fresh data from AI provider
+
   const loadUserData = useCallback(async () => {
     try {
-      const [sessions, profile] = await Promise.all([
-        offlineStorage.getData('ai_game_sessions'),
-        offlineStorage.getData('ai_game_profile')
-      ]);
-      
-      if (sessions) setUserSessions(sessions);
-      if (profile) {
-        setUserLevel(profile.level || 1);
-        setTotalXP(profile.totalXP || 0);
-        setStreak(profile.streak || 0);
-      }
+      // Sessions are ephemeral - not stored locally
+      setUserSessions([]);
+      // Profile data comes from API only
+      setUserLevel(1);
+      setTotalXP(0);
+      setStreak(0);
     } catch (error) {
       console.error('Failed to load user data:', error);
     }
@@ -204,9 +201,8 @@ const AIGamesPlatform: React.FC = () => {
     try {
       const updated = [session, ...userSessions].slice(0, 50);
       setUserSessions(updated);
-      await offlineStorage.storeData('ai_game_sessions', updated);
-      
-      // Also sync to server for admin tracking
+      // Note: NOT saving to local storage - sessions are ephemeral
+      // Only sync to server for admin tracking
       await apiService.saveGameSession?.(session);
     } catch (error) {
       console.error('Failed to save session:', error);

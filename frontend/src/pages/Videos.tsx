@@ -1,20 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import { 
-  Play, 
   Clock, 
   Eye, 
-  Heart, 
-  Shield, 
-  BookOpen, 
-  Users, 
   Star,
   Search,
   Download,
   Wifi,
   WifiOff,
-  X
+  Sparkles,
+  MonitorPlay,
+  GraduationCap,
+  ArrowLeft
 } from 'lucide-react';
 import { useOffline } from '../hooks/useOffline';
+import PageContainer from '../components/Layout/PageContainer';
 
 interface Video {
   id: string;
@@ -34,7 +33,7 @@ interface Video {
 const Videos: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
+  const [selectedDifficulty] = useState('all');
   const [downloadedVideos, setDownloadedVideos] = useState<string[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
@@ -320,13 +319,6 @@ const Videos: React.FC = () => {
     { value: 'Youth Education', label: 'Youth Education' }
   ];
 
-  const difficulties = [
-    { value: 'all', label: 'All Levels' },
-    { value: 'beginner', label: 'Beginner' },
-    { value: 'intermediate', label: 'Intermediate' },
-    { value: 'advanced', label: 'Advanced' }
-  ];
-
   const filteredVideos = videos.filter(video => {
     const matchesSearch = video.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          video.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -347,12 +339,6 @@ const Videos: React.FC = () => {
     setShowDescriptionModal(true);
   };
 
-  const closeDescriptionModal = () => {
-    setShowDescriptionModal(false);
-    setSelectedVideo(null);
-  };
-
-
   const formatViews = (views: number) => {
     if (views >= 1000) {
       return `${(views / 1000).toFixed(1)}K`;
@@ -360,384 +346,277 @@ const Videos: React.FC = () => {
     return views.toString();
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'STI Prevention':
-        return Shield;
-      case 'Contraception':
-        return Heart;
-      case 'Reproductive Health':
-        return BookOpen;
-      case 'Mental Health':
-        return Users;
-      case 'Gender & Sexuality':
-        return Users;
-      case 'Legal Rights':
-        return Shield;
-      case 'Youth Education':
-        return BookOpen;
-      default:
-        return Play;
-    }
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'beginner':
-        return 'bg-green-100 text-green-800';
-      case 'intermediate':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'advanced':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
-    <div className="w-full h-full bg-gray-50 overflow-x-hidden">
-      <main className="p-4 sm:p-6 lg:p-8">
-        <div className="space-y-6">
-          {/* Search and Filters */}
-          <div className="card mb-6 sm:mb-8">
-            <div className="space-y-4 sm:space-y-6">
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Search videos, topics, or keywords..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="input-field pl-10 text-sm sm:text-base"
-                />
-              </div>
-
-              {/* Filters */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Category Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
-                  </label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="input-field text-sm sm:text-base"
-                  >
-                    {categories.map(category => (
-                      <option key={category.value} value={category.value}>
-                        {category.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Difficulty Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Difficulty Level
-                  </label>
-                  <select
-                    value={selectedDifficulty}
-                    onChange={(e) => setSelectedDifficulty(e.target.value)}
-                    className="input-field text-sm sm:text-base"
-                  >
-                    {difficulties.map(difficulty => (
-                      <option key={difficulty.value} value={difficulty.value}>
-                        {difficulty.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Offline Status */}
-                <div className="flex items-end">
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg w-full">
-                    {isOnline ? (
-                      <Wifi className="w-5 h-5 text-green-500" />
-                    ) : (
-                      <WifiOff className="w-5 h-5 text-red-500" />
-                    )}
-                    <span className="text-sm font-medium text-gray-700">
-                      {isOnline ? 'Online' : 'Offline Mode'}
-                    </span>
-                  </div>
-                </div>
-              </div>
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-primary-50/20"
+    >
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Hero */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600 p-6 sm:p-8 shadow-2xl shadow-primary-500/20 mb-6">
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.05)_100%)]" />
+          <div className="relative flex items-start gap-4">
+            <div className="flex-shrink-0 p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+              <MonitorPlay className="w-8 h-8 text-white" />
             </div>
-          </div>
-
-          {/* Results Count */}
-          <div className="mb-4 sm:mb-6">
-            <p className="text-sm sm:text-base text-gray-600">
-              Showing {filteredVideos.length} of {videos.length} videos
-            </p>
-          </div>
-
-          {/* Video Grid - 2 videos per row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-            {filteredVideos.map((video) => {
-              const CategoryIcon = getCategoryIcon(video.category);
-              const isDownloaded = downloadedVideos.includes(video.id);
-              
-              return (
-                <div key={video.id} className="card group hover:shadow-xl transition-all duration-300">
-                  {/* YouTube Video Embed - Larger Size */}
-                  <div className="relative mb-4">
-                    <div className="aspect-video rounded-lg overflow-hidden">
-                      <iframe
-                        src={`https://www.youtube.com/embed/${video.youtubeId}?rel=0&modestbranding=1&showinfo=0`}
-                        title={video.title}
-                        className="w-full h-full"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    </div>
-
-                    {/* Duration Badge */}
-                    <div className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-sm px-3 py-1 rounded">
-                      {video.duration}
-                    </div>
-
-                    {/* Offline Badge */}
-                    {video.isOfflineAvailable && (
-                      <div className="absolute top-2 left-2 bg-green-500 text-white text-sm px-3 py-1 rounded">
-                        Offline
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Video Info - Simplified */}
-                  <div className="space-y-4">
-                    {/* Title */}
-                    <div>
-                      <h3 className="font-semibold text-gray-900 text-lg sm:text-xl mb-2 line-clamp-2">
-                        {video.title}
-                      </h3>
-                      <div className="flex items-center space-x-3">
-                        <CategoryIcon className="w-5 h-5 text-primary-600" />
-                        <span className="text-sm text-gray-500">{video.category}</span>
-                        <span className={`text-sm px-3 py-1 rounded-full ${getDifficultyColor(video.difficulty)}`}>
-                          {video.difficulty}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Stats - Simplified */}
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm text-gray-500">
-                      <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex items-center space-x-1">
-                          <Eye className="w-4 h-4" />
-                          <span>{formatViews(video.views)} views</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4 text-yellow-500" />
-                          <span>{video.rating}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{video.duration}</span>
-                      </div>
-                    </div>
-
-                    {/* Actions - View Description Button */}
-                    <div className="flex space-x-3 pt-2">
-                      <button
-                        onClick={() => handleViewDescription(video)}
-                        className="flex-1 btn-primary text-sm sm:text-base py-3 flex items-center justify-center space-x-2"
-                      >
-                        <BookOpen className="w-4 h-4" />
-                        <span>View Description</span>
-                      </button>
-                      
-                      {video.isOfflineAvailable && (
-                        <button
-                          onClick={() => handleDownload(video.id)}
-                          disabled={isDownloaded}
-                          className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                            isDownloaded
-                              ? 'bg-green-100 text-green-700 cursor-not-allowed'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          <Download className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* No Results */}
-          {filteredVideos.length === 0 && (
-            <div className="text-center py-12 sm:py-16">
-              <Search className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg sm:text-xl font-medium text-gray-900 mb-2">No videos found</h3>
-              <p className="text-sm sm:text-base text-gray-500 mb-4">
-                Try adjusting your search terms or filters
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 bg-white/25 rounded-full text-xs font-semibold text-white uppercase tracking-wide">Educational</span>
+                <Sparkles className="w-3.5 h-3.5 text-white/80" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">SRHR Video Library</h1>
+              <p className="text-sm text-white/90 leading-relaxed">
+                Watch educational videos about sexual health, relationships, and reproductive wellness. Learn at your own pace.
               </p>
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategory('all');
-                  setSelectedDifficulty('all');
-                }}
-                className="btn-outline"
-              >
-                Clear Filters
-              </button>
             </div>
-          )}
+          </div>
+        </div>
+        {/* Search & Filters */}
+        <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-4 mb-6">
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Search videos, topics, or keywords..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+          </div>
 
-          {/* Offline Notice */}
-          {!isOnline && (
-            <div className="mt-6 sm:mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-4 sm:p-6">
-              <div className="flex items-start space-x-3 sm:space-x-4">
-                <WifiOff className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600 mt-1 flex-shrink-0" />
-                <div className="min-w-0">
-                  <h4 className="font-semibold text-yellow-900 mb-2 text-sm sm:text-base">Offline Mode</h4>
-                  <p className="text-yellow-800 text-xs sm:text-sm mb-3 leading-relaxed">
-                    You're currently offline. Only downloaded videos and offline-available content can be accessed.
-                    Download videos when online to watch them later.
-                  </p>
-                  <div className="text-yellow-700 text-xs sm:text-sm">
-                    <p>• Downloaded videos: {downloadedVideos.length}</p>
-                    <p>• Offline-available videos: {videos.filter(v => v.isOfflineAvailable).length}</p>
+          <div className="flex flex-wrap gap-3">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              {categories.map(category => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
+                </option>
+              ))}
+            </select>
+
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg">
+              {isOnline ? (
+                <Wifi className="w-4 h-4 text-green-500" />
+              ) : (
+                <WifiOff className="w-4 h-4 text-red-500" />
+              )}
+              <span className="text-sm font-medium text-gray-700">
+                {isOnline ? 'Online' : 'Offline Mode'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          {[
+            { icon: MonitorPlay, title: `${filteredVideos.length}`, desc: 'Videos', color: 'from-blue-500 to-indigo-500' },
+            { icon: GraduationCap, title: '6', desc: 'Categories', color: 'from-emerald-500 to-teal-500' },
+            { icon: Download, title: `${downloadedVideos.length}`, desc: 'Downloaded', color: 'from-amber-500 to-orange-500' }
+          ].map(({ icon: Icon, title, desc, color }) => (
+            <div key={desc} className="flex items-center gap-3 p-4 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/60 shadow-sm">
+              <div className={`p-2.5 rounded-xl bg-gradient-to-br ${color}`}>
+                <Icon className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="font-bold text-gray-900 text-lg">{title}</p>
+                <p className="text-xs text-gray-500">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Video Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredVideos.map((video) => (
+            <div key={video.id} className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
+              {/* Video Embed */}
+              <div className="relative aspect-video">
+                <iframe
+                  src={`https://www.youtube.com/embed/${video.youtubeId}?rel=0&modestbranding=1`}
+                  title={video.title}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+                <div className="absolute bottom-2 right-2 bg-black/75 text-white text-xs px-2 py-1 rounded">
+                  {video.duration}
+                </div>
+                {video.isOfflineAvailable && (
+                  <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                    Offline
                   </div>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="p-4">
+                <h3 className="font-semibold text-gray-900 text-base mb-2 line-clamp-2">
+                  {video.title}
+                </h3>
+                
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    {video.category}
+                  </span>
+                  <div className="flex items-center gap-1 text-xs text-gray-500">
+                    <Star className="w-3 h-3 text-yellow-500" />
+                    <span>{video.rating}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                  <div className="flex items-center gap-1">
+                    <Eye className="w-4 h-4" />
+                    <span>{formatViews(video.views)}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    <span>{video.duration}</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleViewDescription(video)}
+                    className="flex-1 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+                  >
+                    View Details
+                  </button>
+                  {video.isOfflineAvailable && (
+                    <button
+                      onClick={() => handleDownload(video.id)}
+                      disabled={downloadedVideos.includes(video.id)}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        downloadedVideos.includes(video.id)
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
-          )}
+          ))}
         </div>
+
+        {/* No Results */}
+        {filteredVideos.length === 0 && (
+          <div className="text-center py-12">
+            <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No videos found</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              Try adjusting your search terms or filters
+            </p>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('all');
+              }}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
+
+        {/* Offline Notice */}
+        {!isOnline && (
+          <div className="mt-6 flex items-start gap-3 p-4 rounded-2xl bg-amber-50/80 border border-amber-200/60">
+            <WifiOff className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-amber-900 text-sm">Offline Mode</p>
+              <p className="text-xs text-amber-800 mt-1">
+                You're currently offline. Only downloaded videos can be accessed.
+              </p>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Description Modal */}
       {showDescriptionModal && selectedVideo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-blue-500 to-green-500 text-white p-4 sm:p-6">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center space-x-3">
-                  <BookOpen className="w-6 h-6" />
-                  <h3 className="text-lg sm:text-xl font-semibold">Video Description</h3>
-                </div>
-                <button
-                  onClick={closeDescriptionModal}
-                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white w-full sm:max-w-lg sm:rounded-3xl rounded-t-3xl shadow-2xl max-h-[90vh] flex flex-col animate-in slide-in-from-bottom sm:animate-none">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="font-semibold text-gray-900">Video Details</h3>
+              <button
+                onClick={() => setShowDescriptionModal(false)}
+                className="p-2 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
             </div>
+            
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="aspect-video rounded-xl overflow-hidden mb-4">
+                <iframe
+                  src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?rel=0&modestbranding=1`}
+                  title={selectedVideo.title}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
 
-            {/* Modal Content */}
-            <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
-              {/* Video Title */}
-              <h4 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">
                 {selectedVideo.title}
               </h4>
 
-              {/* Video Stats */}
               <div className="flex flex-wrap items-center gap-3 mb-4 text-sm text-gray-600">
-                <div className="flex items-center space-x-1">
+                <span className="bg-gray-100 px-2 py-1 rounded">
+                  {selectedVideo.category}
+                </span>
+                <div className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
                   <span>{formatViews(selectedVideo.views)} views</span>
                 </div>
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   <span>{selectedVideo.duration}</span>
                 </div>
-              </div>
-
-              {/* Category and Difficulty */}
-              <div className="flex flex-wrap items-center gap-3 mb-4">
-                <div className="flex items-center space-x-2">
-                  {(() => {
-                    const CategoryIcon = getCategoryIcon(selectedVideo.category);
-                    return <CategoryIcon className="w-5 h-5 text-primary-600" />;
-                  })()}
-                  <span className="text-sm text-gray-500">{selectedVideo.category}</span>
-                </div>
-                <span className={`text-sm px-3 py-1 rounded-full ${getDifficultyColor(selectedVideo.difficulty)}`}>
-                  {selectedVideo.difficulty}
-                </span>
-              </div>
-
-              {/* Full Description */}
-              <div className="mb-6">
-                <h5 className="text-sm font-semibold text-gray-700 mb-2">Description</h5>
-                <p className="text-gray-600 leading-relaxed">
-                  {selectedVideo.description}
-                </p>
-              </div>
-
-              {/* Tags */}
-              <div className="mb-6">
-                <h5 className="text-sm font-semibold text-gray-700 mb-2">Tags</h5>
-                <div className="flex flex-wrap gap-2">
-                  {selectedVideo.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 text-yellow-500" />
+                  <span>{selectedVideo.rating}</span>
                 </div>
               </div>
 
-              {/* Video Embed */}
-              <div className="mb-6">
-                <h5 className="text-sm font-semibold text-gray-700 mb-2">Video Preview</h5>
-                <div className="aspect-video rounded-lg overflow-hidden">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?rel=0&modestbranding=1&showinfo=0`}
-                    title={selectedVideo.title}
-                    className="w-full h-full"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
+              <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                {selectedVideo.description}
+              </p>
+
+              <div className="flex flex-wrap gap-2">
+                {selectedVideo.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             </div>
 
-            {/* Modal Footer */}
-            <div className="bg-gray-50 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:justify-end gap-2 sm:gap-3">
+            <div className="p-4 border-t border-gray-200">
               <button
-                onClick={closeDescriptionModal}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                onClick={() => setShowDescriptionModal(false)}
+                className="w-full py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors"
               >
                 Close
               </button>
-              {selectedVideo.isOfflineAvailable && (
-                <button
-                  onClick={() => {
-                    handleDownload(selectedVideo.id);
-                    closeDescriptionModal();
-                  }}
-                  disabled={downloadedVideos.includes(selectedVideo.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    downloadedVideos.includes(selectedVideo.id)
-                      ? 'bg-green-100 text-green-700 cursor-not-allowed'
-                      : 'bg-blue-500 text-white hover:bg-blue-600'
-                  }`}
-                >
-                  <Download className="w-4 h-4 inline mr-2" />
-                  {downloadedVideos.includes(selectedVideo.id) ? 'Downloaded' : 'Download'}
-                </button>
-              )}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 };
 

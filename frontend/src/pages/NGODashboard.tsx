@@ -281,13 +281,13 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile-First Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/30">
+      {/* Modern Header */}
+      <div className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/60 sticky top-0 z-40">
         <div className="px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex items-center justify-center shadow-md ring-2 ring-orange-100">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden flex items-center justify-center shadow-md ring-2 ring-orange-100 bg-gradient-to-br from-orange-500 to-amber-500">
                 <img 
                   src={LogoCircular} 
                   alt="REPRO PLAN Logo" 
@@ -295,22 +295,22 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                 />
               </div>
               <div className="min-w-0 flex-1 flex flex-col leading-[1]">
-                <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">NGO Dashboard</h1>
-                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block -mt-2 leading-none">Community Programs & Outreach</p>
+                <h1 className="text-base sm:text-lg font-bold text-gray-900 truncate">NGO Dashboard</h1>
+                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block -mt-2 leading-none">Community Programs & Outreach</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-2 sm:space-x-4">
               <button
                 onClick={() => setIsMenuOpen(true)}
-                className="lg:hidden p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                className="lg:hidden p-2 text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-100 transition-colors"
                 aria-label="Open menu"
               >
                 <Menu size={18} />
               </button>
-              <button className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 relative">
+              <button className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 relative rounded-xl hover:bg-gray-100 transition-colors">
                 <Bell size={18} className="sm:w-5 sm:h-5" />
-                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-orange-500 rounded-full"></span>
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-orange-500 rounded-full animate-pulse"></span>
               </button>
             </div>
           </div>
@@ -372,7 +372,7 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
         )}
 
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block w-56 xl:w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+        <div className="hidden lg:block w-56 xl:w-64 bg-white/80 backdrop-blur-sm shadow-sm border-r border-gray-200/60 min-h-screen">
           <nav className="p-4 space-y-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -380,10 +380,10 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     activeTab === tab.id
-                      ? 'bg-orange-50 text-orange-700 border border-orange-200'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md'
+                      : 'text-gray-600 hover:bg-orange-50 hover:text-orange-700'
                   }`}
                 >
                   <Icon size={18} />
@@ -403,44 +403,52 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
                 <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Program Management</h2>
                 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
-                  <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm text-gray-600 truncate">Total Beneficiaries</p>
-                        <p className="text-lg sm:text-2xl font-semibold text-gray-900">{ngoData.ngoMetrics.totalBeneficiaries.toLocaleString()}</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Total Beneficiaries</p>
+                        <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{ngoData.ngoMetrics.totalBeneficiaries.toLocaleString()}</p>
                       </div>
-                      <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 flex-shrink-0" />
+                      <div className="p-2.5 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex-shrink-0">
+                        <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm text-gray-600 truncate">Active Programs</p>
-                        <p className="text-lg sm:text-2xl font-semibold text-green-600">{ngoData.ngoMetrics.activePrograms}</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Active Programs</p>
+                        <p className="text-xl sm:text-2xl font-bold text-green-600 mt-1">{ngoData.ngoMetrics.activePrograms}</p>
                       </div>
-                      <Target className="w-6 h-6 sm:w-8 sm:h-8 text-green-500 flex-shrink-0" />
+                      <div className="p-2.5 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex-shrink-0">
+                        <Target className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm text-gray-600 truncate">Completed Programs</p>
-                        <p className="text-lg sm:text-2xl font-semibold text-blue-600">{ngoData.ngoMetrics.completedPrograms}</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Completed Programs</p>
+                        <p className="text-xl sm:text-2xl font-bold text-blue-600 mt-1">{ngoData.ngoMetrics.completedPrograms}</p>
                       </div>
-                      <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 flex-shrink-0" />
+                      <div className="p-2.5 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex-shrink-0">
+                        <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm text-gray-600 truncate">Community Reach</p>
-                        <p className="text-lg sm:text-2xl font-semibold text-orange-600">{ngoData.ngoMetrics.communityReach.toLocaleString()}</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Community Reach</p>
+                        <p className="text-xl sm:text-2xl font-bold text-orange-600 mt-1">{ngoData.ngoMetrics.communityReach.toLocaleString()}</p>
                       </div>
-                      <Globe className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500 flex-shrink-0" />
+                      <div className="p-2.5 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl flex-shrink-0">
+                        <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+                      </div>
                     </div>
                   </div>
                 </div>
