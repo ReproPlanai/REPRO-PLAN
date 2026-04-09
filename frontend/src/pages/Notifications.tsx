@@ -156,14 +156,14 @@ const Notifications: React.FC = () => {
   ];
 
   return (
-    <PageContainer 
-      gradient 
-      gradientFrom="from-blue-50" 
-      gradientVia="via-white" 
-      gradientTo="to-purple-50"
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-primary-50/20"
     >
-
-      {/* Search and Filter Bar */}
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Search and Filter Bar */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-3 sm:px-4 py-3 sm:py-4">
         <div className="space-y-2 sm:space-y-3">
           {/* Search */}
@@ -296,6 +296,7 @@ const Notifications: React.FC = () => {
           </div>
         )}
       </div>
+      </main>
     </PageContainer>
   );
 };

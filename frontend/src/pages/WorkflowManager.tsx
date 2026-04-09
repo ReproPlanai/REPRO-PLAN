@@ -114,37 +114,34 @@ const WorkflowManager: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate(-1)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div className="flex items-center gap-3">
-                <WorkflowIcon className="w-8 h-8 text-indigo-600" />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Workflow Manager</h1>
-                  <p className="text-sm text-gray-500">Automate tasks and processes</p>
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Create Workflow
-            </button>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Page Actions */}
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Create Workflow
+          </button>
+        </div>
+
+        {/* Page Title */}
+        <div className="flex items-center gap-3 mb-6">
+          <WorkflowIcon className="w-8 h-8 text-indigo-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Workflow Manager</h1>
+            <p className="text-sm text-gray-500">Automate tasks and processes</p>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
         {error && (
           <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
             <AlertTriangle className="w-5 h-5" />

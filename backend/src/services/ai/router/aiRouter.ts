@@ -91,9 +91,9 @@ export function getModelString(provider: 'gemini' | 'anthropic', taskType: TaskT
       case 'explain':
         return 'gemini-2.5-flash-lite'; // Most cost-effective
       case 'chat':
-        return 'gemini-2.5-flash'; // Better quality for chat
+        return 'gemini-3-flash-preview'; // Better quality for chat
       default:
-        return 'gemini-2.5-flash-lite';
+        return 'gemini-3-flash-preview';
     }
   }
 
@@ -102,5 +102,5 @@ export function getModelString(provider: 'gemini' | 'anthropic', taskType: TaskT
     return 'claude-sonnet-4-6';
   }
 
-  return 'gemini-2.5-flash-lite';
+  return 'gemini-3-flash-preview';
 }

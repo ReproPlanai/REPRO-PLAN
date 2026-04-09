@@ -6,10 +6,11 @@ const log = createServiceLogger('cost-tracker');
 // Cost per million tokens for each model (pinned model strings as per plan)
 const MODEL_COSTS: Record<string, { inputCostPerMillion: number; outputCostPerMillion: number }> = {
   'claude-sonnet-4-6': { inputCostPerMillion: 3.0, outputCostPerMillion: 15.0 },
-  'gemini-2.5-flash-lite': { inputCostPerMillion: 0.10, outputCostPerMillion: 0.40 },
-  'gemini-2.5-pro': { inputCostPerMillion: 2.50, outputCostPerMillion: 10.0 },
+  'gemini-3-flash-preview': { inputCostPerMillion: 0.075, outputCostPerMillion: 0.30 },
+  'gemini-3-pro-preview': { inputCostPerMillion: 2.50, outputCostPerMillion: 10.0 },
+  'gemini-2.5-flash-lite': { inputCostPerMillion: 0.05, outputCostPerMillion: 0.20 },
   'gemini-2.5-flash': { inputCostPerMillion: 0.075, outputCostPerMillion: 0.30 },
-  'gemini-flash-latest': { inputCostPerMillion: 0.075, outputCostPerMillion: 0.30 },
+  'gemini-2.5-pro': { inputCostPerMillion: 2.50, outputCostPerMillion: 10.0 },
 };
 
 // Estimate cost based on tokens and model

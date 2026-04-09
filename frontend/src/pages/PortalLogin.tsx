@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle, CheckCircle, LogIn, UserPlus, RefreshCw } from 'lucide-react';
 import { apiService } from '../services/api';
+import PageContainer from '../components/Layout/PageContainer';
 
 interface PortalLoginProps {
   role: string;
@@ -188,8 +189,14 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
   };
 
   return (
-    <div className="min-h-screen min-h-[100dvh] bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-x-hidden">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 max-w-md w-full p-4 sm:p-6 lg:p-8 mx-4 sm:mx-6">
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-primary-50/20"
+    >
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex items-center justify-center min-h-screen">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 max-w-md w-full p-4 sm:p-6 lg:p-8">
         {/* Error Message */}
         {error && (
           <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
@@ -521,7 +528,8 @@ const PortalLogin: React.FC<PortalLoginProps> = ({ role, onLoginSuccess, onBack 
           </p>
         </div>
       </div>
-    </div>
+      </main>
+    </PageContainer>
   );
 };
 

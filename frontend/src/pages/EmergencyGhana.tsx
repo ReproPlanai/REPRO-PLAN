@@ -15,6 +15,7 @@ import {
   Sparkles,
   Share2
 } from 'lucide-react';
+import PageContainer from '../components/Layout/PageContainer';
 
 interface EmergencyNumber {
   name: string;
@@ -162,8 +163,14 @@ const EmergencyGhana: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto">
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-primary-50/20"
+    >
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="max-w-4xl mx-auto">
         {/* Header - Pentagon Style */}
         <div className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600 rounded-3xl shadow-2xl p-6 sm:p-8 mb-8">
           <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.1)_100%)]" />
@@ -342,7 +349,8 @@ const EmergencyGhana: React.FC = () => {
           <p className="mt-2">All numbers are verified Ghana emergency services</p>
         </div>
       </div>
-    </div>
+      </main>
+    </PageContainer>
   );
 };
 

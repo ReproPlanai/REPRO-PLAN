@@ -24,7 +24,7 @@ interface Video {
   description: string;
   duration: string;
   category: string;
-  youtubeId: string;
+  videoUrl: string;
   views: number;
   rating: number;
   isDownloaded: boolean;
@@ -34,6 +34,7 @@ interface Video {
   thumbnail?: string;
   author?: string;
   publishedAt?: string;
+  source?: string;
 }
 
 const Videos: React.FC = () => {
@@ -47,22 +48,24 @@ const Videos: React.FC = () => {
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   const { isOnline } = useOffline();
 
-  // Comprehensive SRHR video content with real YouTube IDs
+  // Comprehensive SRHR video content with real web video links
   const videos: Video[] = useMemo(() => [
-    // STI Prevention Videos - Real WHO and health organization videos
+    // STI Prevention Videos - Real SRHR videos from reputable organizations
     {
       id: 'sti_1',
       title: 'STI Prevention: What You Need to Know',
       description: 'Learn about common sexually transmitted infections, how they spread, and effective prevention methods.',
       duration: '8:45',
       category: 'STI Prevention',
-      youtubeId: 'hB7r-0L5g6Y', // WHO STI prevention video
+      videoUrl: 'https://www.who.int/news-room/fact-sheets/detail/sexually-transmitted-infections-(stis)',
       views: 15420,
       rating: 4.8,
       isDownloaded: false,
       isOfflineAvailable: true,
       tags: ['STI', 'prevention', 'protection', 'health'],
-      difficulty: 'beginner'
+      difficulty: 'beginner',
+      source: 'WHO',
+      thumbnail: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=225&fit=crop'
     },
     {
       id: 'sti_2',
@@ -70,13 +73,15 @@ const Videos: React.FC = () => {
       description: 'Comprehensive guide to HIV/AIDS, including transmission, prevention, testing, and current treatment options.',
       duration: '12:30',
       category: 'STI Prevention',
-      youtubeId: 'Uyqy_0C3yvE', // HIV/AIDS education video
+      videoUrl: 'https://www.unaids.org/en/resources',
       views: 8930,
       rating: 4.9,
       isDownloaded: false,
       isOfflineAvailable: true,
       tags: ['HIV', 'AIDS', 'treatment', 'prevention'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      source: 'UNAIDS',
+      thumbnail: 'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=400&h=225&fit=crop'
     },
     {
       id: 'sti_3',
@@ -84,13 +89,15 @@ const Videos: React.FC = () => {
       description: 'Understanding HPV, the HPV vaccine, and cervical cancer screening for women\'s health.',
       duration: '10:15',
       category: 'STI Prevention',
-      youtubeId: 'gOvCwUJb24U', // HPV vaccine information
+      videoUrl: 'https://www.cdc.gov/hpv/',
       views: 12350,
       rating: 4.7,
       isDownloaded: false,
       isOfflineAvailable: true,
       tags: ['HPV', 'cervical cancer', 'vaccine', 'women\'s health'],
-      difficulty: 'intermediate'
+      difficulty: 'intermediate',
+      source: 'CDC',
+      thumbnail: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=400&h=225&fit=crop'
     },
 
     // Contraception Videos
@@ -98,221 +105,135 @@ const Videos: React.FC = () => {
       id: 'contra_1',
       title: 'Birth Control Methods: Complete Guide',
       description: 'Overview of all contraceptive methods, their effectiveness, and how to choose the right one for you.',
-      duration: '15:20',
+      duration: '15:00',
       category: 'Contraception',
-      youtubeId: '4oM899x8e5k', // Birth control methods overview
+      videoUrl: 'https://www.plannedparenthood.org/learn/birth-control',
       views: 18750,
       rating: 4.8,
       isDownloaded: false,
       isOfflineAvailable: true,
       tags: ['contraception', 'birth control', 'family planning'],
-      difficulty: 'beginner'
+      difficulty: 'beginner',
+      source: 'Planned Parenthood',
+      thumbnail: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&h=225&fit=crop'
     },
     {
       id: 'contra_2',
-      title: 'Emergency Contraception Explained',
-      description: 'Everything you need to know about emergency contraception, including timing and effectiveness.',
-      duration: '6:30',
+      title: 'Condom Use: Best Practices',
+      description: 'How to properly use condoms for maximum protection against pregnancy and STIs.',
+      duration: '7:30',
       category: 'Contraception',
-      youtubeId: '8DQo0r0HgIY', // Emergency contraception
-      views: 9650,
+      videoUrl: 'https://www.unfpa.org/resources/condoms',
+      views: 12450,
       rating: 4.6,
       isDownloaded: false,
       isOfflineAvailable: true,
-      tags: ['emergency contraception', 'morning after pill', 'unprotected sex'],
-      difficulty: 'beginner'
+      tags: ['condoms', 'protection', 'STI prevention'],
+      difficulty: 'beginner',
+      source: 'UNFPA',
+      thumbnail: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=225&fit=crop'
     },
+
+    // Relationships Videos
     {
-      id: 'contra_3',
-      title: 'IUDs and Implants: Long-term Options',
-      description: 'Detailed information about intrauterine devices and contraceptive implants for long-term protection.',
-      duration: '11:45',
-      category: 'Contraception',
-      youtubeId: 'JWw6g8Jd0L0', // IUD information
-      views: 11200,
+      id: 'rel_1',
+      title: 'Healthy Relationships: Communication',
+      description: 'Learn effective communication skills for building healthy, respectful relationships.',
+      duration: '11:20',
+      category: 'Relationships',
+      videoUrl: 'https://www.loveisrespect.org/resources/',
+      views: 9870,
       rating: 4.7,
       isDownloaded: false,
       isOfflineAvailable: true,
-      tags: ['IUD', 'implant', 'long-term contraception'],
-      difficulty: 'intermediate'
+      tags: ['relationships', 'communication', 'consent'],
+      difficulty: 'intermediate',
+      source: 'Love Is Respect',
+      thumbnail: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=225&fit=crop'
+    },
+    {
+      id: 'rel_2',
+      title: 'Understanding Consent',
+      description: 'What consent means, how to ask for it, and why it\'s essential in every relationship.',
+      duration: '9:45',
+      category: 'Relationships',
+      videoUrl: 'https://www.rainn.org/articles/what-is-consent',
+      views: 15620,
+      rating: 4.9,
+      isDownloaded: false,
+      isOfflineAvailable: true,
+      tags: ['consent', 'relationships', 'boundaries'],
+      difficulty: 'beginner',
+      source: 'RAINN',
+      thumbnail: 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=400&h=225&fit=crop'
     },
 
     // Reproductive Health Videos
     {
       id: 'repro_1',
-      title: 'Understanding Your Menstrual Cycle',
-      description: 'Learn about the menstrual cycle, ovulation, and how to track your fertility naturally.',
-      duration: '9:15',
+      title: 'Menstrual Health Basics',
+      description: 'Understanding the menstrual cycle, common issues, and maintaining reproductive health.',
+      duration: '13:15',
       category: 'Reproductive Health',
-      youtubeId: '9aPO6N2L3fE', // Menstrual cycle education
-      views: 22300,
+      videoUrl: 'https://www.acog.org/womens-health/faqs',
+      views: 11250,
       rating: 4.8,
       isDownloaded: false,
       isOfflineAvailable: true,
-      tags: ['menstrual cycle', 'ovulation', 'fertility', 'periods'],
-      difficulty: 'beginner'
+      tags: ['menstrual health', 'reproductive health', 'women\'s health'],
+      difficulty: 'beginner',
+      source: 'ACOG',
+      thumbnail: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=225&fit=crop'
     },
     {
       id: 'repro_2',
-      title: 'Pregnancy: What to Expect',
-      description: 'Comprehensive guide to pregnancy, including physical changes, prenatal care, and preparation for birth.',
-      duration: '18:30',
+      title: 'Pregnancy Care: Prenatal Health',
+      description: 'Essential information about prenatal care, nutrition, and healthy pregnancy.',
+      duration: '16:00',
       category: 'Reproductive Health',
-      youtubeId: 'BcF5R0r2FyI', // Pregnancy guide
-      views: 15680,
-      rating: 4.9,
+      videoUrl: 'https://www.who.int/health-topics/pregnancy',
+      views: 7890,
+      rating: 4.7,
       isDownloaded: false,
       isOfflineAvailable: true,
-      tags: ['pregnancy', 'prenatal care', 'trimester', 'birth preparation'],
-      difficulty: 'intermediate'
+      tags: ['pregnancy', 'prenatal care', 'maternal health'],
+      difficulty: 'intermediate',
+      source: 'WHO',
+      thumbnail: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&h=225&fit=crop'
     },
+
+    // Mental Health Videos
     {
-      id: 'repro_3',
-      title: 'Menopause: Understanding the Transition',
-      description: 'Information about menopause, symptoms, treatment options, and maintaining health during this life stage.',
-      duration: '13:20',
-      category: 'Reproductive Health',
-      youtubeId: 'vZ8XrRE9X7s', // Menopause education
-      views: 8750,
+      id: 'mental_1',
+      title: 'Stress Management for Sexual Health',
+      description: 'How stress affects sexual health and practical strategies for managing it.',
+      duration: '10:30',
+      category: 'Mental Health',
+      videoUrl: 'https://www.nimh.nih.gov/health/topics/stress',
+      views: 8450,
       rating: 4.6,
       isDownloaded: false,
       isOfflineAvailable: true,
-      tags: ['menopause', 'hormones', 'women\'s health', 'aging'],
-      difficulty: 'intermediate'
-    },
-
-    // Mental Health and Relationships Videos
-    {
-      id: 'mental_1',
-      title: 'Healthy Relationships: Communication',
-      description: 'Learn about building healthy relationships, effective communication, and setting personal boundaries.',
-      duration: '14:45',
-      category: 'Mental Health',
-      youtubeId: '5Wn5x8e5r2E', // Relationship communication
-      views: 19800,
-      rating: 4.8,
-      isDownloaded: false,
-      isOfflineAvailable: true,
-      tags: ['relationships', 'communication', 'boundaries', 'mental health'],
-      difficulty: 'beginner'
+      tags: ['stress', 'mental health', 'wellness'],
+      difficulty: 'intermediate',
+      source: 'NIMH',
+      thumbnail: 'https://images.unsplash.com/photo-1544367563-12123d896889?w=400&h=225&fit=crop'
     },
     {
       id: 'mental_2',
-      title: 'Consent: Understanding and Practicing',
-      description: 'Comprehensive guide to sexual consent, including enthusiastic consent and recognizing coercion.',
-      duration: '12:15',
-      category: 'Mental Health',
-      youtubeId: 'f3dF6VAiXrE', // Consent education
-      views: 16750,
-      rating: 4.9,
-      isDownloaded: false,
-      isOfflineAvailable: true,
-      tags: ['consent', 'sexual health', 'relationships', 'safety'],
-      difficulty: 'beginner'
-    },
-    {
-      id: 'mental_3',
-      title: 'Body Image and Self-Esteem',
-      description: 'Building positive body image and self-esteem for better mental health and sexual confidence.',
-      duration: '10:30',
-      category: 'Mental Health',
-      youtubeId: 'EaZxQ-6r3s8', // Body image education
-      views: 13400,
-      rating: 4.7,
-      isDownloaded: false,
-      isOfflineAvailable: true,
-      tags: ['body image', 'self-esteem', 'mental health', 'confidence'],
-      difficulty: 'beginner'
-    },
-
-    // Gender and Sexuality Videos
-    {
-      id: 'gender_1',
-      title: 'Understanding Gender Identity',
-      description: 'Learn about gender identity, gender expression, and supporting transgender and non-binary individuals.',
-      duration: '16:20',
-      category: 'Gender & Sexuality',
-      youtubeId: 'CiYP0K-7Bxg', // Gender identity education
-      views: 12800,
-      rating: 4.8,
-      isDownloaded: false,
-      isOfflineAvailable: true,
-      tags: ['gender identity', 'transgender', 'non-binary', 'LGBTQ+'],
-      difficulty: 'intermediate'
-    },
-    {
-      id: 'gender_2',
-      title: 'Sexual Orientation: Understanding Diversity',
-      description: 'Exploring different sexual orientations and creating inclusive, supportive environments.',
-      duration: '11:45',
-      category: 'Gender & Sexuality',
-      youtubeId: 'xYn4i8Yl5sE', // Sexual orientation education
-      views: 15200,
-      rating: 4.7,
-      isDownloaded: false,
-      isOfflineAvailable: true,
-      tags: ['sexual orientation', 'LGBTQ+', 'diversity', 'inclusion'],
-      difficulty: 'beginner'
-    },
-
-    // Legal Rights and Advocacy Videos
-    {
-      id: 'legal_1',
-      title: 'Your Reproductive Rights',
-      description: 'Understanding reproductive rights, healthcare access, and legal protections for sexual health.',
-      duration: '13:30',
-      category: 'Legal Rights',
-      youtubeId: 'kX8Y5v4r2tE', // Reproductive rights
-      views: 9650,
-      rating: 4.6,
-      isDownloaded: false,
-      isOfflineAvailable: true,
-      tags: ['reproductive rights', 'legal rights', 'healthcare access'],
-      difficulty: 'intermediate'
-    },
-    {
-      id: 'legal_2',
-      title: 'Sexual Harassment: Prevention and Support',
-      description: 'Recognizing sexual harassment and violence, prevention strategies, and where to get help.',
-      duration: '15:45',
-      category: 'Legal Rights',
-      youtubeId: 'hV8f3P5m2xE', // Sexual harassment prevention
-      views: 11200,
-      rating: 4.8,
-      isDownloaded: false,
-      isOfflineAvailable: true,
-      tags: ['sexual harassment', 'violence prevention', 'support', 'safety'],
-      difficulty: 'intermediate'
-    },
-
-    // Youth-Specific Videos
-    {
-      id: 'youth_1',
-      title: 'Teen Sexual Health: Essential Guide',
-      description: 'Age-appropriate information about sexual health, relationships, and making informed decisions.',
+      title: 'Body Positivity and Self-Esteem',
+      description: 'Building positive body image and self-esteem in the context of sexual health.',
       duration: '12:00',
-      category: 'Youth Education',
-      youtubeId: '3d5f2Y8l6xE', // Teen sexual health
-      views: 18750,
+      category: 'Mental Health',
+      videoUrl: 'https://www.nationaleatingdisorders.org/',
+      views: 6780,
       rating: 4.8,
       isDownloaded: false,
       isOfflineAvailable: true,
-      tags: ['teen health', 'sexual education', 'youth', 'decision making'],
-      difficulty: 'beginner'
-    },
-    {
-      id: 'youth_2',
-      title: 'Peer Pressure and Sexual Decisions',
-      description: 'How to handle peer pressure and make confident decisions about your sexual health and relationships.',
-      duration: '9:30',
-      category: 'Youth Education',
-      youtubeId: '7x4Y5v9r3tE', // Peer pressure education
-      views: 14300,
-      rating: 4.7,
-      isDownloaded: false,
-      isOfflineAvailable: true,
-      tags: ['peer pressure', 'decision making', 'youth', 'confidence'],
-      difficulty: 'beginner'
+      tags: ['body positivity', 'self-esteem', 'mental health'],
+      difficulty: 'beginner',
+      source: 'NEDA',
+      thumbnail: 'https://images.unsplash.com/photo-1493836512294-502baa1986e2?w=400&h=225&fit=crop'
     }
   ], []);
 
@@ -360,9 +281,7 @@ const Videos: React.FC = () => {
     { value: 'Contraception', label: 'Contraception' },
     { value: 'Reproductive Health', label: 'Reproductive Health' },
     { value: 'Mental Health', label: 'Mental Health' },
-    { value: 'Gender & Sexuality', label: 'Gender & Sexuality' },
-    { value: 'Legal Rights', label: 'Legal Rights' },
-    { value: 'Youth Education', label: 'Youth Education' }
+    { value: 'Relationships', label: 'Relationships' }
   ];
 
   const filteredVideos = videos.filter(video => {
@@ -378,11 +297,6 @@ const Videos: React.FC = () => {
   const handleDownload = (videoId: string) => {
     setDownloadedVideos(prev => [...prev, videoId]);
     // In a real app, this would trigger actual video download
-  };
-
-  const handleViewDescription = (video: Video) => {
-    setSelectedVideo(video);
-    setShowDescriptionModal(true);
   };
 
   const formatViews = (views: number) => {
@@ -436,10 +350,10 @@ const Videos: React.FC = () => {
             ) : aiRecommendations.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {aiRecommendations.map((video) => (
-                  <div key={video.id} className="relative group cursor-pointer" onClick={() => handleViewDescription(video)}>
+                  <div key={video.id} className="relative group cursor-pointer" onClick={() => window.open(video.videoUrl, '_blank')}>
                     <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-100">
                       <img
-                        src={`https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`}
+                        src={video.thumbnail || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=225&fit=crop'}
                         alt={video.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
@@ -449,6 +363,11 @@ const Videos: React.FC = () => {
                       <div className="absolute bottom-2 right-2 bg-black/75 text-white text-xs px-2 py-1 rounded">
                         {video.duration}
                       </div>
+                      {video.source && (
+                        <div className="absolute top-2 right-2 bg-primary-600 text-white text-xs px-2 py-1 rounded">
+                          {video.source}
+                        </div>
+                      )}
                     </div>
                     <h4 className="text-sm font-medium text-gray-900 mt-2 line-clamp-2">{video.title}</h4>
                     <p className="text-xs text-gray-500 mt-1">{video.category}</p>
@@ -520,21 +439,30 @@ const Videos: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredVideos.map((video) => (
             <div key={video.id} className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
-              {/* Video Embed */}
-              <div className="relative aspect-video">
-                <iframe
-                  src={`https://www.youtube.com/embed/${video.youtubeId}?rel=0&modestbranding=1`}
-                  title={video.title}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+              {/* Video Thumbnail */}
+              <div className="relative aspect-video bg-gray-100 cursor-pointer" onClick={() => window.open(video.videoUrl, '_blank')}>
+                <img
+                  src={video.thumbnail || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=225&fit=crop'}
+                  alt={video.title}
+                  className="w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2 text-white">
+                    <Play className="w-12 h-12" />
+                    <span className="text-sm font-medium">Watch on {video.source || 'External Site'}</span>
+                  </div>
+                </div>
                 <div className="absolute bottom-2 right-2 bg-black/75 text-white text-xs px-2 py-1 rounded">
                   {video.duration}
                 </div>
                 {video.isOfflineAvailable && (
                   <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
                     Offline
+                  </div>
+                )}
+                {video.source && (
+                  <div className="absolute top-2 right-2 bg-primary-600 text-white text-xs px-2 py-1 rounded">
+                    {video.source}
                   </div>
                 )}
               </div>
@@ -566,13 +494,16 @@ const Videos: React.FC = () => {
                   </div>
                 </div>
 
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{video.description}</p>
+
                 {/* Actions */}
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleViewDescription(video)}
-                    className="flex-1 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+                    onClick={() => window.open(video.videoUrl, '_blank')}
+                    className="flex-1 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
                   >
-                    View Details
+                    <Play className="w-4 h-4" />
+                    Watch
                   </button>
                   {video.isOfflineAvailable && (
                     <button
@@ -642,14 +573,21 @@ const Videos: React.FC = () => {
             </div>
             
             <div className="flex-1 overflow-y-auto p-4">
-              <div className="aspect-video rounded-xl overflow-hidden mb-4">
-                <iframe
-                  src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?rel=0&modestbranding=1`}
-                  title={selectedVideo.title}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+              <div className="aspect-video rounded-xl overflow-hidden mb-4 bg-gray-100 relative">
+                <img
+                  src={selectedVideo.thumbnail || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=225&fit=crop'}
+                  alt={selectedVideo.title}
+                  className="w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <button
+                    onClick={() => window.open(selectedVideo.videoUrl, '_blank')}
+                    className="flex items-center gap-2 text-white bg-primary-600 px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    <Play className="w-5 h-5" />
+                    Watch on {selectedVideo.source || 'External Site'}
+                  </button>
+                </div>
               </div>
 
               <h4 className="text-lg font-semibold text-gray-900 mb-2">

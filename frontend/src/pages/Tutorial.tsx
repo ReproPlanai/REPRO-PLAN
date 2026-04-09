@@ -8,11 +8,12 @@ import {
   MessageCircle,
   MapPin,
   Gamepad2,
+  ArrowRight,
   Heart,
   Lock,
-  Zap,
-  ArrowRight
+  Zap
 } from 'lucide-react';
+import PageContainer from '../components/Layout/PageContainer';
 
 interface Step {
   id: string;
@@ -103,7 +104,12 @@ const Tutorial: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full bg-gradient-to-br from-slate-50 via-white to-primary-50/30 overflow-x-hidden">
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-primary-50/20"
+    >
       <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Progress */}
         <div className="mb-6 sm:mb-8">
@@ -204,7 +210,7 @@ const Tutorial: React.FC = () => {
           ))}
         </div>
       </main>
-    </div>
+    </PageContainer>
   );
 };
 

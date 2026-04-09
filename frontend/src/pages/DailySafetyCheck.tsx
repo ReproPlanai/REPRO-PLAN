@@ -16,12 +16,13 @@ import {
   ArrowRight,
   X,
   MapPin,
-  ChevronLeft,
   Flame,
-  Clock
+  Clock,
+  Sparkles
 } from 'lucide-react';
 import { apiService } from '../services/api';
 import { offlineStorage } from '../utils/offlineStorage';
+import PageContainer from '../components/Layout/PageContainer';
 
 interface SafetyCheck {
   id: string;
@@ -332,40 +333,57 @@ const DailySafetyCheck: React.FC = () => {
   const totalSteps = SAFETY_CHECK_QUESTIONS.length + 2;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary-600 via-purple-600 to-pink-600 text-white">
-        <div className="flex items-center gap-4 p-4 pt-safe">
-          <button 
-            onClick={() => navigate(-1)}
-            className="p-2 hover:bg-white/20 rounded-full transition-colors"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-xl font-bold">Daily Safety Check</h1>
-        </div>
-        
-        {/* Stats Cards */}
-        <div className="px-4 pb-6 grid grid-cols-2 gap-4">
-          <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-5 h-5 text-white/80" />
-              <span className="text-sm text-white/80">Completed Today</span>
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-primary-50/20"
+    >
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Hero */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600 p-6 sm:p-8 shadow-2xl shadow-primary-500/20 mb-6">
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.05)_100%)]" />
+          <div className="relative flex items-start gap-4">
+            <div className="flex-shrink-0 p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+              <Shield className="w-8 h-8 text-white" />
             </div>
-            <p className="text-3xl font-bold">{todayChecks.length}<span className="text-lg text-white/60">/3</span></p>
-          </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Flame className="w-5 h-5 text-orange-300" />
-              <span className="text-sm text-white/80">Day Streak</span>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 bg-white/25 rounded-full text-xs font-semibold text-white uppercase tracking-wide">Daily Check</span>
+                <Sparkles className="w-3.5 h-3.5 text-white/80" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">Daily Safety Check</h1>
+              <p className="text-sm text-white/90 leading-relaxed">
+                Track your well-being throughout the day with morning, afternoon, and evening check-ins.
+              </p>
             </div>
-            <p className="text-3xl font-bold">{streak}</p>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="p-4 space-y-4 -mt-2">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-6">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/60 shadow-sm">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500">
+              <CheckCircle className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 text-sm">{todayChecks.length}/3</p>
+              <p className="text-xs text-gray-500">Completed Today</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/60 shadow-sm">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-orange-500 to-red-500">
+              <Flame className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 text-sm">{streak}</p>
+              <p className="text-xs text-gray-500">Day Streak</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="space-y-4">
         {/* Progress Overview */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Today's Progress</h2>
@@ -785,7 +803,8 @@ const DailySafetyCheck: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+      </main>
+    </PageContainer>
   );
 };
 

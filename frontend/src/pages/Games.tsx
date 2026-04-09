@@ -13,9 +13,14 @@ const Games: React.FC = () => {
   }
 
   return (
-    <PageContainer gradient>
-      {/* Hero */}
-      <div className="text-center mb-8">
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-primary-50/20"
+    >
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Hero */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-primary-500/10 to-purple-500/10 text-primary-600 text-xs font-semibold mb-4">
             <Sparkles className="w-3.5 h-3.5" />
@@ -84,7 +89,7 @@ const Games: React.FC = () => {
             Both games save your scores and achievements. Complete quizzes and scenarios to build your SRHR knowledge.
           </p>
         </div>
-      </div>
+      </main>
     </PageContainer>
   );
 };

@@ -1,10 +1,8 @@
 import { getEnv } from '../../config/env';
 import { createServiceLogger } from '../../config/logger';
 import { getCached, setCached } from '../cache';
-import type { AIProvider, Message } from './types';
+import type { Message } from './types';
 import { REPROBOT_SYSTEM_PROMPT } from './types';
-import { createGeminiProvider } from './providers/gemini';
-import { createAnthropicProvider } from './providers/anthropic';
 import { selectModel, getModelString, type TaskType } from './router/aiRouter';
 import { executeWithFallback, executeContentWithFallback } from './router/fallback';
 import { buildContext } from '../gateway/contextManager';
@@ -12,30 +10,6 @@ import { logUsage, logError } from '../analytics/costTracker';
 import { randomUUID } from 'crypto';
 
 const log = createServiceLogger('reprobot');
-
-let cachedProvider: AIProvider | null = null;
-
-function getAIProvider(): AIProvider {
-  if (cachedProvider) return cachedProvider;
-
-  const env = getEnv();
-  const provider = env.AI_PROVIDER;
-
-  if (provider === 'gemini' && env.GEMINI_API_KEY) {
-    cachedProvider = createGeminiProvider(env.GEMINI_API_KEY);
-    log.info('ReproBot using Gemini');
-  } else if (provider === 'anthropic' && env.ANTHROPIC_API_KEY) {
-    cachedProvider = createAnthropicProvider(env.ANTHROPIC_API_KEY);
-    log.info('ReproBot using Anthropic Claude');
-  } else if (env.GEMINI_API_KEY) {
-    cachedProvider = createGeminiProvider(env.GEMINI_API_KEY);
-    log.info('ReproBot using Gemini (fallback)');
-  } else {
-    throw new Error('No AI provider configured. Set AI_PROVIDER and corresponding API key (e.g. GEMINI_API_KEY).');
-  }
-
-  return cachedProvider;
-}
 
 function cacheKey(prompt: string, history?: Message[]): string {
   const h = history?.map((m) => `${m.role}:${m.content}`).join('|') || '';
@@ -176,29 +150,18 @@ export async function generateContent(
 }
 
 export function isAIConfigured(): boolean {
-  try {
-    getAIProvider();
-    return true;
-  } catch {
-    return false;
-  }
+  const env = getEnv();
+  // AI is configured if at least one provider has an API key
+  return !!(env.GEMINI_API_KEY || env.ANTHROPIC_API_KEY);
 }
 
 export function getSupportedModels(): string[] {
   return [
-    'gemini-2.5-flash-lite',
-    'gemini-2.5-pro',
-    'gemini-2.5-flash',
     'gemini-3-flash-preview',
-    'gemini-3.1-pro-preview',
-    'gemini-3.1-flash-lite-preview',
-    'gemini-3.1-flash-image-preview',
-    'gemini-3-pro-image-preview',
-    'gemini-pro-latest',
-    'gemini-flash-latest',
-    'gemini-flash-lite-latest',
-    'imagen-4.0-generate-001',
-    'imagen-4.0-ultra-generate-001'
+    'gemini-3-pro-preview',
+    'gemini-2.5-flash-lite',
+    'gemini-2.5-flash',
+    'gemini-2.5-pro'
   ];
 }
 
