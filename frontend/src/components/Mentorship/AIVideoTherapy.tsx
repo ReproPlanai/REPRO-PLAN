@@ -67,7 +67,6 @@ const AIVideoTherapy: React.FC = () => {
   };
 
   const startSession = (topicId: string) => {
-    setSelectedTopic(topicId);
     const newSession: TherapySession = {
       id: Date.now().toString(),
       topic: topicId,
