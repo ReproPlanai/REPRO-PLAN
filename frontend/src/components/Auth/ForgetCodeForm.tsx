@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 // import { useTranslation } from 'react-i18next'; // Reserved for future use
 import { Shield, ArrowLeft, RefreshCw, Check, Copy, AlertCircle, Upload, FileText } from 'lucide-react';
+import { apiService } from '../../services/api';
 
 interface ForgetCodeFormProps {
   onBack: () => void;
@@ -51,7 +52,6 @@ const ForgetCodeForm: React.FC<ForgetCodeFormProps> = ({ onBack, onCodeRecovered
     setIsLoading(true);
 
     try {
-      const { apiService } = await import('../../services/api');
       const response = await apiService.forgetCode(recoveryValue) as { success: boolean; message?: string; secretCode?: string };
 
       if (response.success && response.secretCode) {

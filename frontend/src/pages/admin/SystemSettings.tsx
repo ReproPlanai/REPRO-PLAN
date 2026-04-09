@@ -14,6 +14,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import PageContainer from '../../components/Layout/PageContainer';
+import { apiService } from '../../services/api';
 
 const defaultSettings = {
   notifications: {
@@ -55,7 +56,6 @@ const SystemSettings: React.FC = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const { apiService } = await import('../../services/api');
         const res = await apiService.getSystemSettings() as { success: boolean; settings?: typeof defaultSettings };
         if (res.success && res.settings) {
           setSettings({ ...defaultSettings, ...res.settings });
@@ -71,7 +71,6 @@ const SystemSettings: React.FC = () => {
     setSaving(true);
     setLoadError(null);
     try {
-      const { apiService } = await import('../../services/api');
       const res = await apiService.updateSystemSettings(settings) as { success: boolean };
       if (res.success) {
         setSaved(true);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Phone, Mail, UserPlus, X } from 'lucide-react';
+import { apiService } from '../../services/api';
 
 interface Stakeholder {
   id: number;
@@ -51,7 +52,6 @@ const StakeholderManagement: React.FC = () => {
   const fetchStakeholders = async () => {
     setLoading(true);
     try {
-      const { apiService } = await import('../../services/api');
       const res = await apiService.getStakeholders() as { success: boolean; stakeholders?: Stakeholder[] };
       if (res.success && res.stakeholders) {
         setStakeholders(res.stakeholders);
@@ -285,7 +285,6 @@ const AddStakeholderModal: React.FC<{
     setLoading(true);
     setError('');
     try {
-      const { apiService } = await import('../../services/api');
       const res = await apiService.registerStakeholder({
         role,
         phoneNumber: phoneNumber.trim(),

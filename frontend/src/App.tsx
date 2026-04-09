@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './i18n';
 import { Analytics } from '@vercel/analytics/react';
+import { apiService } from './services/api';
 
 // Components
 import OfflineIndicator from './components/OfflineIndicator';
@@ -178,11 +179,11 @@ function App() {
 
   const handleLogin = async (code: string) => {
     try {
-      const response = await (await import('./services/api')).apiService.loginUser(code) as { success: boolean; message?: string; user?: any };
+      const response = await apiService.loginUser(code) as { success: boolean; message?: string; user?: any };
 
       if (response.success) {
-        if ((await import('./utils/secretCode')).secretCodeManager.validateSecretCode(code)) {
-          (await import('./utils/secretCode')).secretCodeManager.updateLastUsed();
+        if (secretCodeManager.validateSecretCode(code)) {
+          secretCodeManager.updateLastUsed();
           setIsAuthenticated(true);
         }
       } else {
@@ -190,8 +191,8 @@ function App() {
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      if ((await import('./utils/secretCode')).secretCodeManager.validateSecretCode(code)) {
-        (await import('./utils/secretCode')).secretCodeManager.updateLastUsed();
+      if (secretCodeManager.validateSecretCode(code)) {
+        secretCodeManager.updateLastUsed();
         setIsAuthenticated(true);
       } else {
         alert('Invalid secret code. Please try again.');

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Download, Eye, Edit, Trash2, Plus, Phone, X, Copy, Check } from 'lucide-react';
+import { apiService } from '../../services/api';
 
 interface User {
   id: number;
@@ -97,7 +98,6 @@ const UserManagement: React.FC = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const { apiService } = await import('../../services/api');
       const response = await apiService.getUsers() as { success: boolean; users?: any[] };
 
       if (response.success && response.users) {
@@ -140,7 +140,6 @@ const UserManagement: React.FC = () => {
   const handleAddUser = async () => {
     setLoading(true);
     try {
-      const { apiService } = await import('../../services/api');
       const response = await apiService.registerUser() as { success: boolean; secretCode?: string; surveyLink?: string };
       if (response.success && response.secretCode && response.surveyLink) {
         setAddSuccess({ secretCode: response.secretCode, surveyLink: response.surveyLink });
@@ -158,7 +157,6 @@ const UserManagement: React.FC = () => {
     if (!editingUser) return;
     setLoading(true);
     try {
-      const { apiService } = await import('../../services/api');
       const response = await apiService.updateUser(editingUser.id.toString(), updates as any) as { success: boolean };
       if (response.success) {
         setEditingUser(null);
@@ -178,7 +176,6 @@ const UserManagement: React.FC = () => {
     if (!userToDelete) return;
     setLoading(true);
     try {
-      const { apiService } = await import('../../services/api');
       const response = await apiService.deleteUser(userToDelete.id.toString()) as { success: boolean };
       if (response.success) {
         setUserToDelete(null);
