@@ -16,7 +16,8 @@ import {
   QrCode,
   Sparkles,
   Lock,
-  Activity
+  Activity,
+  Heart
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import PWAInstallPrompt from '../components/PWAInstallPrompt';
