@@ -3,7 +3,7 @@ import { createServiceLogger } from '../../config/logger';
 import { getCached, setCached } from '../cache';
 import type { AIProvider, Message } from './types';
 import { REPROBOT_SYSTEM_PROMPT } from './types';
-import { createGeminiProvider, SUPPORTED_MODELS, type SupportedModel } from './providers/gemini';
+import { createGeminiProvider } from './providers/gemini';
 import { createAnthropicProvider } from './providers/anthropic';
 import { selectModel, getModelString, type TaskType } from './router/aiRouter';
 import { executeWithFallback, executeContentWithFallback } from './router/fallback';
@@ -22,20 +22,14 @@ function getAIProvider(): AIProvider {
   const provider = env.AI_PROVIDER;
 
   if (provider === 'gemini' && env.GEMINI_API_KEY) {
-    const defaultModel: SupportedModel = (env.GEMINI_MODEL && SUPPORTED_MODELS.includes(env.GEMINI_MODEL as SupportedModel))
-      ? env.GEMINI_MODEL as SupportedModel
-      : 'gemini-2.5-flash-lite';
-    cachedProvider = createGeminiProvider(env.GEMINI_API_KEY, defaultModel);
-    log.info({ model: defaultModel }, 'ReproBot using Gemini');
+    cachedProvider = createGeminiProvider(env.GEMINI_API_KEY);
+    log.info('ReproBot using Gemini');
   } else if (provider === 'anthropic' && env.ANTHROPIC_API_KEY) {
     cachedProvider = createAnthropicProvider(env.ANTHROPIC_API_KEY);
     log.info('ReproBot using Anthropic Claude');
   } else if (env.GEMINI_API_KEY) {
-    const defaultModel: SupportedModel = (env.GEMINI_MODEL && SUPPORTED_MODELS.includes(env.GEMINI_MODEL as SupportedModel))
-      ? env.GEMINI_MODEL as SupportedModel
-      : 'gemini-2.5-flash-lite';
-    cachedProvider = createGeminiProvider(env.GEMINI_API_KEY, defaultModel);
-    log.info({ model: defaultModel }, 'ReproBot using Gemini (fallback)');
+    cachedProvider = createGeminiProvider(env.GEMINI_API_KEY);
+    log.info('ReproBot using Gemini (fallback)');
   } else {
     throw new Error('No AI provider configured. Set AI_PROVIDER and corresponding API key (e.g. GEMINI_API_KEY).');
   }
@@ -191,7 +185,21 @@ export function isAIConfigured(): boolean {
 }
 
 export function getSupportedModels(): string[] {
-  return [...SUPPORTED_MODELS];
+  return [
+    'gemini-2.5-flash-lite',
+    'gemini-2.5-pro',
+    'gemini-2.5-flash',
+    'gemini-3-flash-preview',
+    'gemini-3.1-pro-preview',
+    'gemini-3.1-flash-lite-preview',
+    'gemini-3.1-flash-image-preview',
+    'gemini-3-pro-image-preview',
+    'gemini-pro-latest',
+    'gemini-flash-latest',
+    'gemini-flash-lite-latest',
+    'imagen-4.0-generate-001',
+    'imagen-4.0-ultra-generate-001'
+  ];
 }
 
 // Export new gateway services for direct use if needed

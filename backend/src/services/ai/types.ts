@@ -4,11 +4,11 @@ export interface Message {
 }
 
 export interface AIProvider {
-  generateResponse(prompt: string, history?: Message[], systemPrompt?: string): Promise<string>;
-  generateContent(prompt: string, options?: { maxTokens?: number }): Promise<string>;
+  generateResponse(prompt: string, history?: Message[], systemPrompt?: string, model?: string): Promise<string>;
+  generateContent(prompt: string, options?: { maxTokens?: number, model?: string }): Promise<string>;
 }
 
-export const REHANA_SYSTEM_PROMPT = `You are Rehana, REPRO PLAN's AI assistant for sexual and reproductive health and rights (SRHR) support for youth across Africa.
+export const REPROBOT_SYSTEM_PROMPT = `You are ReproBot, REPRO PLAN's AI assistant for sexual and reproductive health and rights (SRHR) support for youth across Africa.
 
 Your role:
 - Provide accurate, empathetic, and non-judgmental SRHR information

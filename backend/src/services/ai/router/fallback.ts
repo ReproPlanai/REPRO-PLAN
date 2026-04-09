@@ -3,9 +3,6 @@ import type { AIProvider, Message } from '../types';
 import { createGeminiProvider } from '../providers/gemini';
 import { createAnthropicProvider } from '../providers/anthropic';
 import { getEnv } from '../../../config/env';
-import type { SupportedModel } from '../providers/gemini';
-import { withTimeout } from '../../gateway/timeout';
-import { withRetry } from '../../gateway/retry';
 
 const log = createServiceLogger('ai-fallback');
 
@@ -20,10 +17,7 @@ function createProvider(provider: 'gemini' | 'anthropic'): AIProvider {
     if (!env.GEMINI_API_KEY) {
       throw new Error('Gemini API key not configured');
     }
-    const defaultModel: SupportedModel = (env.GEMINI_MODEL && env.GEMINI_MODEL.includes('gemini'))
-      ? env.GEMINI_MODEL as SupportedModel
-      : 'gemini-2.5-flash-lite';
-    return createGeminiProvider(env.GEMINI_API_KEY, defaultModel);
+    return createGeminiProvider(env.GEMINI_API_KEY);
   }
 
   if (provider === 'anthropic') {
@@ -58,18 +52,11 @@ export async function executeWithFallback(
 
         const aiProvider = createProvider(provider);
 
-        // Wrap with retry (exponential backoff) and timeout
-        const response = await withRetry(async () => {
-          return withTimeout(
-            aiProvider.generateResponse(
-              request.prompt,
-              request.history,
-              request.systemPrompt,
-              request.model
-            ),
-            8000 // 8 second timeout as per plan
-          );
-        }, 1); // Retry once (2 total attempts per provider handled by outer loop)
+        const response = await aiProvider.generateResponse(
+          request.prompt,
+          request.history,
+          request.systemPrompt
+        );
 
         log.info({ provider, attempts, providerAttempt, success: true }, 'Request successful');
         return { response, provider, attempts };
@@ -116,14 +103,7 @@ export async function executeContentWithFallback(
         log.info({ provider, attempt: attempts, providerAttempt }, `Attempting ${provider} for content generation (attempt ${providerAttempt}/${maxAttemptsPerProvider})`);
 
         const aiProvider = createProvider(provider);
-
-        // Wrap with retry (exponential backoff) and timeout
-        const response = await withRetry(async () => {
-          return withTimeout(
-            aiProvider.generateContent(prompt, options),
-            8000 // 8 second timeout as per plan
-          );
-        }, 1); // Retry once (2 total attempts per provider handled by outer loop)
+        const response = await aiProvider.generateContent(prompt, options);
 
         log.info({ provider, attempts, providerAttempt, success: true }, 'Content generation successful');
         return { response, provider, attempts };
