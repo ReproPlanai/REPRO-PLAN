@@ -1,3 +1,10 @@
+# =============================================================================
+# FORTUNE 500 / PENTAGON LEVEL SECURITY .GITIGNORE
+# =============================================================================
+# This .gitignore prevents ALL sensitive data from being committed
+# NO API keys, secrets, credentials, or environment files should ever be tracked
+# =============================================================================
+
 # Dependencies
 node_modules/
 frontend/node_modules/
@@ -12,21 +19,81 @@ backend/dist/
 backend/build/
 *.tsbuildinfo
 
-# Environment variables
+# =============================================================================
+# ENVIRONMENT FILES - CRITICAL SECURITY
+# =============================================================================
+# NEVER commit any environment files, templates, or configurations
 .env
+.env.*
 .env.local
 .env.*.local
 .env.development
+.env.development.local
 .env.production
+.env.production.local
 .env.test
+.env.test.local
+.env.staging
+.env.staging.local
 frontend/.env
+frontend/.env.*
 frontend/.env.local
+frontend/.env.development
 frontend/.env.production
+frontend/.env.test
+frontend/.env.staging
 backend/.env
+backend/.env.*
 backend/.env.local
+backend/.env.development
 backend/.env.production
+backend/.env.test
+backend/.env.staging
+*.env
+*.env.*
 
+# Environment templates (even examples should be renamed to .env.example only)
+.env.template
+.env.example.backup
+.env.defaults
+.env.config
+
+# =============================================================================
+# SECRETS, CREDENTIALS, AND API KEYS - CRITICAL SECURITY
+# =============================================================================
+# NEVER commit any files containing secrets, keys, or credentials
+*.key
+*.pem
+*.cert
+*.crt
+*.p12
+*.pfx
+*.der
+*.keystore
+*.jks
+*.secret
+*.credentials
+*.auth
+secrets/
+credentials/
+keys/
+certs/
+ssl/
+tls/
+
+# =============================================================================
+# CONFIGURATION FILES WITH SENSITIVE DATA
+# =============================================================================
+config/secrets.json
+config/credentials.json
+config/api-keys.json
+config/private.json
+config/*.secret
+config/*.key
+
+# =============================================================================
 # IDE
+# =============================================================================
 .vscode/
 .idea/
 *.swp
@@ -34,8 +101,12 @@ backend/.env.production
 *~
 *.sublime-project
 *.sublime-workspace
+.history/
+*.orig
 
+# =============================================================================
 # OS
+# =============================================================================
 .DS_Store
 .DS_Store?
 ._*
@@ -44,8 +115,12 @@ backend/.env.production
 ehthumbs.db
 Thumbs.db
 Desktop.ini
+.AppleDouble
+.LSOverride
 
-# Logs
+# =============================================================================
+# LOGS - MAY CONTAIN SENSITIVE INFORMATION
+# =============================================================================
 logs/
 *.log
 npm-debug.log*
@@ -53,67 +128,182 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 pnpm-debug.log*
+server.log
+access.log
+error.log
+*.log.*
 
-# Coverage
+# =============================================================================
+# COVERAGE AND TESTING
+# =============================================================================
 coverage/
 *.lcov
 .nyc_output/
 .jest/
-
-# Testing
 .nyc_output
 test-results/
 playwright-report/
 playwright/.cache/
+test-coverage/
 
-# Temporary files
+# =============================================================================
+# TEMPORARY FILES
+# =============================================================================
 *.tmp
 *.temp
 .cache/
 .temp/
 .tmp/
+tmp/
+temp/
+*.bak
+*.backup
+*.old
+*.swp
 
-# Production
+# =============================================================================
+# PRODUCTION
+# =============================================================================
 /build
 /dist
 
-# Misc
+# =============================================================================
+# MISC - SECURITY RELATED
+# =============================================================================
 .eslintcache
 .stylelintcache
 *.pem
 *.key
 *.cert
 
-# Database
+# =============================================================================
+# DATABASE - MAY CONTAIN SENSITIVE DATA
+# =============================================================================
 *.sqlite
 *.sqlite3
 *.db
 *.db-journal
+*.db-shm
+*.db-wal
+database/
+databases/
 
+# =============================================================================
+# BACKUP FILES - MAY CONTAIN SENSITIVE DATA
+# =============================================================================
+*.backup
+*.bak
+backup/
+backups/
+dump/
+dumps/
+
+# =============================================================================
 # TypeScript
+# =============================================================================
 *.tsbuildinfo
 
+# =============================================================================
 # PWA
+# =============================================================================
 **/service-worker.js
 **/workbox-*.js
 # Note: sw.js in public folder should be committed for PWA functionality
 
-# Docker
+# =============================================================================
+# DOCKER - MAY CONTAIN SENSITIVE DATA IN CONFIG
+# =============================================================================
 .docker/
 docker-compose.override.yml
+docker-compose.yml.local
+docker-compose.*.yml
 
+# =============================================================================
+# CLOUD PROVIDER CONFIGS - MAY CONTAIN API KEYS
+# =============================================================================
 # DigitalOcean
 .do/
+.digitalocean/
 
 # Railway
 .railway/
+.railwayconfig.json
 
 # Vercel
 .vercel/
+.vercelignore
 
-# Vercel
-.vercel/
+# AWS
+.aws/
+.aws-sam/
 
-# Local development
+# Google Cloud
+.gcloud/
+
+# Azure
+.azure/
+
+# =============================================================================
+# LOCAL DEVELOPMENT
+# =============================================================================
 .local/
 local/
+dev/
+development/
+
+# =============================================================================
+# ADDITIONAL SECURITY PATTERNS
+# =============================================================================
+# Files that might contain hardcoded secrets
+secrets.env
+private.env
+production.env
+staging.env
+config.local.json
+config.production.json
+
+# CI/CD secrets (should be in platform, not repo)
+.github/secrets/
+.gitlab-ci.yml.local
+.circleci/config.local.yml
+
+# Package manager lock files with potential sensitive metadata
+package-lock.json.backup
+yarn.lock.backup
+
+# =============================================================================
+# SPECIFIC TO REPROPLAN - ADDITIONAL SECURITY
+# =============================================================================
+# Test files with sample credentials
+TEST_CREDENTIALS.md
+TEST_SECRETS.md
+test-keys.json
+test-config.json
+
+# Survey data with PII
+survey-responses/
+survey-data/
+user-data/
+
+# Health records with PII
+health-records-backup/
+patient-data/
+
+# Secret code backups
+secret-codes-backup/
+codes-backup/
+
+# =============================================================================
+# END OF SECURITY GITIGNORE
+# =============================================================================
+# If you need to add a new pattern, ensure it does NOT expose:
+# - API keys
+# - Secrets
+# - Passwords
+# - Tokens
+# - Certificates
+# - Private keys
+# - Environment configurations
+# - User data
+# - PII (Personally Identifiable Information)
+# =============================================================================

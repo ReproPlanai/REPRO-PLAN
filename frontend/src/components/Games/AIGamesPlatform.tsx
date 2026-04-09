@@ -128,7 +128,7 @@ const AIGamesPlatform: React.FC = () => {
     },
     {
       id: 'ai-learning-chat',
-      title: 'Learn with Rehana',
+      title: 'Learn with ReproBot',
       description: 'Gamified AI chat - earn points by asking good questions',
       icon: MessageCircle,
       color: 'bg-pink-500',

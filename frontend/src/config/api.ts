@@ -15,6 +15,9 @@ export const API_BASE_URL = isDevelopment && isLocalhost
   ? LOCAL_API_URL 
   : PRODUCTION_API_URL;
 
+// Mapbox access key
+export const MAPBOX_ACCESS_KEY = process.env.REACT_APP_MAPBOX_ACCESS_KEY || '';
+
 // API endpoints configuration
 export const API_ENDPOINTS = {
   // Auth
@@ -60,7 +63,7 @@ export const API_ENDPOINTS = {
   },
   
   // Services
-  REHANA: '/rehana',
+  REPROBOT: '/reprobot',
   TRANSCRIBE: '/transcribe',
   AI: '/ai',
   

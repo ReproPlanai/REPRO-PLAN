@@ -1,13 +1,8 @@
 import React from 'react';
-import PageContainer from '../components/Layout/PageContainer';
-import MentorshipSystem from '../components/Mentorship/MentorshipSystem';
+import AIVideoTherapy from '../components/Mentorship/AIVideoTherapy';
 
 const Mentorship: React.FC = () => {
-  return (
-    <PageContainer>
-      <MentorshipSystem />
-    </PageContainer>
-  );
+  return <AIVideoTherapy />;
 };
 
 export default Mentorship;

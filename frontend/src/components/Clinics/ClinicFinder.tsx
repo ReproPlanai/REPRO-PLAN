@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MapPin,
@@ -14,9 +14,12 @@ import {
   ArrowRight,
   Star
 } from 'lucide-react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { offlineStorage } from '../../utils/offlineStorage';
 import UnifiedVerificationForm from '../Auth/UnifiedVerificationForm';
 import { apiService } from '../../services/api';
+import { MAPBOX_ACCESS_KEY } from '../../config/api';
 
 interface Clinic {
   id: string;
@@ -34,6 +37,8 @@ interface Clinic {
 
 const ClinicFinder: React.FC = () => {
   const navigate = useNavigate();
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [filteredClinics, setFilteredClinics] = useState<Clinic[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -158,6 +163,66 @@ const ClinicFinder: React.FC = () => {
     filterAndSortClinics();
   }, [filterAndSortClinics]);
 
+  // Initialize Mapbox map
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
+
+    mapboxgl.accessToken = MAPBOX_ACCESS_KEY;
+
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [-0.1870, 5.6037], // Accra, Ghana
+      zoom: 12,
+    });
+
+    mapRef.current = map;
+
+    return () => {
+      map.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  // Add markers for clinics when they're loaded
+  useEffect(() => {
+    if (!mapRef.current || clinics.length === 0) return;
+
+    const map = mapRef.current;
+
+    // Remove existing markers
+    const markers = document.getElementsByClassName('mapboxgl-marker');
+    while (markers[0]) {
+      markers[0].remove();
+    }
+
+    // Add new markers for filtered clinics
+    filteredClinics.forEach((clinic) => {
+      const el = document.createElement('div');
+      el.className = 'marker';
+      el.style.width = '30px';
+      el.style.height = '30px';
+      el.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236366f1\'%3E%3Cpath d=\'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z\'/%3E%3C/svg%3E")';
+      el.style.backgroundSize = 'cover';
+      el.style.cursor = 'pointer';
+
+      new mapboxgl.Marker(el)
+        .setLngLat([clinic.coordinates.lng, clinic.coordinates.lat])
+        .setPopup(new mapboxgl.Popup({ offset: 25 })
+          .setHTML(`<h3 style="margin:0 0 5px 0;font-size:14px;">${clinic.name}</h3><p style="margin:0;font-size:12px;">${clinic.address}</p>`))
+        .addTo(map);
+    });
+
+    // Fit map to show all clinics
+    if (filteredClinics.length > 0) {
+      const bounds = new mapboxgl.LngLatBounds();
+      filteredClinics.forEach(clinic => {
+        bounds.extend([clinic.coordinates.lng, clinic.coordinates.lat]);
+      });
+      map.fitBounds(bounds, { padding: 50 });
+    }
+  }, [filteredClinics, clinics.length]);
+
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'clinic':
@@ -229,9 +294,14 @@ const ClinicFinder: React.FC = () => {
             className="flex items-center gap-2 py-2.5 px-4 bg-gradient-to-r from-primary-500/10 to-purple-500/10 text-primary-600 rounded-xl font-medium hover:from-primary-500/20 hover:to-purple-500/20 transition-all min-h-[44px]"
           >
             <Sparkles className="w-4 h-4" />
-            <span>Ask Rehana for recommendations</span>
+            <span>Ask ReproBot for recommendations</span>
             <ArrowRight className="w-4 h-4" />
           </button>
+        </div>
+
+        {/* Mapbox Map */}
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 overflow-hidden shadow-sm">
+          <div ref={mapContainerRef} className="h-64 sm:h-80 w-full" />
         </div>
 
         {/* Filters - pills */}

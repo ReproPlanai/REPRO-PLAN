@@ -196,10 +196,15 @@ CREATE TABLE IF NOT EXISTS stories (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   title VARCHAR(255) NOT NULL,
   content TEXT NOT NULL,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   author_type VARCHAR(20) DEFAULT 'anonymous', -- 'anonymous', 'user', 'stakeholder'
   author_id UUID,
+  category VARCHAR(100),
+  status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'approved', 'rejected'
   is_approved BOOLEAN DEFAULT false,
-  tags TEXT[] DEFAULT '{}',
+  is_anonymous BOOLEAN DEFAULT true,
+  tags JSONB DEFAULT '[]',
+  likes_count INTEGER DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -508,6 +513,37 @@ CREATE TABLE IF NOT EXISTS quiz_questions (
 );
 
 -- ============================================
+-- AI ANALYTICS TABLES (Fortune 500 Grade)
+-- ============================================
+
+-- AI usage logs for cost tracking and analytics
+CREATE TABLE IF NOT EXISTS ai_usage_logs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  session_id VARCHAR(255) NOT NULL, -- Anonymous session ID (not user_id)
+  model_used VARCHAR(100) NOT NULL, -- e.g., 'claude-sonnet-4-6', 'gemini-2.5-flash-lite'
+  task_type VARCHAR(50) NOT NULL, -- 'chat', 'quiz', 'game', 'therapy', 'health', 'explain'
+  input_tokens INTEGER DEFAULT 0,
+  output_tokens INTEGER DEFAULT 0,
+  latency_ms INTEGER,
+  cost_usd DECIMAL(10,6) DEFAULT 0.000000,
+  request_id VARCHAR(255) UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- AI error logs for monitoring and fallback tracking
+CREATE TABLE IF NOT EXISTS ai_errors (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  session_id VARCHAR(255) NOT NULL, -- Anonymous session ID
+  model_used VARCHAR(100) NOT NULL,
+  error_type VARCHAR(50) NOT NULL, -- 'timeout', 'rate_limit', 'api_error', 'parse_error'
+  error_message TEXT,
+  request_id VARCHAR(255),
+  fallback_attempted BOOLEAN DEFAULT false,
+  fallback_to_model VARCHAR(100),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
 -- MENTORSHIP & SUPPORT TABLES
 -- ============================================
 
@@ -583,13 +619,17 @@ CREATE TABLE IF NOT EXISTS support_groups (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR(255) NOT NULL,
   description TEXT,
-  focus_area VARCHAR(50) NOT NULL, -- 'teen_parents', 'survivors', 'lgbtq', 'mental_health'
+  category VARCHAR(50), -- 'teen_parents', 'survivors', 'lgbtq', 'mental_health', 'general'
+  focus_area VARCHAR(50), -- 'teen_parents', 'survivors', 'lgbtq', 'mental_health'
   facilitator_id UUID REFERENCES stakeholders(id) ON DELETE SET NULL,
   meeting_schedule JSONB DEFAULT '{}', -- {day, time, frequency}
   is_virtual BOOLEAN DEFAULT true,
+  is_private BOOLEAN DEFAULT false,
   location JSONB DEFAULT '{}', -- For in-person meetings
-  max_members INTEGER DEFAULT 20,
+  max_members INTEGER DEFAULT 50,
+  member_count INTEGER DEFAULT 0,
   current_members INTEGER DEFAULT 0,
+  rules JSONB DEFAULT '[]',
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -609,6 +649,22 @@ CREATE TABLE IF NOT EXISTS support_group_members (
 -- ============================================
 -- WORKFLOW & AUTOMATION TABLES
 -- ============================================
+
+-- Workflows (runtime workflows)
+CREATE TABLE IF NOT EXISTS workflows (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  category VARCHAR(50),
+  trigger_type VARCHAR(50) NOT NULL, -- 'alert_created', 'case_assigned', 'scheduled', 'manual'
+  trigger_conditions JSONB DEFAULT '{}',
+  actions JSONB NOT NULL, -- Array of actions to execute
+  is_active BOOLEAN DEFAULT true,
+  created_by UUID REFERENCES stakeholders(id) ON DELETE SET NULL,
+  run_count INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Workflow templates
 CREATE TABLE IF NOT EXISTS workflow_templates (
@@ -819,6 +875,21 @@ CREATE INDEX IF NOT EXISTS idx_quiz_questions_difficulty ON quiz_questions(diffi
 CREATE INDEX IF NOT EXISTS idx_quiz_questions_active ON quiz_questions(is_active);
 
 -- ============================================
+-- AI ANALYTICS INDEXES
+-- ============================================
+CREATE INDEX IF NOT EXISTS idx_ai_usage_logs_session ON ai_usage_logs(session_id);
+CREATE INDEX IF NOT EXISTS idx_ai_usage_logs_model ON ai_usage_logs(model_used);
+CREATE INDEX IF NOT EXISTS idx_ai_usage_logs_task ON ai_usage_logs(task_type);
+CREATE INDEX IF NOT EXISTS idx_ai_usage_logs_created ON ai_usage_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_ai_usage_logs_request ON ai_usage_logs(request_id);
+
+CREATE INDEX IF NOT EXISTS idx_ai_errors_session ON ai_errors(session_id);
+CREATE INDEX IF NOT EXISTS idx_ai_errors_model ON ai_errors(model_used);
+CREATE INDEX IF NOT EXISTS idx_ai_errors_type ON ai_errors(error_type);
+CREATE INDEX IF NOT EXISTS idx_ai_errors_created ON ai_errors(created_at);
+CREATE INDEX IF NOT EXISTS idx_ai_errors_request ON ai_errors(request_id);
+
+-- ============================================
 -- MENTORSHIP INDEXES
 -- ============================================
 CREATE INDEX IF NOT EXISTS idx_mentors_stakeholder ON mentors(stakeholder_id);
@@ -848,6 +919,10 @@ CREATE INDEX IF NOT EXISTS idx_support_group_members_user ON support_group_membe
 -- ============================================
 -- WORKFLOW INDEXES
 -- ============================================
+CREATE INDEX IF NOT EXISTS idx_workflows_trigger ON workflows(trigger_type);
+CREATE INDEX IF NOT EXISTS idx_workflows_active ON workflows(is_active);
+CREATE INDEX IF NOT EXISTS idx_workflows_category ON workflows(category);
+
 CREATE INDEX IF NOT EXISTS idx_workflow_templates_trigger ON workflow_templates(trigger_type);
 CREATE INDEX IF NOT EXISTS idx_workflow_templates_active ON workflow_templates(is_active);
 
@@ -935,8 +1010,17 @@ CREATE TRIGGER update_support_groups_updated_at BEFORE UPDATE ON support_groups
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Workflow triggers
+DROP TRIGGER IF EXISTS update_workflows_updated_at ON workflows;
+CREATE TRIGGER update_workflows_updated_at BEFORE UPDATE ON workflows
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 DROP TRIGGER IF EXISTS update_workflow_templates_updated_at ON workflow_templates;
 CREATE TRIGGER update_workflow_templates_updated_at BEFORE UPDATE ON workflow_templates
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Safety checks trigger
+DROP TRIGGER IF EXISTS update_safety_checks_updated_at ON safety_checks;
+CREATE TRIGGER update_safety_checks_updated_at BEFORE UPDATE ON safety_checks
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Quiz/consent triggers
@@ -994,8 +1078,13 @@ CREATE TABLE IF NOT EXISTS pharmacies (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR(255) NOT NULL,
   address TEXT NOT NULL,
+  city VARCHAR(100),
+  region VARCHAR(100),
   phone VARCHAR(50),
+  email VARCHAR(255),
+  hours VARCHAR(255),
   coordinates JSONB DEFAULT '{}',
+  delivery_available BOOLEAN DEFAULT false,
   delivery_fee DECIMAL(10,2) DEFAULT 0,
   delivery_time VARCHAR(50),
   is_open BOOLEAN DEFAULT true,
@@ -1120,6 +1209,222 @@ CREATE TRIGGER update_cart_items_updated_at BEFORE UPDATE ON cart_items
 
 DROP TRIGGER IF EXISTS update_external_data_connections_updated_at ON external_data_connections;
 CREATE TRIGGER update_external_data_connections_updated_at BEFORE UPDATE ON external_data_connections
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- ACCESSIBILITY TABLES
+-- ============================================
+
+-- Accessibility settings per user
+CREATE TABLE IF NOT EXISTS accessibility_settings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  high_contrast BOOLEAN DEFAULT false,
+  large_text BOOLEAN DEFAULT false,
+  screen_reader BOOLEAN DEFAULT false,
+  reduced_motion BOOLEAN DEFAULT false,
+  color_blind_mode VARCHAR(20), -- 'deuteranopia', 'protanopia', 'tritanopia', 'achromatopsia'
+  font_size VARCHAR(10) DEFAULT 'medium', -- 'small', 'medium', 'large', 'x-large'
+  keyboard_navigation BOOLEAN DEFAULT false,
+  focus_indicators BOOLEAN DEFAULT true,
+  captions_enabled BOOLEAN DEFAULT false,
+  audio_descriptions BOOLEAN DEFAULT false,
+  sign_language BOOLEAN DEFAULT false,
+  language VARCHAR(10) DEFAULT 'en',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id)
+);
+
+-- Accessibility profiles (preset configurations)
+CREATE TABLE IF NOT EXISTS accessibility_profiles (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  settings JSONB NOT NULL DEFAULT '{}',
+  is_public BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- REPORTS TABLE (Crime/SRHR Incident Reporting)
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS reports (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  report_number VARCHAR(100) UNIQUE NOT NULL,
+  report_type VARCHAR(50) NOT NULL, -- 'harassment', 'assault', 'domestic_violence', 'medical_emergency', 'other'
+  type VARCHAR(50), -- Alias for report_type for compatibility
+  description TEXT NOT NULL,
+  location TEXT,
+  coordinates JSONB DEFAULT '{}',
+  incident_date TIMESTAMP,
+  is_anonymous BOOLEAN DEFAULT true,
+  reporter_name VARCHAR(255),
+  reporter_contact VARCHAR(255),
+  contact_info TEXT, -- Additional contact information
+  reporter_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL, -- Alias for reporter_user_id for compatibility
+  consent_to_share BOOLEAN DEFAULT false,
+  wants_callback BOOLEAN DEFAULT false,
+  evidence_urls JSONB, -- Array of evidence URLs
+  status VARCHAR(20) DEFAULT 'submitted' CHECK (status IN ('submitted', 'under_review', 'investigating', 'resolved', 'closed', 'archived')),
+  priority VARCHAR(20) DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'critical')),
+  assigned_to UUID REFERENCES stakeholders(id) ON DELETE SET NULL,
+  assigned_role VARCHAR(20),
+  resolution_notes TEXT,
+  resolved_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Report notes/comments
+CREATE TABLE IF NOT EXISTS report_notes (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  report_id UUID REFERENCES reports(id) ON DELETE CASCADE,
+  note TEXT NOT NULL,
+  created_by UUID REFERENCES stakeholders(id) ON DELETE SET NULL,
+  created_by_type VARCHAR(20) DEFAULT 'stakeholder', -- 'stakeholder', 'system'
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- ERROR REPORTING TABLE
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS error_reports (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  message TEXT NOT NULL,
+  stack TEXT,
+  user_agent TEXT,
+  url TEXT,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  status VARCHAR(20) DEFAULT 'new' CHECK (status IN ('new', 'investigating', 'resolved', 'ignored')),
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- SAFETY CHECKS TABLE
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS safety_checks (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  mood VARCHAR(20) NOT NULL, -- 'great', 'good', 'okay', 'bad', 'terrible'
+  safety_level VARCHAR(20) NOT NULL, -- 'safe', 'concerned', 'unsafe', 'emergency'
+  needs_help BOOLEAN DEFAULT false,
+  notes TEXT,
+  location TEXT,
+  is_anonymous BOOLEAN DEFAULT false,
+  alert_contacts BOOLEAN DEFAULT false,
+  contact_ids JSONB DEFAULT '[]',
+  status VARCHAR(50) DEFAULT 'completed', -- 'completed', 'alert_triggered', 'responded', 'resolved'
+  responded_by UUID REFERENCES stakeholders(id) ON DELETE SET NULL,
+  response_notes TEXT,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- QR CODES TABLE
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS qr_codes (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  code VARCHAR(255) UNIQUE NOT NULL,
+  type VARCHAR(50) NOT NULL, -- 'verification', 'product', 'clinic', 'emergency'
+  entity_id UUID, -- References various entities based on type
+  entity_type VARCHAR(50), -- 'user', 'product', 'clinic', 'stakeholder'
+  data JSONB DEFAULT '{}',
+  qr_image TEXT, -- Base64 encoded PNG
+  qr_svg TEXT, -- SVG string
+  is_active BOOLEAN DEFAULT true,
+  expires_at TIMESTAMP,
+  scan_count INTEGER DEFAULT 0,
+  last_scanned_at TIMESTAMP,
+  created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- QR code scans log
+CREATE TABLE IF NOT EXISTS qr_code_scans (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  qr_code_id UUID REFERENCES qr_codes(id) ON DELETE CASCADE,
+  scanned_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  ip_address INET,
+  user_agent TEXT,
+  location JSONB DEFAULT '{}',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- INDEXES FOR NEW TABLES
+-- ============================================
+
+-- Accessibility indexes
+CREATE INDEX IF NOT EXISTS idx_accessibility_settings_user ON accessibility_settings(user_id);
+CREATE INDEX IF NOT EXISTS idx_accessibility_profiles_user ON accessibility_profiles(user_id);
+CREATE INDEX IF NOT EXISTS idx_accessibility_profiles_public ON accessibility_profiles(is_public, is_active);
+
+-- Reports indexes
+CREATE INDEX IF NOT EXISTS idx_reports_type ON reports(report_type);
+CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
+CREATE INDEX IF NOT EXISTS idx_reports_priority ON reports(priority);
+CREATE INDEX IF NOT EXISTS idx_reports_assigned ON reports(assigned_to);
+CREATE INDEX IF NOT EXISTS idx_reports_reporter ON reports(reporter_user_id);
+CREATE INDEX IF NOT EXISTS idx_reports_created ON reports(created_at);
+CREATE INDEX IF NOT EXISTS idx_reports_anonymous ON reports(is_anonymous);
+CREATE INDEX IF NOT EXISTS idx_report_notes_report ON report_notes(report_id);
+
+-- Error reports indexes
+CREATE INDEX IF NOT EXISTS idx_error_reports_status ON error_reports(status);
+CREATE INDEX IF NOT EXISTS idx_error_reports_created ON error_reports(created_at);
+CREATE INDEX IF NOT EXISTS idx_error_reports_user ON error_reports(user_id);
+
+-- Safety checks indexes
+CREATE INDEX IF NOT EXISTS idx_safety_checks_user ON safety_checks(user_id);
+CREATE INDEX IF NOT EXISTS idx_safety_checks_mood ON safety_checks(mood);
+CREATE INDEX IF NOT EXISTS idx_safety_checks_safety ON safety_checks(safety_level);
+CREATE INDEX IF NOT EXISTS idx_safety_checks_created ON safety_checks(created_at);
+CREATE INDEX IF NOT EXISTS idx_safety_checks_needs_help ON safety_checks(needs_help);
+
+-- QR codes indexes
+CREATE INDEX IF NOT EXISTS idx_qr_codes_code ON qr_codes(code);
+CREATE INDEX IF NOT EXISTS idx_qr_codes_type ON qr_codes(type);
+CREATE INDEX IF NOT EXISTS idx_qr_codes_entity ON qr_codes(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_qr_codes_active ON qr_codes(is_active);
+CREATE INDEX IF NOT EXISTS idx_qr_codes_expires ON qr_codes(expires_at);
+CREATE INDEX IF NOT EXISTS idx_qr_code_scans_qr ON qr_code_scans(qr_code_id);
+CREATE INDEX IF NOT EXISTS idx_qr_code_scans_date ON qr_code_scans(created_at);
+
+-- ============================================
+-- TRIGGERS FOR NEW TABLES
+-- ============================================
+
+DROP TRIGGER IF EXISTS update_accessibility_settings_updated_at ON accessibility_settings;
+CREATE TRIGGER update_accessibility_settings_updated_at BEFORE UPDATE ON accessibility_settings
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_accessibility_profiles_updated_at ON accessibility_profiles;
+CREATE TRIGGER update_accessibility_profiles_updated_at BEFORE UPDATE ON accessibility_profiles
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_reports_updated_at ON reports;
+CREATE TRIGGER update_reports_updated_at BEFORE UPDATE ON reports
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_error_reports_updated_at ON error_reports;
+CREATE TRIGGER update_error_reports_updated_at BEFORE UPDATE ON error_reports
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_qr_codes_updated_at ON qr_codes;
+CREATE TRIGGER update_qr_codes_updated_at BEFORE UPDATE ON qr_codes
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 `;
 

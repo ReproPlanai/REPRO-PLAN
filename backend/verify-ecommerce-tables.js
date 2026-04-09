@@ -1,7 +1,8 @@
 const { Pool } = require('pg');
 
+// Use environment variable for database URL - NEVER hardcode credentials
 const pool = new Pool({
-  connectionString: 'postgres://postgres:JqQzUpViBWYpDnTtFBZtSkWnUhfmhUpe@centerbeam.proxy.rlwy.net:31576/railway',
+  connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 

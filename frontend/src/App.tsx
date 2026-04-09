@@ -25,6 +25,7 @@ import FloatingDownloadButton from './components/FloatingDownloadButton';
 // Contexts
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import { TestingProvider, ErrorBoundary } from './contexts/TestingContext';
+import { UpdateProvider, UpdateModal } from './contexts/UpdateContext';
 
 // Pages
 import Home from './pages/Home';
@@ -33,13 +34,12 @@ import Videos from './pages/Videos';
 import Clinics from './pages/Clinics';
 import Tracker from './pages/Tracker';
 import Games from './pages/Games';
-import Emergency from './pages/Emergency';
+import EmergencyGhana from './pages/EmergencyGhana';
 import Mentorship from './pages/Mentorship';
 import Settings from './pages/Settings';
 import Notifications from './pages/Notifications';
 import Tutorial from './pages/Tutorial';
 import AccessibilityHub from './pages/AccessibilityHub';
-import SystemHealthDashboard from './pages/SystemHealthDashboard';
 import SignLanguage from './pages/SignLanguage';
 import MedicationOrder from './pages/MedicationOrder';
 import SecureMap from './pages/SecureMap';
@@ -252,32 +252,34 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <TestingProvider>
-        <AccessibilityProvider>
-          <Router>
-            <Analytics />
-            <div className="min-h-screen min-h-[100dvh] bg-gray-50 overflow-x-hidden" style={{ overflowY: 'visible' }}>
-              <OfflineIndicator />
-              
-              {/* App Install Banner */}
-              <AppInstallBanner
-                onInstall={handleDownload}
-                onDismiss={closeModal}
-              />
-              
-              {/* Update Notification */}
-              {isUpdateAvailable && (
-                <UpdateNotification
-                  onUpdate={updateServiceWorker}
-                  onDismiss={dismissUpdate}
+      <UpdateProvider>
+        <TestingProvider>
+          <AccessibilityProvider>
+            <Router>
+              <Analytics />
+              <div className="min-h-screen min-h-[100dvh] bg-gray-50 overflow-x-hidden" style={{ overflowY: 'visible' }}>
+                <OfflineIndicator />
+                <UpdateModal />
+                
+                {/* App Install Banner */}
+                <AppInstallBanner
+                  onInstall={handleDownload}
+                  onDismiss={closeModal}
                 />
-              )}
-              
-              <AppLayoutContent isAuthenticated={isAuthenticated}>
+                
+                {/* Update Notification */}
+                {isUpdateAvailable && (
+                  <UpdateNotification
+                    onUpdate={updateServiceWorker}
+                    onDismiss={dismissUpdate}
+                  />
+                )}
+                
+                <AppLayoutContent isAuthenticated={isAuthenticated}>
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/chatbot" element={<Chatbot />} />
-                  <Route path="/rehana" element={<Chatbot />} />
+                  <Route path="/ReproBot" element={<Chatbot />} />
                   <Route path="/videos" element={<Videos />} />
                   <Route path="/stories" element={<StorytellingPlatform />} />
                   <Route path="/clinics" element={<Clinics />} />
@@ -286,13 +288,12 @@ function App() {
                   <Route path="/games" element={<Games />} />
                   <Route path="/consent-game" element={<ConsentEducationGame />} />
                   <Route path="/inclusive-support" element={<InclusiveYouthSupport />} />
-                  <Route path="/emergency" element={<Emergency />} />
+                  <Route path="/emergency" element={<EmergencyGhana />} />
                   <Route path="/mentorship" element={<Mentorship />} />
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/tutorial" element={<Tutorial />} />
                   <Route path="/qr-verification" element={<QRVerification />} />
                   <Route path="/accessibility" element={<AccessibilityHub />} />
-                  <Route path="/system-health" element={<SystemHealthDashboard />} />
                   <Route path="/sign-language" element={<SignLanguage />} />
                   <Route path="/medication-order" element={<MedicationOrder />} />
                   <Route path="/secure-map" element={<SecureMap />} />
@@ -331,8 +332,9 @@ function App() {
             </Router>
           </AccessibilityProvider>
         </TestingProvider>
-      </ErrorBoundary>
-    );
+      </UpdateProvider>
+    </ErrorBoundary>
+  );
 }
 
 export default App;

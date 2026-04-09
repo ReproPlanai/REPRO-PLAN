@@ -62,9 +62,9 @@ async function testGemini31Pro() {
   console.log('📝 Max Output: 65,536 tokens');
   console.log('⚡ Capabilities: Text, Code, Images, Audio, Video, PDF\n');
   
-  // Test 1: Rehana AI Chat
-  console.log('\n--- TEST 1: Rehana AI Chat (SRHR Assistant) ---');
-  const chatTest = await testAI('Rehana Chat - General Question', 'POST', '/rehana', {
+  // Test 1: ReproBot AI Chat
+  console.log('\n--- TEST 1: ReproBot AI Chat (SRHR Assistant) ---');
+  const chatTest = await testAI('ReproBot Chat - General Question', 'POST', '/reprobot', {
     message: 'What is SRHR and why is it important for youth in Africa?',
     history: []
   });
@@ -125,7 +125,7 @@ async function testGemini31Pro() {
   
   // Test 5: Complex SRHR Topic
   console.log('\n--- TEST 5: Complex SRHR Analysis (Testing 3.1 Pro Reasoning) ---');
-  const complexTest = await testAI('Complex Analysis - Rights & Policy', 'POST', '/rehana', {
+  const complexTest = await testAI('Complex Analysis - Rights & Policy', 'POST', '/reprobot', {
     message: `Analyze the intersection of reproductive rights, cultural traditions, and modern healthcare access in West Africa. 
     Consider: 
     1. Legal frameworks

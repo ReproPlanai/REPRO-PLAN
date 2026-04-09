@@ -1,16 +1,16 @@
 import { createServiceLogger } from '../config/logger';
+import { get, set, del, getCacheStatus } from './cache/redisCache';
 
 const log = createServiceLogger('cache');
 
-// In-memory cache storage
-const memoryCache = new Map<string, { value: string; expiresAt: number }>();
+// In-memory cache storage for OTP (not stored in Redis for security)
 const memoryOTPStore = new Map<string, { otp: string; expiresAt: number }>();
 
 const OTP_TTL = 600; // 10 minutes in seconds
 const OTP_PREFIX = 'otp:';
 const CACHE_PREFIX = 'cache:';
 
-// Cleanup expired entries every 5 minutes
+// Cleanup expired OTP entries every 5 minutes (general cache uses Redis with its own TTL)
 setInterval(() => {
   const now = Date.now();
   let cleaned = 0;
@@ -22,15 +22,8 @@ setInterval(() => {
     }
   }
 
-  for (const [key, entry] of memoryCache) {
-    if (entry.expiresAt < now) {
-      memoryCache.delete(key);
-      cleaned++;
-    }
-  }
-
   if (cleaned > 0) {
-    log.info({ cleaned }, 'Cleaned expired cache entries');
+    log.info({ cleaned }, 'Cleaned expired OTP entries');
   }
 }, 300000); // 5 minutes
 
@@ -64,35 +57,29 @@ export async function deleteOTP(key: string): Promise<void> {
 
 export async function getCached<T>(key: string): Promise<T | null> {
   const fullKey = `${CACHE_PREFIX}${key}`;
-  const entry = memoryCache.get(fullKey);
-
-  if (!entry) {
-    return null;
-  }
-
-  if (entry.expiresAt < Date.now()) {
-    memoryCache.delete(fullKey);
-    return null;
-  }
-
   try {
-    return JSON.parse(entry.value) as T;
-  } catch {
+    return await get<T>(fullKey);
+  } catch (error) {
+    log.error({ key: fullKey, error: error instanceof Error ? error.message : String(error) }, 'Cache get failed');
     return null;
   }
 }
 
 export async function setCached(key: string, value: unknown, ttlSeconds = 3600): Promise<void> {
   const fullKey = `${CACHE_PREFIX}${key}`;
-  const expiresAt = Date.now() + ttlSeconds * 1000;
-  const serialized = JSON.stringify(value);
-  memoryCache.set(fullKey, { value: serialized, expiresAt });
+  try {
+    await set(fullKey, value, ttlSeconds);
+    log.debug({ key: fullKey, ttlSeconds }, 'Cache set');
+  } catch (error) {
+    log.error({ key: fullKey, error: error instanceof Error ? error.message : String(error) }, 'Cache set failed');
+  }
 }
 
 // Memory usage stats for monitoring
-export function getCacheStats(): { otpCount: number; cacheCount: number } {
+export function getCacheStats(): { otpCount: number; redisConnected: boolean } {
+  const redisStatus = getCacheStatus();
   return {
     otpCount: memoryOTPStore.size,
-    cacheCount: memoryCache.size,
+    redisConnected: redisStatus.redis,
   };
 }

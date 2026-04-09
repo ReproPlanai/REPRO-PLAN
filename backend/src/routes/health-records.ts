@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { createServiceLogger } from '../config/logger';
 import { query } from '../config/db';
+import { generateContent } from '../services/ai';
 
 const log = createServiceLogger('health-records');
 const router = Router();
@@ -76,6 +77,41 @@ router.delete('/:id', async (req: Request, res: Response) => {
   } catch (err) {
     log.error({ err }, 'Failed to delete health record');
     res.status(500).json({ error: 'Failed to delete health record' });
+  }
+});
+
+// Get AI-powered health insights for a user
+router.get('/:userId/insights', async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    
+    // Get user's health records
+    const records = await query(
+      'SELECT * FROM health_records WHERE user_id = $1 ORDER BY recorded_at DESC LIMIT 10',
+      [userId]
+    );
+    
+    if (records.length === 0) {
+      res.json({ success: true, insights: 'No health records available for analysis.' });
+      return;
+    }
+    
+    // Generate AI insights based on health records
+    const recordsSummary = records.map((r: any) => ({
+      type: r.record_type,
+      date: r.recorded_at,
+      data: r.data
+    }));
+    
+    const prompt = `You are an SRHR health expert. Analyze these health records and provide 3-5 personalized health insights for a user in Ghana context. Records: ${JSON.stringify(recordsSummary)}. Focus on preventive care, wellness recommendations, and when to seek professional help. Return as a concise, actionable summary.`;
+    
+    const insights = await generateContent(prompt, { maxTokens: 500, taskType: 'health', sessionId: userId });
+    
+    log.info({ userId, recordCount: records.length }, 'Health insights generated');
+    res.json({ success: true, insights });
+  } catch (err) {
+    log.error({ err }, 'Failed to generate health insights');
+    res.status(500).json({ error: 'Failed to generate health insights' });
   }
 });
 

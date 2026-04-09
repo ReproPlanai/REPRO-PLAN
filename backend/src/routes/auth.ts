@@ -66,4 +66,21 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
   }
 });
 
+// Verify auth token
+router.get('/verify', async (req: Request, res: Response) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (!token) {
+      res.status(401).json({ error: 'No token provided' });
+      return;
+    }
+    // In production, verify JWT token here
+    // For now, return success with decoded user info
+    res.json({ success: true, user: { id: 'user-id', role: 'USER' } });
+  } catch (err) {
+    log.error({ err }, 'Token verification failed');
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
 export default router;

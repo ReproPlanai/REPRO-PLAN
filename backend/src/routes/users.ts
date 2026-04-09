@@ -246,4 +246,40 @@ router.get('/:id/health-records', async (req: Request, res: Response) => {
   }
 });
 
+// Tier 3 Authentication - Verify User
+router.post('/verify', authLimiter, async (req: Request, res: Response) => {
+  try {
+    const { secretCode } = req.body;
+
+    if (!secretCode) {
+      res.status(400).json({ error: 'Secret code is required' });
+      return;
+    }
+
+    // Find user by secret code
+    const foundUser = await query('SELECT * FROM users WHERE secret_code = $1', [secretCode.toUpperCase()]);
+    const user = foundUser[0];
+
+    if (!user) {
+      res.status(404).json({ error: 'Invalid secret code' });
+      return;
+    }
+
+    if (!user.is_verified) {
+      res.status(403).json({ error: 'User is not verified' });
+      return;
+    }
+
+    // Generate verification token
+    const token = uuidv4();
+    const { secret_code, ...userWithoutCode } = user;
+
+    log.info({ userId: user.id }, 'User verified via Tier 3 auth');
+    res.json({ success: true, user: userWithoutCode, token });
+  } catch (err) {
+    log.error({ err }, 'User verification failed');
+    res.status(500).json({ error: 'Verification failed' });
+  }
+});
+
 export default router;

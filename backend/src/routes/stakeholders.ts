@@ -169,5 +169,43 @@ router.delete('/:id', async (req: Request, res: Response) => {
   }
 });
 
+// Tier 3 Authentication - Verify Stakeholder
+router.post('/verify', authLimiter, async (req: Request, res: Response) => {
+  try {
+    const { secretCode, phoneNumber, role } = req.body;
+
+    if (!phoneNumber || !role) {
+      res.status(400).json({ error: 'Phone number and role are required' });
+      return;
+    }
+
+    // Find stakeholder
+    const foundStakeholder = await query(
+      'SELECT * FROM stakeholders WHERE phone_number = $1 AND role = $2',
+      [phoneNumber, role.toUpperCase()]
+    );
+    const stakeholder = foundStakeholder[0];
+
+    if (!stakeholder) {
+      res.status(404).json({ error: 'Stakeholder not found' });
+      return;
+    }
+
+    if (!stakeholder.is_active) {
+      res.status(403).json({ error: 'Stakeholder account is not active' });
+      return;
+    }
+
+    // Generate verification token
+    const token = uuidv4();
+
+    log.info({ stakeholderId: stakeholder.id, role }, 'Stakeholder verified via Tier 3 auth');
+    res.json({ success: true, stakeholder, token });
+  } catch (err) {
+    log.error({ err }, 'Stakeholder verification failed');
+    res.status(500).json({ error: 'Verification failed' });
+  }
+});
+
 export default router;
 export { defaultPermissions };

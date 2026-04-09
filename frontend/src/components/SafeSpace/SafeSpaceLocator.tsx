@@ -328,12 +328,12 @@ const SafeSpaceLocator: React.FC = () => {
           </div>
         </div>
 
-        {/* Ask Rehana */}
+        {/* Ask ReproBot */}
         <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 shadow-sm">
           <p className="text-sm text-gray-600 mb-3">Have questions about safe spaces?</p>
           <button onClick={() => navigate('/chatbot?context=safe-spaces')} className="flex items-center gap-2 py-2.5 px-4 bg-gradient-to-r from-primary-500/10 to-purple-500/10 text-primary-600 rounded-xl font-medium hover:from-primary-500/20 hover:to-purple-500/20 transition-all min-h-[44px]">
             <Sparkles className="w-4 h-4" />
-            <span>Ask Rehana about safe spaces</span>
+            <span>Ask ReproBot about safe spaces</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

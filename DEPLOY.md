@@ -264,7 +264,7 @@ Expected response:
 - [ ] Backend URL added to frontend `REACT_APP_API_URL`
 - [ ] Health check endpoint responding
 - [ ] Test user registration/login flow
-- [ ] Test AI features (Rehana)
+- [ ] Test AI features (ReproBot)
 - [ ] Test email notifications
 
 ---

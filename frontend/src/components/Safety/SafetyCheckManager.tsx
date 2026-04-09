@@ -420,7 +420,7 @@ const SafetyCheckModal: React.FC<SafetyCheckModalProps> = ({
                       <MessageCircle className="w-5 h-5 text-primary-600" />
                       <div className="text-left">
                         <p className="font-medium text-sm">Chat in app</p>
-                        <p className="text-xs text-gray-500">Talk to Rehana AI or a counselor</p>
+                        <p className="text-xs text-gray-500">Talk to ReproBot AI or a counselor</p>
                       </div>
                     </button>
 
@@ -561,7 +561,7 @@ const SafetyCheckManager: React.FC = () => {
   const handleHelpRequest = (type: 'app_chat' | 'phone_call' | 'external') => {
     switch (type) {
       case 'app_chat':
-        // Navigate to chat or open Rehana
+        // Navigate to chat or open ReproBot
         window.location.href = '/chat';
         break;
       case 'phone_call':

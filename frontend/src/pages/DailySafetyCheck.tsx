@@ -125,16 +125,16 @@ const DailySafetyCheck: React.FC = () => {
   const [checkHistory, setCheckHistory] = useState<SafetyCheck[]>([]);
   const [streak, setStreak] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const [currentPeriod, setCurrentPeriod] = useState<'morning' | 'afternoon' | 'evening'>('morning');
-  
-  // Modal state
   const [currentStep, setCurrentStep] = useState(0);
+  const [currentPeriod, setCurrentPeriod] = useState<'morning' | 'afternoon' | 'evening'>('morning');
   const [responses, setResponses] = useState<Record<string, number>>({});
   const [selectedConcerns, setSelectedConcerns] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
   const [needsHelp, setNeedsHelp] = useState(false);
   const [helpType, setHelpType] = useState<'app_chat' | 'phone_call' | 'external' | 'none'>('none');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
 
   // Determine current period based on time
   const getCurrentPeriod = useCallback((): 'morning' | 'afternoon' | 'evening' => {
@@ -224,6 +224,37 @@ const DailySafetyCheck: React.FC = () => {
     );
   };
 
+  // Fetch AI recommendations based on safety check responses
+  const fetchAIRecommendations = useCallback(async (responses: Record<string, number>, concerns: string[]) => {
+    setIsLoadingRecommendations(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (apiUrl) {
+        const prompt = `Based on these safety check responses: Physical: ${responses.physicalHealth || 3}/5, Mental: ${responses.mentalHealth || 3}/5, Family: ${responses.familySafety || 3}/5, Overall: ${responses.overallSafety || 3}/5. Concerns: ${concerns.join(', ') || 'none'}. Provide 3-5 personalized safety recommendations for Ghana context. Return as numbered list.`;
+        
+        const res = await fetch(`${apiUrl.replace(/\/$/, '')}/reprobot`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: prompt, history: [] })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          const recommendations = data.response
+            .split('\n')
+            .filter((r: string) => r.trim().length > 0)
+            .map((r: string) => r.replace(/^\d+\.\s*/, '').trim());
+          setAiRecommendations(recommendations);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch AI recommendations:', error);
+      setAiRecommendations([]);
+    } finally {
+      setIsLoadingRecommendations(false);
+    }
+  }, []);
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     
@@ -242,6 +273,9 @@ const DailySafetyCheck: React.FC = () => {
       needsHelp,
       helpType: needsHelp ? helpType : 'none'
     };
+
+    // Fetch AI recommendations after submitting
+    await fetchAIRecommendations(responses, selectedConcerns);
 
     try {
       await apiService.submitSafetyCheck?.(safetyCheck);
@@ -701,7 +735,7 @@ const DailySafetyCheck: React.FC = () => {
                           <MessageCircle className="w-5 h-5 text-primary-600" />
                           <div className="text-left">
                             <p className="font-medium text-sm">Chat in app</p>
-                            <p className="text-xs text-gray-500">Talk to Rehana AI or a counselor</p>
+                            <p className="text-xs text-gray-500">Talk to ReproBot AI or a counselor</p>
                           </div>
                         </button>
 

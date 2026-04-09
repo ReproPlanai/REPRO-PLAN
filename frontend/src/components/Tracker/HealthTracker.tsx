@@ -25,7 +25,7 @@ import { format, addDays, subDays, isSameDay, startOfMonth, endOfMonth, eachDayO
 import { offlineStorage } from '../../utils/offlineStorage';
 import { apiService } from '../../services/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import RehanaTrackerPanel from './RehanaTrackerPanel';
+import ReproBotTrackerPanel from './ReproBotTrackerPanel';
 
 interface CycleEntry {
   id: string;
@@ -79,8 +79,8 @@ const HealthTracker: React.FC = () => {
     isPeriod: false
   });
   const [activeTab, setActiveTab] = useState<'tracker' | 'analytics' | 'education' | 'ai'>('tracker');
-  const [showRehanaPanel, setShowRehanaPanel] = useState(false);
-  const [rehanaInitialPrompt, setRehanaInitialPrompt] = useState<string | null>(null);
+  const [showReproBotPanel, setShowReproBotPanel] = useState(false);
+  const [reproBotInitialPrompt, setReproBotInitialPrompt] = useState<string | null>(null);
 
   const flowOptions = [
     { value: 'none', label: 'None', color: 'bg-gray-100' },
@@ -331,7 +331,7 @@ const HealthTracker: React.FC = () => {
     return insights;
   }, [regularityScore, symptomFrequency, chartData, cycleData.predictions.fertileWindow]);
 
-  const rehanaContext = useMemo(() => ({
+  const reproBotContext = useMemo(() => ({
     nextPeriod: cycleData.predictions.nextPeriod,
     ovulation: cycleData.predictions.ovulation,
     fertileWindow: cycleData.predictions.fertileWindow,
@@ -662,13 +662,13 @@ const HealthTracker: React.FC = () => {
             </div>
           </div>
 
-          {/* Rehana AI Panel */}
-          <RehanaTrackerPanel
-            cycleContext={rehanaContext}
-            isExpanded={showRehanaPanel}
-            onToggle={() => setShowRehanaPanel(!showRehanaPanel)}
-            initialPrompt={rehanaInitialPrompt}
-            onPromptSent={() => setRehanaInitialPrompt(null)}
+          {/* ReproBot AI Panel */}
+          <ReproBotTrackerPanel
+            cycleContext={reproBotContext}
+            isExpanded={showReproBotPanel}
+            onToggle={() => setShowReproBotPanel(!showReproBotPanel)}
+            initialPrompt={reproBotInitialPrompt}
+            onPromptSent={() => setReproBotInitialPrompt(null)}
           />
 
           {/* Recent Entries */}
@@ -714,15 +714,15 @@ const HealthTracker: React.FC = () => {
                     <span className="px-2.5 py-0.5 bg-white/25 backdrop-blur-sm rounded-full text-xs font-semibold text-white uppercase tracking-wide">AI-Powered</span>
                   </div>
                   <h2 className="text-xl sm:text-2xl font-bold text-white">Cycle Insights</h2>
-                  <p className="text-sm text-white/90 mt-0.5">Personalized analysis powered by Rehana AI</p>
+                  <p className="text-sm text-white/90 mt-0.5">Personalized analysis powered by ReproBot AI</p>
                 </div>
               </div>
               <button
-                onClick={() => { setActiveTab('tracker'); setShowRehanaPanel(true); }}
+                onClick={() => { setActiveTab('tracker'); setShowReproBotPanel(true); }}
                 className="flex-shrink-0 px-5 py-2.5 bg-white text-primary-600 font-semibold rounded-xl hover:bg-white/95 transition-all shadow-lg flex items-center gap-2"
               >
                 <MessageCircle className="w-4 h-4" />
-                Ask Rehana
+                Ask ReproBot
               </button>
             </div>
           </div>
@@ -770,10 +770,10 @@ const HealthTracker: React.FC = () => {
                 </div>
                 <p className="text-sm text-gray-700 mb-3">Get personalized cycle insights and SRHR answers</p>
                 <button
-                  onClick={() => { setActiveTab('tracker'); setShowRehanaPanel(true); }}
+                  onClick={() => { setActiveTab('tracker'); setShowReproBotPanel(true); }}
                   className="w-full py-2 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white text-sm font-medium rounded-xl hover:from-primary-600 hover:to-purple-600 transition-all shadow-md"
                 >
-                  Chat with Rehana
+                  Chat with ReproBot
                 </button>
               </div>
             </div>
@@ -972,7 +972,7 @@ const HealthTracker: React.FC = () => {
               </div>
             </div>
             <p className="text-sm sm:text-base text-gray-600 mb-6">
-              Rehana uses advanced AI to analyze your cycle data and provide personalized insights. Get explanations for your predictions, understand symptom patterns, and receive tailored health recommendations.
+              ReproBot uses advanced AI to analyze your cycle data and provide personalized insights. Get explanations for your predictions, understand symptom patterns, and receive tailored health recommendations.
             </p>
 
             <div className="space-y-4">
@@ -980,14 +980,14 @@ const HealthTracker: React.FC = () => {
                 <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 shadow-sm">
                   <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-primary-600" />
-                    Ask Rehana
+                    Ask ReproBot
                   </h4>
-                  <p className="text-sm text-gray-600 mb-3">Chat with Rehana about your cycle, symptoms, and get personalized SRHR answers.</p>
+                  <p className="text-sm text-gray-600 mb-3">Chat with ReproBot about your cycle, symptoms, and get personalized SRHR answers.</p>
                   <button
-                    onClick={() => { setActiveTab('tracker'); setShowRehanaPanel(true); }}
+                    onClick={() => { setActiveTab('tracker'); setShowReproBotPanel(true); }}
                     className="w-full py-2 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white text-sm font-medium rounded-xl hover:from-primary-600 hover:to-purple-600 transition-all"
                   >
-                    Open Rehana
+                    Open ReproBot
                   </button>
                 </div>
                 <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 shadow-sm">
@@ -1007,15 +1007,15 @@ const HealthTracker: React.FC = () => {
 
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 shadow-sm">
                 <h4 className="font-medium text-gray-900 mb-2">Quick AI prompts</h4>
-                <p className="text-sm text-gray-600 mb-3">Try these questions with Rehana for cycle-specific insights:</p>
+                <p className="text-sm text-gray-600 mb-3">Try these questions with ReproBot for cycle-specific insights:</p>
                 <div className="flex flex-wrap gap-2">
                   {['Explain my cycle predictions', 'Why might I feel tired?', 'When am I most fertile?', 'What do my symptoms mean?', 'How can I manage cramps?'].map((prompt) => (
                     <button
                       key={prompt}
                       onClick={() => {
-                        setRehanaInitialPrompt(prompt);
+                        setReproBotInitialPrompt(prompt);
                         setActiveTab('tracker');
-                        setShowRehanaPanel(true);
+                        setShowReproBotPanel(true);
                       }}
                       className="px-3 py-1.5 text-xs bg-primary-50 text-primary-700 rounded-full hover:bg-primary-100 transition-colors border border-primary-200/50"
                     >

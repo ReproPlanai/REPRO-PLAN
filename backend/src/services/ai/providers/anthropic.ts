@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import type { AIProvider, Message } from '../types';
-import { REHANA_SYSTEM_PROMPT } from '../types';
+import { REPROBOT_SYSTEM_PROMPT } from '../types';
 
 export function createAnthropicProvider(apiKey: string): AIProvider {
   const client = new Anthropic({ apiKey });
@@ -20,9 +20,9 @@ export function createAnthropicProvider(apiKey: string): AIProvider {
       messages.push({ role: 'user', content: prompt });
 
       const response = await client.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1024,
-        system: systemPrompt || REHANA_SYSTEM_PROMPT,
+        system: systemPrompt || REPROBOT_SYSTEM_PROMPT,
         messages,
       });
 
@@ -32,7 +32,7 @@ export function createAnthropicProvider(apiKey: string): AIProvider {
 
     async generateContent(prompt: string, options?: { maxTokens?: number }): Promise<string> {
       const response = await client.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-sonnet-4-6',
         max_tokens: options?.maxTokens ?? 1024,
         messages: [{ role: 'user', content: prompt }],
       });

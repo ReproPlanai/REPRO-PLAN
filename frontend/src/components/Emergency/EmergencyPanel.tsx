@@ -47,6 +47,44 @@ const EmergencyPanel: React.FC = () => {
   const [emergencyMessage, setEmergencyMessage] = useState('');
   const [showLocationShare, setShowLocationShare] = useState(false);
   const [isSharingLocation, setIsSharingLocation] = useState(false);
+  
+  // AI guidance state
+  const [aiGuidance, setAiGuidance] = useState<string>('');
+  const [isLoadingGuidance, setIsLoadingGuidance] = useState(false);
+
+  // Fetch AI-powered emergency guidance
+  const fetchAIGuidance = useCallback(async () => {
+    setIsLoadingGuidance(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (apiUrl) {
+        const prompt = 'Provide 3-5 emergency response guidance tips for SRHR situations in Ghana context. Focus on safety, immediate actions, and when to call emergency services. Return as numbered list.';
+        
+        const res = await fetch(`${apiUrl.replace(/\/$/, '')}/reprobot`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: prompt, history: [] })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          const guidance = data.response
+            .split('\n')
+            .filter((r: string) => r.trim().length > 0)
+            .map((r: string) => r.replace(/^\d+\.\s*/, '').trim());
+          setAiGuidance(guidance.join('\n'));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch AI guidance:', error);
+    } finally {
+      setIsLoadingGuidance(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAIGuidance();
+  }, [fetchAIGuidance]);
 
   // Ghana emergency contacts
   const defaultEmergencyContacts: EmergencyContact[] = useMemo(() => [
@@ -389,20 +427,20 @@ const EmergencyPanel: React.FC = () => {
           </div>
         </div>
 
-        {/* Ask Rehana - AI section */}
+        {/* Ask ReproBot - AI section */}
         <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 sm:p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
             <MessageCircle className="w-5 h-5 text-primary-600" />
-            Ask Rehana
+            Ask ReproBot
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            Not sure what to do? Rehana can provide situation-based guidance and connect you with the right resources.
+            Not sure what to do? ReproBot can provide situation-based guidance and connect you with the right resources.
           </p>
           <button
             onClick={() => navigate('/chatbot?context=emergency')}
             className="flex items-center gap-2 py-3 px-5 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 transition-all min-h-[44px]"
           >
-            <span>Chat with Rehana for help</span>
+            <span>Chat with ReproBot for help</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

@@ -36,11 +36,11 @@ const steps: Step[] = [
   },
   {
     id: 'chat',
-    title: 'Chat with Rehana',
+    title: 'Chat with ReproBot',
     subtitle: 'AI-powered SRHR assistant',
     icon: MessageCircle,
     gradient: 'from-purple-500 to-pink-600',
-    content: 'Rehana is your confidential AI assistant. Ask questions about contraception, relationships, health, and more. All conversations are private and secure.',
+    content: 'ReproBot is your confidential AI assistant. Ask questions about contraception, relationships, health, and more. All conversations are private and secure.',
     highlights: ['24/7 support', 'Culturally aware', 'Personalized answers']
   },
   {
@@ -76,7 +76,7 @@ const steps: Step[] = [
     subtitle: 'Start exploring',
     icon: Zap,
     gradient: 'from-blue-500 to-cyan-600',
-    content: 'You now know the basics. Explore the app, chat with Rehana, and use the features that matter most to you. Your journey to better SRHR starts here.',
+    content: 'You now know the basics. Explore the app, chat with ReproBot, and use the features that matter most to you. Your journey to better SRHR starts here.',
     highlights: ['Explore freely', 'Ask anything', 'Stay safe']
   }
 ];
@@ -189,7 +189,7 @@ const Tutorial: React.FC = () => {
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { path: '/', icon: Shield, label: 'Home' },
-            { path: '/chatbot', icon: MessageCircle, label: 'Rehana' },
+            { path: '/chatbot', icon: MessageCircle, label: 'ReproBot' },
             { path: '/clinics', icon: MapPin, label: 'Clinics' },
             { path: '/games', icon: Gamepad2, label: 'Learn & Play' }
           ].map(({ path, icon: Ico, label }) => (

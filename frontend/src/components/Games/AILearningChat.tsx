@@ -28,7 +28,7 @@ const AILearningChat: React.FC<AILearningChatProps> = ({ onComplete, onExit }) =
     setMessages([{
       id: '1',
       sender: 'ai',
-      text: "Hi! I'm Rehana, your AI SRHR learning companion. Ask me anything about sexual health, relationships, consent, or rights - and earn XP for great questions! What would you like to learn today?",
+      text: "Hi! I'm ReproBot, your AI SRHR learning companion. Ask me anything about sexual health, relationships, consent, or rights - and earn XP for great questions! What would you like to learn today?",
       isQuestion: false
     }]);
   }, []);
@@ -91,7 +91,7 @@ const AILearningChat: React.FC<AILearningChatProps> = ({ onComplete, onExit }) =
               <MessageCircle className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Learn with Rehana</h1>
+              <h1 className="text-xl font-bold text-gray-900">Learn with ReproBot</h1>
               <p className="text-sm text-gray-600">Your AI SRHR Tutor</p>
             </div>
           </div>
@@ -119,7 +119,7 @@ const AILearningChat: React.FC<AILearningChatProps> = ({ onComplete, onExit }) =
                   {msg.sender === 'ai' && (
                     <div className="flex items-center gap-2 mb-2">
                       <Brain className="w-4 h-4 text-pink-500" />
-                      <span className="text-xs font-medium text-pink-600">Rehana AI</span>
+                      <span className="text-xs font-medium text-pink-600">ReproBot AI</span>
                     </div>
                   )}
                   <p>{msg.text}</p>

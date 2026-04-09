@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { 
   Pill, 
   CheckCircle, 
@@ -173,6 +173,9 @@ const MedicationOrder: React.FC = () => {
   const [reviewModal, setReviewModal] = useState<{ medicationId: string; medicationName: string } | null>(null);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
+  
+  // AI recommendation state
+  const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
 
   const loadMedications = useCallback(async () => {
     setIsLoadingMeds(true);
@@ -200,8 +203,58 @@ const MedicationOrder: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to load pharmacies:', error);
+      setPharmacies([]);
     }
   }, []);
+
+  // Fetch AI recommendations
+  const fetchAIRecommendations = useCallback(async () => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (apiUrl) {
+        const cartItems = cart.map(item => item.medication.name).join(', ');
+        const prompt = `Based on the user's cart items: ${cartItems || 'none'}, recommend 3-5 additional SRHR products that would complement their order. Focus on Ghana-specific needs. Return only product names separated by commas.`;
+        
+        const res = await fetch(`${apiUrl.replace(/\/$/, '')}/reprobot`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: prompt, history: [] })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          const recommendations = data.response
+            .split(',')
+            .map((r: string) => r.trim())
+            .filter((r: string) => r.length > 0);
+          setAiRecommendations(recommendations);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch AI recommendations:', error);
+      setAiRecommendations([]);
+    }
+  }, [cart]);
+
+  // Fetch AI recommendations when cart changes
+  useEffect(() => {
+    if (cart.length > 0) {
+      fetchAIRecommendations();
+    } else {
+      setAiRecommendations([]);
+    }
+  }, [cart, fetchAIRecommendations]);
+
+  // Get recommended medications
+  const recommendedMedications = useMemo(() => {
+    if (aiRecommendations.length === 0) return [];
+    return medications.filter(med => 
+      aiRecommendations.some(rec => 
+        med.name.toLowerCase().includes(rec.toLowerCase()) ||
+        rec.toLowerCase().includes(med.name.toLowerCase())
+      )
+    ).slice(0, 5);
+  }, [medications, aiRecommendations]);
 
   useEffect(() => {
     loadMedications();
@@ -218,14 +271,11 @@ const MedicationOrder: React.FC = () => {
       };
       
       if (editingMedication) {
-        // Update existing
         await apiService.updateMedication?.(editingMedication.id, medData);
       } else {
-        // Create new
         await apiService.createMedication?.(medData);
       }
       
-      // Reset form and reload
       setMedicationForm({
         name: '',
         genericName: '',
@@ -285,11 +335,8 @@ const MedicationOrder: React.FC = () => {
   const handleTier3Verification = async () => {
     setTier3Error('');
     try {
-      // Simulate API call for tier 3 verification
-      // In production, this would call: apiService.verifyTier3?.({ code: tier3Code, orderTotal: total })
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simple validation: code must be 6 digits and order total < 1000
       if (tier3Code.length === 6 && /^\d+$/.test(tier3Code)) {
         setTier3Verified(true);
         setShowTier3Verification(false);

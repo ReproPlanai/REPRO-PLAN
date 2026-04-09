@@ -1,9 +1,10 @@
 const { Pool } = require('pg');
-const fetch = require('node-fetch');
+const { v4: uuidv4 } = require('uuid');
 
-// Configuration
+// Configuration - Node.js 20+ has native fetch
 const BASE_URL = 'http://localhost:8080';
-const DATABASE_URL = 'postgres://postgres:JqQzUpViBWYpDnTtFBZtSkWnUhfmhUpe@centerbeam.proxy.rlwy.net:31576/railway';
+// Use environment variable for database URL - NEVER hardcode credentials
+const DATABASE_URL = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString: DATABASE_URL,
@@ -17,6 +18,27 @@ const testResults = {
   tests: [],
   startTime: Date.now()
 };
+
+// Global test user ID
+let testUserId = null;
+
+async function createTestUser() {
+  try {
+    const id = uuidv4();
+    await pool.query(
+      `INSERT INTO users (id, secret_code, phone_number, demographics, is_verified, is_used, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, true, false, NOW(), NOW())
+       ON CONFLICT (secret_code) DO NOTHING`,
+      [id, `test-${id}`, '+233200000001', JSON.stringify({ ageRange: '18-25', gender: 'female' })]
+    );
+    testUserId = id;
+    console.log(`✅ Test user created: ${id}`);
+    return id;
+  } catch (err) {
+    console.error('❌ Failed to create test user:', err.message);
+    return null;
+  }
+}
 
 async function testEndpoint(name, method, path, body = null, expectedStatus = 200) {
   try {
@@ -66,6 +88,9 @@ async function runTests() {
   console.log('  COMPREHENSIVE ENDPOINT TEST SUITE');
   console.log('  Testing 119+ endpoints + AI + QR + all features');
   console.log('='.repeat(80) + '\n');
+
+  // Create test user first to satisfy foreign key constraints
+  await createTestUser();
   
   // 1. Health & System
   console.log('📊 HEALTH & SYSTEM ENDPOINTS');
@@ -75,7 +100,10 @@ async function runTests() {
   
   // 2. User Management
   console.log('\n👤 USER MANAGEMENT');
-  const userReg = await testEndpoint('User Register', 'POST', '/api/users/register', { demographics: { ageRange: '18-25', gender: 'female' } });
+  const userReg = await testEndpoint('User Register', 'POST', '/api/users/register', { 
+    secretCode: 'TEST-' + Date.now(),
+    demographics: { ageRange: '18-25', gender: 'female' } 
+  });
   const userId = userReg.data?.user?.id;
   if (userId) {
     await testEndpoint('User Get', 'GET', `/api/users/${userId}`);
@@ -117,7 +145,10 @@ async function runTests() {
   const caseItem = await testEndpoint('Case Create', 'POST', '/api/cases', {
     caseType: 'investigation',
     description: 'Test case',
-    priority: 'medium'
+    priority: 'medium',
+    assignedTo: stakeholderId || userId,
+    assignedRole: 'NGO',
+    createdBy: userId
   });
   const caseId = caseItem.data?.case?.id;
   if (caseId) {
@@ -142,12 +173,13 @@ async function runTests() {
   await testEndpoint('Message List', 'GET', '/api/messages');
   
   // 7. Clinics
-  console.log.log('\n🏥 CLINICS');
+  console.log('\n🏥 CLINICS');
   await testEndpoint('Clinic List', 'GET', '/api/clinics');
   const clinic = await testEndpoint('Clinic Create', 'POST', '/api/clinics', {
     name: 'Test Clinic',
     address: 'Test Address',
     phone: '+233123456789',
+    hours: '9:00-17:00',
     services: ['SRHR', 'Counseling']
   });
   if (clinic.data?.clinic?.id) {
@@ -193,7 +225,7 @@ async function runTests() {
   // 10. Notifications
   console.log('\n🔔 NOTIFICATIONS');
   const notification = await testEndpoint('Notification Create', 'POST', '/api/notifications', {
-    userId,
+    userId: testUserId,
     title: 'Test Notification',
     message: 'This is a test notification',
     type: 'info',
@@ -207,7 +239,7 @@ async function runTests() {
   // 11. Stories (Community)
   console.log('\n📖 STORIES');
   const story = await testEndpoint('Story Create', 'POST', '/api/stories', {
-    userId,
+    userId: testUserId,
     title: 'My SRHR Journey',
     content: 'This is my story about accessing SRHR services...',
     category: 'experience',
@@ -215,7 +247,7 @@ async function runTests() {
   });
   if (story.data?.story?.id) {
     await testEndpoint('Story Get', 'GET', `/api/stories/${story.data.story.id}`);
-    await testEndpoint('Story Like', 'POST', `/api/stories/${story.data.story.id}/like`, { userId });
+    await testEndpoint('Story Like', 'POST', `/api/stories/${story.data.story.id}/like`, { userId: testUserId });
   }
   await testEndpoint('Story List', 'GET', '/api/stories');
   
@@ -224,7 +256,8 @@ async function runTests() {
   const group = await testEndpoint('Support Group Create', 'POST', '/api/support-groups', {
     name: 'Youth SRHR Support',
     description: 'A safe space for youth to discuss SRHR',
-    category: 'youth'
+    category: 'youth',
+    facilitatorId: testUserId
   });
   if (group.data?.group?.id) {
     await testEndpoint('Support Group Get', 'GET', `/api/support-groups/${group.data.group.id}`);
@@ -240,7 +273,8 @@ async function runTests() {
     name: 'Jane Mentor',
     email: `mentor${Date.now()}@test.com`,
     specialties: ['SRHR', 'Counseling'],
-    bio: 'Experienced SRHR counselor'
+    bio: 'Experienced SRHR counselor',
+    stakeholderId: stakeholderId || testUserId
   });
   if (mentor.data?.mentor?.id) {
     await testEndpoint('Mentor Get', 'GET', `/api/mentors/${mentor.data.mentor.id}`);
@@ -253,7 +287,8 @@ async function runTests() {
     title: 'SRHR Guide 2025',
     description: 'Comprehensive SRHR guide',
     category: 'education',
-    type: 'pdf'
+    type: 'pdf',
+    createdBy: testUserId
   });
   if (resource.data?.resource?.id) {
     await testEndpoint('Resource Get', 'GET', `/api/resources/${resource.data.resource.id}`);
@@ -265,7 +300,8 @@ async function runTests() {
   const chatRoom = await testEndpoint('Chat Room Create', 'POST', '/api/chat/rooms', {
     name: 'General Support',
     description: 'General discussion room',
-    isPrivate: false
+    isPrivate: false,
+    createdBy: testUserId
   });
   if (chatRoom.data?.room?.id) {
     await testEndpoint('Chat Room Get', 'GET', `/api/chat/rooms/${chatRoom.data.room.id}/messages`);
@@ -318,14 +354,14 @@ async function runTests() {
   // 20. AI ENDPOINTS (GEMINI TEST)
   console.log('\n🤖 AI ENDPOINTS (Gemini API Test)');
   
-  // Test Rehana AI
-  const rehanaTest = await testEndpoint('Rehana AI Chat', 'POST', '/rehana', {
+  // Test ReproBot AI
+  const reprobotTest = await testEndpoint('ReproBot AI Chat', 'POST', '/reprobot', {
     message: 'What is SRHR and why is it important?',
     history: []
   }, 200);
   
-  if (rehanaTest.success && rehanaTest.data?.response) {
-    console.log('   ✅ Rehana AI responded with:', rehanaTest.data.response.substring(0, 100) + '...');
+  if (reprobotTest.success && reprobotTest.data?.response) {
+    console.log('   ✅ ReproBot AI responded with:', reprobotTest.data.response.substring(0, 100) + '...');
   }
   
   // Test AI Quiz
@@ -354,6 +390,135 @@ async function runTests() {
   await testEndpoint('Auth OTP Request', 'POST', '/auth/request-otp', {
     email: `test${Date.now()}@test.com`
   });
+  await testEndpoint('Auth Verify Token', 'GET', '/auth/verify', null, 401); // Should fail without token
+  
+  // 22. Pharmacies
+  console.log('\n💊 PHARMACIES');
+  const pharmacy = await testEndpoint('Pharmacy Create', 'POST', '/api/pharmacies', {
+    name: 'Test Pharmacy',
+    address: '123 Test Street',
+    city: 'Accra',
+    phone: '+233123456789',
+    deliveryAvailable: true,
+    deliveryFee: 5.00
+  });
+  const pharmacyId = pharmacy.data?.pharmacy?.id;
+  if (pharmacyId) {
+    await testEndpoint('Pharmacy Get', 'GET', `/api/pharmacies/${pharmacyId}`);
+    await testEndpoint('Pharmacy Update', 'PUT', `/api/pharmacies/${pharmacyId}`, { deliveryFee: 3.50 });
+  }
+  await testEndpoint('Pharmacy List', 'GET', '/api/pharmacies');
+  await testEndpoint('Pharmacy List by Location', 'GET', '/api/pharmacies?location=Accra');
+  
+  // 23. Accessibility
+  console.log('\n♿ ACCESSIBILITY');
+  await testEndpoint('Accessibility Settings Get', 'GET', '/api/accessibility/settings');
+  await testEndpoint('Accessibility Settings Update', 'PUT', '/api/accessibility/settings', {
+    userId: testUserId,
+    settings: { highContrast: true, largeText: true }
+  });
+  await testEndpoint('Accessibility Profiles List', 'GET', '/api/accessibility/profiles');
+  const profile = await testEndpoint('Accessibility Profile Create', 'POST', '/api/accessibility/profiles', {
+    userId: testUserId,
+    name: 'High Contrast Profile',
+    description: 'Optimized for visual impairments',
+    settings: { highContrast: true, screenReader: true },
+    isPublic: true
+  });
+  if (profile.data?.profile?.id) {
+    await testEndpoint('Accessibility Profile Delete', 'DELETE', `/api/accessibility/profiles/${profile.data.profile.id}`);
+  }
+  
+  // 24. Reports (Crime/SRHR Reporting)
+  console.log('\n📋 REPORTS');
+  const report = await testEndpoint('Report Create', 'POST', '/api/reports', {
+    type: 'harassment',
+    description: 'Test incident report',
+    location: 'Test Location',
+    isAnonymous: true,
+    consentToShare: true,
+    wantsCallback: false
+  });
+  const reportId = report.data?.report?.id;
+  if (reportId) {
+    await testEndpoint('Report Get', 'GET', `/api/reports/${reportId}`);
+    await testEndpoint('Report Status Update', 'PUT', `/api/reports/${reportId}/status`, { status: 'under_review', notes: 'Investigating' });
+    await testEndpoint('Report Add Note', 'POST', `/api/reports/${reportId}/notes`, { note: 'Initial review complete' });
+    await testEndpoint('Report Get Notes', 'GET', `/api/reports/${reportId}/notes`);
+  }
+  await testEndpoint('Report List', 'GET', '/api/reports');
+  
+  // 25. Error Reporting
+  console.log('\n🐛 ERROR REPORTING');
+  await testEndpoint('Error Report Submit', 'POST', '/api/errors', {
+    message: 'Test error from test suite',
+    stack: 'Test stack trace',
+    context: { userAgent: 'TestBot/1.0', url: '/test', timestamp: new Date().toISOString() }
+  });
+  await testEndpoint('Error Reports List', 'GET', '/api/errors');
+  
+  // 26. Tier 3 Auth Verification
+  console.log('\n🔒 TIER 3 VERIFICATION');
+  if (userId) {
+    await testEndpoint('User Tier 3 Verify', 'POST', '/api/users/verify', { 
+      secretCode: userReg.data?.secretCode || 'TEST123' 
+    }, 404); // User may not exist
+  }
+  await testEndpoint('Stakeholder Tier 3 Verify', 'POST', '/api/stakeholders/verify', { 
+    phoneNumber: '+2331234567890',
+    role: 'NGO'
+  }, 404); // Stakeholder may not exist
+  
+  // 27. E-commerce Products
+  console.log('\n🛒 E-COMMERCE');
+  const product = await testEndpoint('Product Create', 'POST', '/api/products', {
+    name: 'Test Product',
+    price: 10.99,
+    category: 'Contraception',
+    stockQuantity: 100
+  });
+  const productId = product.data?.product?.id;
+  if (productId) {
+    await testEndpoint('Product Get', 'GET', `/api/products/${productId}`);
+    await testEndpoint('Product Review Add', 'POST', `/api/products/${productId}/reviews`, {
+      userId: testUserId,
+      rating: 5,
+      comment: 'Great product!'
+    });
+  }
+  await testEndpoint('Product List', 'GET', '/api/products');
+  await testEndpoint('Product Categories', 'GET', '/api/products/categories/list');
+  
+  // 28. Cart & Orders
+  console.log('\n🛍️  CART & ORDERS');
+  const cartItem = await testEndpoint('Cart Add Item', 'POST', '/api/cart/items', {
+    userId: testUserId,
+    productId: productId,
+    quantity: 2
+  });
+  await testEndpoint('Cart Get', 'GET', `/api/cart?userId=${testUserId}`);
+  await testEndpoint('Cart Summary', 'GET', `/api/cart/summary?userId=${testUserId}`);
+  if (cartItem.data?.item?.id) {
+    await testEndpoint('Cart Update Item', 'PUT', `/api/cart/items/${cartItem.data.item.id}`, { quantity: 3 });
+    await testEndpoint('Cart Remove Item', 'DELETE', `/api/cart/items/${cartItem.data.item.id}`);
+  }
+  await testEndpoint('Cart Clear', 'DELETE', `/api/cart/clear?userId=${testUserId}`);
+  
+  // Create order if we have a product
+  if (productId) {
+    const order = await testEndpoint('Order Create', 'POST', '/api/orders', {
+      userId: testUserId,
+      items: [{ productId, quantity: 1 }],
+      deliveryType: 'pickup'
+    });
+    const orderId = order.data?.order?.id;
+    if (orderId) {
+      await testEndpoint('Order Get', 'GET', `/api/orders/${orderId}`);
+      await testEndpoint('Order Receipt', 'GET', `/api/orders/${orderId}/receipt`);
+      await testEndpoint('Order Cancel', 'POST', `/api/orders/${orderId}/cancel`, { reason: 'Test cancellation' });
+    }
+  }
+  await testEndpoint('Order List', 'GET', '/api/orders');
   
   // Summary
   const duration = (Date.now() - testResults.startTime) / 1000;
@@ -376,7 +541,7 @@ async function runTests() {
   
   // AI Status
   console.log('\n   🤖 AI STATUS:');
-  const aiTests = testResults.tests.filter(t => t.name.includes('AI') || t.name.includes('Rehana'));
+  const aiTests = testResults.tests.filter(t => t.name.includes('AI') || t.name.includes('ReproBot') || t.name.includes('Quiz') || t.name.includes('Consent'));
   const aiPassed = aiTests.filter(t => t.passed).length;
   console.log(`      Gemini API: ${aiPassed}/${aiTests.length} tests passed`);
   
@@ -385,6 +550,34 @@ async function runTests() {
   const qrTests = testResults.tests.filter(t => t.name.includes('QR'));
   const qrPassed = qrTests.filter(t => t.passed).length;
   console.log(`      QR Generation: ${qrPassed}/${qrTests.length} tests passed`);
+  
+  // New Routes Status
+  console.log('\n   🆕 NEW ROUTES STATUS:');
+  const pharmacyTests = testResults.tests.filter(t => t.name.includes('Pharmacy'));
+  const accessibilityTests = testResults.tests.filter(t => t.name.includes('Accessibility'));
+  const reportTests = testResults.tests.filter(t => t.name.includes('Report') && !t.name.includes('Audit'));
+  const errorTests = testResults.tests.filter(t => t.name.includes('Error'));
+  
+  console.log(`      Pharmacies: ${pharmacyTests.filter(t => t.passed).length}/${pharmacyTests.length} tests passed`);
+  console.log(`      Accessibility: ${accessibilityTests.filter(t => t.passed).length}/${accessibilityTests.length} tests passed`);
+  console.log(`      Reports: ${reportTests.filter(t => t.passed).length}/${reportTests.length} tests passed`);
+  console.log(`      Error Reporting: ${errorTests.filter(t => t.passed).length}/${errorTests.length} tests passed`);
+  
+  // All Endpoints Summary
+  console.log('\n   📋 ALL ROUTES TESTED:');
+  const routeGroups = [
+    'Health & System', 'User', 'Stakeholder', 'Alert', 'Case', 'Message',
+    'Clinic', 'Health Record', 'QR', 'Notification', 'Story', 'Support Group',
+    'Mentor', 'Resource', 'Chat', 'Workflow', 'Admin', 'Audit', 'Safety',
+    'AI', 'Auth', 'Pharmacy', 'Accessibility', 'Report', 'Error',
+    'Product', 'Cart', 'Order'
+  ];
+  routeGroups.forEach(group => {
+    const groupTests = testResults.tests.filter(t => t.name.toLowerCase().includes(group.toLowerCase()));
+    const passed = groupTests.filter(t => t.passed).length;
+    const status = passed === groupTests.length ? '✅' : passed === 0 ? '❌' : '⚠️';
+    console.log(`      ${status} ${group}: ${passed}/${groupTests.length}`);
+  });
   
   console.log('\n' + '='.repeat(80) + '\n');
   

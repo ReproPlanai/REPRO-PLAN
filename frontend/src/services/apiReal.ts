@@ -578,7 +578,7 @@ class RealAPIService {
   }
 
   async chatWithAI(message: string, history?: any[]) {
-    return apiRequest('/rehana', {
+    return apiRequest('/ReproBot', {
       method: 'POST',
       body: JSON.stringify({ message, history })
     });

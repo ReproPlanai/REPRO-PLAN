@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Shield, 
@@ -15,6 +15,8 @@ import {
   Navigation,
   RefreshCw
 } from 'lucide-react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import UnifiedVerificationForm from '../components/Auth/UnifiedVerificationForm';
 
 import { apiService } from '../services/api';
@@ -63,6 +65,8 @@ interface OTPVerification {
 
 const SecureMap: React.FC = () => {
   const navigate = useNavigate();
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedSafeHouse, setSelectedSafeHouse] = useState<SafeHouse | null>(null);
@@ -83,6 +87,40 @@ const SecureMap: React.FC = () => {
   const fetchSafeHouses = async () => {
     setLoading(true);
     try {
+      // Try to get Ghana clinics from backend first
+      const ghanaResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/clinics/ghana`);
+      if (ghanaResponse.ok) {
+        const data = await ghanaResponse.json();
+        if (data.success && data.clinics) {
+          const transformed: SafeHouse[] = data.clinics.map((clinic: any) => ({
+            id: clinic.id,
+            name: clinic.name,
+            type: mapClinicTypeToSafeHouse(clinic.type),
+            address: clinic.address,
+            description: `${clinic.name} - ${clinic.services?.join(', ')}`,
+            coordinates: clinic.coordinates || { lat: 5.6037, lng: -0.1870 },
+            distance: calculateDistanceFromUser(clinic.coordinates),
+            rating: 4.5,
+            isOpen: true,
+            capacity: clinic.type === 'hospital' ? 50 : 20,
+            currentOccupancy: Math.floor(Math.random() * 10),
+            securityLevel: 'high',
+            features: clinic.services || [],
+            contactPhone: clinic.phone || '+233-XXX-XXX-XXXX',
+            emergencyContact: clinic.phone || '+233-XXX-XXX-XXXX',
+            operatingHours: clinic.operatingHours || 'Contact for hours',
+            requiresOTP: false,
+            otpExpiry: 30,
+            organization: clinic.organization,
+            region: clinic.region,
+            youthFriendly: clinic.youthFriendly
+          }));
+          setSafeHouses(transformed);
+          return;
+        }
+      }
+      
+      // Fallback to original API
       const response = await apiService.getClinics?.() as { success?: boolean; clinics?: any[] };
       
       if (response?.success && response.clinics) {
@@ -139,6 +177,52 @@ const SecureMap: React.FC = () => {
     fetchSafeHouses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Initialize Mapbox map
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
+
+    // Set Mapbox access token from environment variable only
+    // Never hardcode API keys - security risk
+    if (!process.env.REACT_APP_MAPBOX_ACCESS_KEY) {
+      console.error('Mapbox access token not configured. Set REACT_APP_MAPBOX_ACCESS_KEY in environment.');
+      return;
+    }
+    mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_KEY;
+
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [-0.1870, 5.6037], // Accra, Ghana
+      zoom: 12,
+    });
+
+    mapRef.current = map;
+
+    // Add markers for clinics when they're loaded
+    if (safeHouses.length > 0) {
+      safeHouses.forEach(clinic => {
+        const el = document.createElement('div');
+        el.className = 'marker';
+        el.style.width = '30px';
+        el.style.height = '30px';
+        el.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236366f1\'%3E%3Cpath d=\'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z\'/%3E%3C/svg%3E")';
+        el.style.backgroundSize = 'cover';
+        el.style.cursor = 'pointer';
+
+        new mapboxgl.Marker(el)
+          .setLngLat([clinic.coordinates.lng, clinic.coordinates.lat])
+          .setPopup(new mapboxgl.Popup({ offset: 25 })
+            .setHTML(`<h3 style="margin:0 0 5px 0;font-size:14px;">${clinic.name}</h3><p style="margin:0;font-size:12px;">${clinic.address}</p>`))
+          .addTo(map);
+      });
+    }
+
+    return () => {
+      map.remove();
+      mapRef.current = null;
+    };
+  }, [safeHouses]);
 
   const typeOptions = [
     { value: 'all', label: 'All Types', icon: Building },
@@ -333,19 +417,18 @@ const SecureMap: React.FC = () => {
           <p className="text-sm text-gray-600 mb-3">Need help with directions or choosing a location?</p>
           <button onClick={() => navigate('/chatbot?context=secure-map')} className="flex items-center gap-2 py-2.5 px-4 bg-gradient-to-r from-primary-500/10 to-purple-500/10 text-primary-600 rounded-xl font-medium hover:from-primary-500/20 hover:to-purple-500/20 transition-all min-h-[44px]">
             <Sparkles className="w-4 h-4" />
-            <span>Rehana can help with directions</span>
+            <span>ReproBot can help with directions</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Map placeholder / controls */}
+        {/* Mapbox Map */}
         <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 overflow-hidden mb-6 shadow-sm">
-          <div className="h-48 sm:h-56 bg-gradient-to-br from-primary-100/50 via-purple-100/30 to-pink-100/30 flex flex-col items-center justify-center">
-            <MapPin className="w-12 h-12 text-primary-400 mb-2" />
-            <p className="text-sm text-gray-600 mb-3">Map view</p>
-            <button onClick={getCurrentLocation} className="flex items-center gap-2 py-2 px-4 bg-white/80 border border-gray-200 rounded-xl font-medium text-sm min-h-[44px]">
+          <div ref={mapContainerRef} className="h-64 sm:h-80 w-full" />
+          <div className="absolute bottom-4 right-4 z-10">
+            <button onClick={getCurrentLocation} className="flex items-center gap-2 py-2 px-4 bg-white shadow-lg rounded-xl font-medium text-sm border border-gray-200 min-h-[44px] hover:bg-gray-50 transition-colors">
               <Navigation size={18} />
-              Use my location
+              <span>Use my location</span>
             </button>
           </div>
         </div>

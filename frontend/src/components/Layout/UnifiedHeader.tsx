@@ -59,6 +59,7 @@ const UnifiedHeader: React.FC = () => {
         { path: '/medication-order', icon: Pill, label: 'Order Medicine' },
         { path: '/emergency', icon: Shield, label: t('navigation.emergency') },
         { path: '/tracker', icon: Calendar, label: t('navigation.tracker') },
+        { path: '/health-records', icon: Heart, label: 'Health Records' },
       ]
     },
     {
@@ -87,7 +88,6 @@ const UnifiedHeader: React.FC = () => {
         { path: '/notifications', icon: Bell, label: 'Notifications' },
         { path: '/tutorial', icon: GraduationCap, label: 'Tutorial' },
         { path: '/qr-verification', icon: QrCode, label: 'QR Code Verification' },
-        { path: '/system-health', icon: Settings, label: 'System Health' },
         { path: '/accessibility', icon: Settings, label: 'Accessibility' },
         { path: '/settings', icon: Settings, label: t('navigation.settings') },
       ]

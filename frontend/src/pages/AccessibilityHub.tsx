@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Eye,
   Brain,
@@ -15,7 +15,11 @@ import {
   Pause,
   RefreshCw,
   HelpCircle,
-  ChevronRight
+  ChevronRight,
+  Lightbulb,
+  Languages,
+  Mic,
+  Wand2
 } from 'lucide-react';
 import PageContainer from '../components/Layout/PageContainer';
 import { apiService } from '../services/api';
@@ -90,6 +94,9 @@ const AccessibilityHub: React.FC = () => {
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [activeCategory, setActiveCategory] = useState<'all' | 'visual' | 'cognitive' | 'hearing' | 'motor'>('all');
+  const [aiTips, setAiTips] = useState<string[]>([]);
+  const [isListening, setIsListening] = useState(false);
+  const [adaptedContent, setAdaptedContent] = useState<string | null>(null);
 
   useEffect(() => {
     loadAccessibilitySettings();
@@ -200,6 +207,150 @@ const AccessibilityHub: React.FC = () => {
     apiService.updateAccessibilitySettings?.(defaultSettings).catch(error => {
       console.error('Failed to reset accessibility settings:', error);
     });
+  };
+
+  // Generate AI-powered accessibility tips
+  const generateAITips = useCallback(async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/ai/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Based on these current accessibility settings: 
+              Visual - High Contrast: ${settings.visual.highContrast}, Large Text: ${settings.visual.largeText}, Screen Reader: ${settings.visual.screenReader}
+              Cognitive - Simple Language: ${settings.cognitive.simpleLanguage}, Show Progress: ${settings.cognitive.showProgress}
+              Hearing - Captions: ${settings.hearing.captionsEnabled}, Visual Alerts: ${settings.hearing.visualAlerts}
+              Motor - Keyboard Navigation: ${settings.motor.keyboardNavigation}, Large Buttons: ${settings.motor.largeButtons}
+              
+              Generate 3 personalized accessibility tips to improve the user experience. Return only JSON array:
+              ["tip 1", "tip 2", "tip 3"]`
+            }]
+          }]
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const tips = JSON.parse(data.candidates[0].content.parts[0].text);
+        setAiTips(tips);
+      }
+    } catch (error) {
+      console.warn('Failed to generate AI tips:', error);
+    }
+  }, [settings]);
+
+  // AI-powered content adaptation
+  const adaptContentWithAI = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/ai/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Simplify this accessibility hub description for users with cognitive disabilities: 
+              "Personalize your experience with accessibility features designed for everyone. Features include visual adjustments like high contrast and large text, cognitive support like simple language mode, hearing assistance with captions and visual alerts, and motor accessibility with keyboard navigation and voice control."
+              
+              Return only the simplified text, no markdown.`
+            }]
+          }]
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAdaptedContent(data.candidates[0].content.parts[0].text);
+      }
+    } catch (error) {
+      console.warn('Failed to adapt content:', error);
+    }
+  };
+
+  // AI-powered voice command processing
+  const processVoiceCommand = async (command: string) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/ai/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Process this accessibility voice command: "${command}". 
+              Available actions: enable high contrast, enable large text, enable captions, enable keyboard navigation, reset settings.
+              Return only the action name as a simple string.`
+            }]
+          }]
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const action = data.candidates[0].content.parts[0].text.toLowerCase().trim();
+        
+        // Execute the action
+        if (action.includes('high contrast')) {
+          updateSetting('visual', 'highContrast', !settings.visual.highContrast);
+          speakText('High contrast toggled');
+        } else if (action.includes('large text')) {
+          updateSetting('visual', 'largeText', !settings.visual.largeText);
+          speakText('Large text toggled');
+        } else if (action.includes('captions')) {
+          updateSetting('hearing', 'captionsEnabled', !settings.hearing.captionsEnabled);
+          speakText('Captions toggled');
+        } else if (action.includes('keyboard')) {
+          updateSetting('motor', 'keyboardNavigation', !settings.motor.keyboardNavigation);
+          speakText('Keyboard navigation toggled');
+        } else if (action.includes('reset')) {
+          resetSettings();
+          speakText('Settings reset to default');
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to process voice command:', error);
+    }
+  };
+
+  // Initialize AI tips on mount
+  useEffect(() => {
+    generateAITips();
+  }, [generateAITips]);
+
+  // Voice recognition (Web Speech API)
+  const startVoiceRecognition = () => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      recognition.onstart = () => {
+        setIsListening(true);
+        speakText('Listening for your command');
+      };
+      
+      recognition.onresult = (event: any) => {
+        const command = event.results[0][0].transcript;
+        setIsListening(false);
+        processVoiceCommand(command);
+      };
+      
+      recognition.onerror = () => {
+        setIsListening(false);
+        speakText('Sorry, I did not catch that');
+      };
+      
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      
+      recognition.start();
+    } else {
+      speakText('Voice recognition is not supported in your browser');
+    }
   };
 
   const categories = [
@@ -356,6 +507,86 @@ const AccessibilityHub: React.FC = () => {
               <p className="text-xs text-gray-500">{description}</p>
             </button>
           ))}
+        </div>
+
+        {/* AI-Powered Features Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          {/* AI Tips */}
+          <div className="rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200/60 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-purple-600" />
+                <h3 className="font-semibold text-purple-900">AI Accessibility Tips</h3>
+              </div>
+              <button
+                onClick={generateAITips}
+                className="p-2 hover:bg-purple-100 rounded-lg transition-colors"
+              >
+                <Wand2 className="w-4 h-4 text-purple-600" />
+              </button>
+            </div>
+            {aiTips.length > 0 ? (
+              <ul className="space-y-2">
+                {aiTips.map((tip, index) => (
+                  <li key={index} className="flex items-start gap-2 text-sm text-purple-800">
+                    <span className="text-purple-600 font-bold">{index + 1}.</span>
+                    <span>{tip}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-purple-600">Loading AI tips...</p>
+            )}
+          </div>
+
+          {/* Voice Commands */}
+          <div className="rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200/60 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Mic className="w-5 h-5 text-blue-600" />
+                <h3 className="font-semibold text-blue-900">Voice Commands</h3>
+              </div>
+              <button
+                onClick={startVoiceRecognition}
+                disabled={isListening}
+                className={`p-2 rounded-lg transition-colors ${isListening ? 'bg-red-100 text-red-600' : 'hover:bg-blue-100'}`}
+              >
+                <Mic className={`w-4 h-4 ${isListening ? 'text-red-600' : 'text-blue-600'}`} />
+              </button>
+            </div>
+            {isListening ? (
+              <div className="flex items-center gap-2 text-sm text-blue-600">
+                <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
+                <span>Listening...</span>
+              </div>
+            ) : (
+              <p className="text-sm text-blue-600">Try saying "enable high contrast" or "enable captions"</p>
+            )}
+          </div>
+        </div>
+
+        {/* AI Content Adaptation */}
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-5 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Languages className="w-5 h-5 text-primary-600" />
+              <h3 className="font-semibold text-gray-900">AI Content Adaptation</h3>
+            </div>
+            <button
+              onClick={adaptContentWithAI}
+              className="px-3 py-1.5 bg-primary-100 text-primary-600 rounded-lg text-sm font-medium hover:bg-primary-200 transition-colors flex items-center gap-2"
+            >
+              <Wand2 className="w-4 h-4" />
+              Simplify Text
+            </button>
+          </div>
+          {adaptedContent ? (
+            <div className="p-4 bg-gray-50 rounded-xl">
+              <p className="text-sm text-gray-700">{adaptedContent}</p>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">Click "Simplify Text" to get AI-powered simplified content for easier reading</p>
+          )}
         </div>
 
         {/* Accessibility Features */}

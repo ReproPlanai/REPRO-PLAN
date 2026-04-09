@@ -129,10 +129,10 @@ Empowering youth with anonymous access to sexual and reproductive health informa
 
 ### Supporting Components
 - **Emergency**: Emergency panel, panic button, safety check manager
-- **Chatbot**: Rehana AI chat interface (offline + online)
+- **Chatbot**: ReproBot AI chat interface (offline + online)
 - **Clinics**: Clinic finder with map integration
 - **Mentorship**: Mentorship system matching
-- **Tracker**: Health tracker with Rehana AI panel
+- **Tracker**: Health tracker with ReproBot AI panel
 - **Videos**: Video library with offline support
 
 ## 🔐 Authentication Flows

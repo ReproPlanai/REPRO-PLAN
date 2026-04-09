@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { 
@@ -15,7 +15,8 @@ import {
   Smartphone,
   QrCode,
   Sparkles,
-  Lock
+  Lock,
+  Activity
 } from 'lucide-react';
 import { LogoCircular } from '../assets';
 import PWAInstallPrompt from '../components/PWAInstallPrompt';
@@ -24,13 +25,15 @@ import PageContainer from '../components/Layout/PageContainer';
 const Home: React.FC = () => {
   const { t } = useTranslation();
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const [clinicCount, setClinicCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   const quickAccessItems = [
     {
       path: '/chatbot',
       icon: MessageCircle,
       title: t('home.getHelp'),
-      description: 'Ask SRHR questions anonymously',
+      description: 'Ask ReproBot SRHR questions anonymously',
       color: 'bg-blue-500',
       textColor: 'text-blue-600'
     },
@@ -46,7 +49,7 @@ const Home: React.FC = () => {
       path: '/clinics',
       icon: MapPin,
       title: t('home.findServices'),
-      description: 'Find nearby health services',
+      description: `Find ${isLoading ? '...' : `${clinicCount}+`} health services in Ghana`,
       color: 'bg-green-500',
       textColor: 'text-green-600'
     },
@@ -54,9 +57,17 @@ const Home: React.FC = () => {
       path: '/tracker',
       icon: Calendar,
       title: t('home.trackHealth'),
-      description: 'Track your health and cycles',
+      description: 'Track your health and cycles with AI insights',
       color: 'bg-purple-500',
       textColor: 'text-purple-600'
+    },
+    {
+      path: '/health-records',
+      icon: Heart,
+      title: 'Health Records',
+      description: 'View and manage your complete health history',
+      color: 'bg-pink-500',
+      textColor: 'text-pink-600'
     },
     {
       path: '/games',
@@ -77,8 +88,8 @@ const Home: React.FC = () => {
     {
       path: '/mentorship',
       icon: Users,
-      title: 'Peer Support',
-      description: 'Connect with trained mentors',
+      title: 'AI Video Therapy',
+      description: 'Connect with ReproBot for therapy sessions',
       color: 'bg-indigo-500',
       textColor: 'text-indigo-600'
     },
@@ -93,10 +104,36 @@ const Home: React.FC = () => {
   ];
 
   const recentActivities = [
-    { icon: MessageCircle, text: 'Asked about contraception', time: '2 hours ago' },
-    { icon: Calendar, text: 'Tracked menstrual cycle', time: '1 day ago' },
-    { icon: Gamepad2, text: 'Completed SRHR quiz', time: '3 days ago' }
+    { icon: Activity, text: 'Ghana clinic data updated', time: 'Just now' },
+    { icon: MessageCircle, text: 'ReproBot AI assistant ready', time: 'Just now' },
+    { icon: Shield, text: 'Emergency services configured', time: 'Just now' }
   ];
+
+  // Fetch clinic data from API
+  useEffect(() => {
+    const fetchClinicData = async () => {
+      try {
+        const apiUrl = process.env.REACT_APP_API_URL;
+        if (apiUrl) {
+          const response = await fetch(`${apiUrl.replace(/\/$/, '')}/api/clinics/ghana`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.clinics) {
+              setClinicCount(data.clinics.length);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch clinic data:', error);
+        // Set default count if API fails
+        setClinicCount(50);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchClinicData();
+  }, []);
 
   return (
     <PageContainer

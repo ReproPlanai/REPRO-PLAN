@@ -6,13 +6,15 @@ console.log('[STARTUP] NODE_ENV:', process.env.NODE_ENV);
 console.log('[STARTUP] PORT:', process.env.PORT);
 
 try {
-  // Validate env early with safe fallback
+  // Validate env early - fail fast if critical secrets missing
   if (!process.env.JWT_SECRET) {
-    console.warn('[STARTUP] JWT_SECRET not set, using fallback');
-    process.env.JWT_SECRET = 'fallback-jwt-secret-min-32-chars-long-for-dev-only-123456';
+    console.error('[STARTUP] CRITICAL: JWT_SECRET environment variable not set');
+    console.error('[STARTUP] Set JWT_SECRET in environment before starting server');
+    process.exit(1);
   }
 } catch (error) {
   console.error('[STARTUP] Env validation error:', error);
+  process.exit(1);
 }
 
 import express from 'express';
@@ -28,7 +30,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { requireHTTPS, securityHeaders, validateRequest, sanitizeInput } from './middleware/security';
 import { apiLimiter, authLimiter, adminLimiter } from './middleware/rateLimiter';
 import authRoutes from './routes/auth';
-import rehanaRoutes from './routes/rehana';
+import reprobotRoutes from './routes/reprobot';
 import transcribeRoutes from './routes/transcribe';
 import aiRoutes from './routes/ai';
 import userRoutes from './routes/users';
@@ -54,6 +56,10 @@ import externalDataRoutes from './routes/external-data';
 import productsRoutes from './routes/products';
 import ordersRoutes from './routes/orders';
 import cartRoutes from './routes/cart';
+import pharmaciesRoutes from './routes/pharmacies';
+import accessibilityRoutes from './routes/accessibility';
+import reportsRoutes from './routes/reports';
+import errorsRoutes from './routes/errors';
 
 import { serverDiagnostics, SystemDiagnostics } from './config/diagnostics';
 import { verifyDatabase } from './config/verifyDb';
@@ -186,7 +192,11 @@ app.use('/api/external-data', externalDataRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/cart', cartRoutes);
-app.use('/rehana', rehanaRoutes);
+app.use('/api/pharmacies', pharmaciesRoutes);
+app.use('/api/accessibility', accessibilityRoutes);
+app.use('/api/reports', reportsRoutes);
+app.use('/api/errors', errorsRoutes);
+app.use('/reprobot', reprobotRoutes);
 app.use('/transcribe', transcribeRoutes);
 app.use('/ai', aiRoutes);
 

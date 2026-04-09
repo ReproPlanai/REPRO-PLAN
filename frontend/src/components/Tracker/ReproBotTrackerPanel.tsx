@@ -3,10 +3,10 @@ import ReactMarkdown from 'react-markdown';
 import { Send, ChevronDown, ChevronUp } from 'lucide-react';
 import { useOffline } from '../../hooks/useOffline';
 
-const REHANA_AVATAR_URL = 'https://static.vecteezy.com/system/resources/previews/035/186/557/large_2x/ai-generated-woman-lady-model-cheerful-happy-beauty-face-person-adult-smile-one-background-pretty-photo.jpg';
+const REPROBOT_AVATAR_URL = 'https://static.vecteezy.com/system/resources/previews/035/186/557/large_2x/ai-generated-woman-lady-model-cheerful-happy-beauty-face-person-adult-smile-one-background-pretty-photo.jpg';
 const USER_AVATAR_URL = 'https://api.dicebear.com/7.x/avataaars-neutral/png?seed=user&size=128';
 
-interface RehanaTrackerPanelProps {
+interface ReproBotTrackerPanelProps {
   initialPrompt?: string | null;
   onPromptSent?: () => void;
   cycleContext: {
@@ -32,7 +32,7 @@ const QUICK_PROMPTS = [
   'How can I manage cramps?'
 ];
 
-const RehanaTrackerPanel: React.FC<RehanaTrackerPanelProps> = ({
+const ReproBotTrackerPanel: React.FC<ReproBotTrackerPanelProps> = ({
   cycleContext,
   isExpanded,
   onToggle,
@@ -90,7 +90,7 @@ const RehanaTrackerPanel: React.FC<RehanaTrackerPanelProps> = ({
 
       if (isOnline && apiUrl) {
         const history = messages.map(m => ({ role: m.role, content: m.content }));
-        const res = await fetch(`${apiUrl.replace(/\/$/, '')}/rehana`, {
+        const res = await fetch(`${apiUrl.replace(/\/$/, '')}/reprobot`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: fullMessage, history })
@@ -102,7 +102,7 @@ const RehanaTrackerPanel: React.FC<RehanaTrackerPanelProps> = ({
       }
 
       if (!response) {
-        response = "I'm Rehana, your SRHR assistant. I can help explain your cycle, symptoms, and reproductive health. For personalized answers, make sure you're connected to the internet. You can also ask me in the main Chat section.";
+        response = "I'm ReproBot, your SRHR assistant. I can help explain your cycle, symptoms, and reproductive health. For personalized answers, make sure you're connected to the internet. You can also ask me in the main Chat section.";
       }
 
       setMessages(prev => [...prev, { role: 'assistant' as const, content: response }]);
@@ -134,14 +134,14 @@ const RehanaTrackerPanel: React.FC<RehanaTrackerPanelProps> = ({
         <div className="flex items-center space-x-3">
           <div className="relative">
             <img
-              src={REHANA_AVATAR_URL}
-              alt="Rehana"
+              src={REPROBOT_AVATAR_URL}
+              alt="ReproBot"
               className="w-11 h-11 rounded-2xl object-cover shadow-lg ring-2 ring-gray-100"
             />
             <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" title="Online" />
           </div>
           <div className="flex flex-col gap-0" style={{ marginTop: '-2px' }}>
-            <span className="font-semibold text-gray-900 text-base leading-tight">Ask Rehana</span>
+            <span className="font-semibold text-gray-900 text-base leading-tight">Ask ReproBot</span>
             <span className="text-xs text-gray-500 leading-tight" style={{ marginTop: '-4px' }}>
               Get cycle insights and SRHR answers
             </span>
@@ -181,7 +181,7 @@ const RehanaTrackerPanel: React.FC<RehanaTrackerPanelProps> = ({
                     {msg.role === 'user' ? (
                       <img src={USER_AVATAR_URL} alt="You" className="w-10 h-10 rounded-full object-cover shadow-md" />
                     ) : (
-                      <img src={REHANA_AVATAR_URL} alt="Rehana" className="w-10 h-10 rounded-full object-cover shadow-md" />
+                      <img src={REPROBOT_AVATAR_URL} alt="ReproBot" className="w-10 h-10 rounded-full object-cover shadow-md" />
                     )}
                   </div>
                   <div
@@ -205,7 +205,7 @@ const RehanaTrackerPanel: React.FC<RehanaTrackerPanelProps> = ({
             {isLoading && (
               <div className="flex justify-start">
                 <div className="flex space-x-3">
-                  <img src={REHANA_AVATAR_URL} alt="Rehana" className="w-10 h-10 rounded-full object-cover flex-shrink-0 shadow-md" />
+                  <img src={REPROBOT_AVATAR_URL} alt="ReproBot" className="w-10 h-10 rounded-full object-cover flex-shrink-0 shadow-md" />
                   <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg border border-gray-200/50">
                     <div className="flex items-center space-x-3">
                       <div className="flex space-x-1">
@@ -213,7 +213,7 @@ const RehanaTrackerPanel: React.FC<RehanaTrackerPanelProps> = ({
                         <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                         <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                       </div>
-                      <span className="text-sm text-gray-600 font-medium">Rehana is thinking...</span>
+                      <span className="text-sm text-gray-600 font-medium">ReproBot is thinking...</span>
                     </div>
                   </div>
                 </div>
@@ -247,4 +247,4 @@ const RehanaTrackerPanel: React.FC<RehanaTrackerPanelProps> = ({
   );
 };
 
-export default RehanaTrackerPanel;
+export default ReproBotTrackerPanel;

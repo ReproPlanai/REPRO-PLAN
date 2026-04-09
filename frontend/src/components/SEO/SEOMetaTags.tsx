@@ -140,7 +140,7 @@ const SEOMetaTags: React.FC<SEOMetaTagsProps> = ({
           "inLanguage": "en",
           "isAccessibleForFree": true,
           "featureList": [
-            "Rehana AI Assistant",
+            "ReproBot AI Assistant",
             "Emergency Support",
             "QR Code Verification",
             "Offline Access",

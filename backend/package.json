@@ -1,7 +1,7 @@
 {
   "name": "repro-plan-backend",
   "version": "1.0.0",
-  "description": "REPRO PLAN Backend - Rehana AI, Auth, Email",
+  "description": "REPRO PLAN Backend - ReproBot AI, Auth, Email",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -23,7 +23,6 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
-    "openai": "^4.73.0",
     "pg": "^8.13.0",
     "pino": "^9.4.0",
     "pino-pretty": "^11.3.0",

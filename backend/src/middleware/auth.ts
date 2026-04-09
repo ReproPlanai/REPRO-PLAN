@@ -38,7 +38,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
     }
     
     // Verify token
-    const decoded = jwt.verify(token, env.JWT_SECRET || 'fallback-secret') as any;
+    const decoded = jwt.verify(token, env.JWT_SECRET!) as any;
     
     req.user = {
       id: decoded.id,
@@ -114,7 +114,7 @@ export const optionalAuth = (req: Request, res: Response, next: NextFunction): v
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
-      const decoded = jwt.verify(token, env.JWT_SECRET || 'fallback-secret') as any;
+      const decoded = jwt.verify(token, env.JWT_SECRET!) as any;
       
       req.user = {
         id: decoded.id,

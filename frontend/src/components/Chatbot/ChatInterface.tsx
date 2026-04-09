@@ -29,7 +29,7 @@ interface ChatInterfaceProps {
   onBack?: () => void;
 }
 
-const REHANA_AVATAR_URL = 'https://static.vecteezy.com/system/resources/previews/035/186/557/large_2x/ai-generated-woman-lady-model-cheerful-happy-beauty-face-person-adult-smile-one-background-pretty-photo.jpg';
+const REPROBOT_AVATAR_URL = 'https://static.vecteezy.com/system/resources/previews/035/186/557/large_2x/ai-generated-woman-lady-model-cheerful-happy-beauty-face-person-adult-smile-one-background-pretty-photo.jpg';
 const USER_AVATAR_URL = 'https://api.dicebear.com/7.x/avataaars-neutral/png?seed=user&size=128';
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
@@ -44,8 +44,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [showMiniDropdown, setShowMiniDropdown] = useState(false);
   const [hasShownIntroduction, setHasShownIntroduction] = useState(false);
-  const [hasChosenRehanaType, setHasChosenRehanaType] = useState(false);
-  const [rehanaType, setRehanaType] = useState<{ focus: string; tone: string; mode: string }>({
+  const [hasChosenReproBotType, setHasChosenReproBotType] = useState(false);
+  const [reproBotType, setReproBotType] = useState<{ focus: string; tone: string; mode: string }>({
     focus: 'general',
     tone: 'friendly',
     mode: 'text'
@@ -162,20 +162,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
     "How do I help someone who's suicidal?"
   ], []);
 
-  const rehanaTypeLabels = useMemo(() => ({
+  const reproBotTypeLabels = useMemo(() => ({
     focus: { general: 'General SRHR', contraception: 'Contraception', relationships: 'Relationships', emergency: 'Emergency Support', youth: 'Youth-focused' },
     tone: { clinical: 'Clinical', friendly: 'Friendly', youthFriendly: 'Youth-friendly', crisis: 'Crisis support' },
     mode: { text: 'Text-only', voice: 'Voice-enabled', quick: 'Quick answers', detailed: 'Detailed' }
   }), []);
 
   const getIntroMessage = useCallback(() => {
-    const focusLabel = rehanaTypeLabels.focus[rehanaType.focus as keyof typeof rehanaTypeLabels.focus] || 'General SRHR';
-    const toneLabel = rehanaTypeLabels.tone[rehanaType.tone as keyof typeof rehanaTypeLabels.tone] || 'Friendly';
-    return `Hello! I'm Rehana, your REPRO PLAN AI assistant. I'm here to provide you with accurate, confidential, and supportive information about sexual and reproductive health and rights. You've chosen ${focusLabel} focus with a ${toneLabel} approach. I'm completely anonymous and your conversations with me are private. How can I help you today?`;
-  }, [rehanaType.focus, rehanaType.tone, rehanaTypeLabels]);
+    const focusLabel = reproBotTypeLabels.focus[reproBotType.focus as keyof typeof reproBotTypeLabels.focus] || 'General SRHR';
+    const toneLabel = reproBotTypeLabels.tone[reproBotType.tone as keyof typeof reproBotTypeLabels.tone] || 'Friendly';
+    return `Hello! I'm ReproBot, your REPRO PLAN AI assistant. I'm here to provide you with accurate, confidential, and supportive information about sexual and reproductive health and rights. You've chosen ${focusLabel} focus with a ${toneLabel} approach. I'm completely anonymous and your conversations with me are private. How can I help you today?`;
+  }, [reproBotType.focus, reproBotType.tone, reproBotTypeLabels]);
 
   useEffect(() => {
-    if (messages.length === 0 && hasChosenRehanaType && !hasShownIntroduction) {
+    if (messages.length === 0 && hasChosenReproBotType && !hasShownIntroduction) {
       const introductionMessage: Message = {
         id: Date.now().toString(),
         text: getIntroMessage(),
@@ -191,7 +191,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
       setMessages([introductionMessage]);
       setHasShownIntroduction(true);
     }
-  }, [messages.length, hasChosenRehanaType, hasShownIntroduction, rehanaType.focus, rehanaType.tone, rehanaType.mode, getIntroMessage]);
+  }, [messages.length, hasChosenReproBotType, hasShownIntroduction, reproBotType.focus, reproBotType.tone, reproBotType.mode, getIntroMessage]);
 
   useEffect(() => {
     scrollToBottom();
@@ -214,9 +214,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
   // Note: Chat messages are NOT saved locally - all responses come from Gemini API
   // This ensures fresh, dynamic responses for every conversation
 
-  const handleRehanaTypeContinue = () => {
-    setHasChosenRehanaType(true);
-    // Do NOT save rehana type to storage - fresh start every time
+  const handleReproBotTypeContinue = () => {
+    setHasChosenReproBotType(true);
+    // Do NOT save reprobot type to storage - fresh start every time
   };
 
   const scrollToBottom = () => {
@@ -248,10 +248,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
             const history = newMessages
               .filter((m) => m.text)
               .map((m) => ({ role: m.isUser ? ('user' as const) : ('assistant' as const), content: m.text }));
-            const res = await fetch(`${apiUrl.replace(/\/$/, '')}/rehana`, {
+            const res = await fetch(`${apiUrl.replace(/\/$/, '')}/reprobot`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ message: inputText.trim(), history, rehanaType }),
+              body: JSON.stringify({ message: inputText.trim(), history, reproBotType }),
             });
             if (res.ok) {
               const data = await res.json();
@@ -295,7 +295,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
       console.error('Failed to get response:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I'm sorry, Rehana is having trouble responding right now. You can try again, or visit a health clinic for immediate assistance.",
+        text: "I'm sorry, ReproBot is having trouble responding right now. You can try again, or visit a health clinic for immediate assistance.",
         isUser: false,
         timestamp: Date.now(),
         suggestions: ['Try again', 'What topics can you help with?', 'Find a clinic near me']
@@ -406,10 +406,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
             const history = msgList
               .filter((m) => m.text && !m.text.startsWith('Transcribing'))
               .map((m) => ({ role: m.isUser ? ('user' as const) : ('assistant' as const), content: m.text }));
-            const res = await fetch(`${apiUrl.replace(/\/$/, '')}/rehana`, {
+            const res = await fetch(`${apiUrl.replace(/\/$/, '')}/reprobot`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ message: transcript, history, rehanaType }),
+              body: JSON.stringify({ message: transcript, history, reproBotType }),
             });
             if (res.ok) {
               const data = await res.json();
@@ -501,7 +501,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
     if (window.confirm('Are you sure you want to delete this conversation?')) {
       setMessages([]);
       setHasShownIntroduction(false);
-      setHasChosenRehanaType(false);
+      setHasChosenReproBotType(false);
     }
   };
 
@@ -515,17 +515,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
   return (
     <div className="flex flex-col h-full min-h-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
 
-      {/* Rehana Type Selector - shown when no messages and not yet chosen */}
-      {messages.length === 0 && !hasChosenRehanaType && (
+      {/* ReproBot Type Selector - shown when no messages and not yet chosen */}
+      {messages.length === 0 && !hasChosenReproBotType && (
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           <div className="max-w-lg mx-auto space-y-6">
             <div className="text-center mb-6">
               <img
-                src={REHANA_AVATAR_URL}
-                alt="Rehana"
+                src={REPROBOT_AVATAR_URL}
+                alt="ReproBot"
                 className="w-16 h-16 rounded-2xl object-cover mx-auto mb-4 shadow-lg ring-2 ring-gray-200"
               />
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Meet Rehana</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Meet ReproBot</h2>
               <p className="text-sm text-gray-600">Your confidential AI assistant for sexual and reproductive health. Choose how you'd like to connect.</p>
             </div>
 
@@ -536,14 +536,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
                   {(['general', 'contraception', 'relationships', 'emergency', 'youth'] as const).map((key) => (
                     <button
                       key={key}
-                      onClick={() => setRehanaType((p) => ({ ...p, focus: key }))}
+                      onClick={() => setReproBotType((p) => ({ ...p, focus: key }))}
                       className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-                        rehanaType.focus === key
+                        reproBotType.focus === key
                           ? 'bg-primary-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      {rehanaTypeLabels.focus[key]}
+                      {reproBotTypeLabels.focus[key]}
                     </button>
                   ))}
                 </div>
@@ -555,14 +555,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
                   {(['clinical', 'friendly', 'youthFriendly', 'crisis'] as const).map((key) => (
                     <button
                       key={key}
-                      onClick={() => setRehanaType((p) => ({ ...p, tone: key }))}
+                      onClick={() => setReproBotType((p) => ({ ...p, tone: key }))}
                       className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-                        rehanaType.tone === key
+                        reproBotType.tone === key
                           ? 'bg-primary-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      {rehanaTypeLabels.tone[key]}
+                      {reproBotTypeLabels.tone[key]}
                     </button>
                   ))}
                 </div>
@@ -574,53 +574,53 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
                   {(['text', 'voice', 'quick', 'detailed'] as const).map((key) => (
                     <button
                       key={key}
-                      onClick={() => setRehanaType((p) => ({ ...p, mode: key }))}
+                      onClick={() => setReproBotType((p) => ({ ...p, mode: key }))}
                       className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-                        rehanaType.mode === key
+                        reproBotType.mode === key
                           ? 'bg-primary-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      {rehanaTypeLabels.mode[key]}
+                      {reproBotTypeLabels.mode[key]}
                     </button>
                   ))}
                 </div>
               </div>
 
               <button
-                onClick={handleRehanaTypeContinue}
+                onClick={handleReproBotTypeContinue}
                 className="w-full py-3 bg-gradient-to-r from-primary-600 to-purple-600 text-white font-medium rounded-xl hover:from-primary-700 hover:to-purple-700 transition-all"
               >
-                Start chatting with Rehana
+                Start chatting with ReproBot
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Messages - Rehana chat with header */}
-      {hasChosenRehanaType && (
+      {/* Messages - ReproBot chat with header */}
+      {hasChosenReproBotType && (
       <>
-      {/* Rehana header - modern professional */}
+      {/* ReproBot header - modern professional */}
       <div className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 py-4 bg-white/95 backdrop-blur-xl border-b border-gray-200/80 shadow-sm">
         <div className="flex items-center space-x-4">
           <div className="relative">
             <img
-              src={REHANA_AVATAR_URL}
-              alt="Rehana AI"
+              src={REPROBOT_AVATAR_URL}
+              alt="ReproBot AI"
               className="w-11 h-11 rounded-2xl object-cover shadow-lg ring-2 ring-gray-100"
             />
             <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" title="Online" />
           </div>
           <div className="flex flex-col gap-0" style={{ marginTop: '-2px' }}>
-            <span className="font-semibold text-gray-900 text-base leading-tight">Rehana</span>
+            <span className="font-semibold text-gray-900 text-base leading-tight">ReproBot</span>
             <span className="text-xs text-gray-500 leading-tight" style={{ marginTop: '-4px' }}>
-              {rehanaTypeLabels.focus[rehanaType.focus as keyof typeof rehanaTypeLabels.focus]} · {rehanaTypeLabels.tone[rehanaType.tone as keyof typeof rehanaTypeLabels.tone]}
+              {reproBotTypeLabels.focus[reproBotType.focus as keyof typeof reproBotTypeLabels.focus]} · {reproBotTypeLabels.tone[reproBotType.tone as keyof typeof reproBotTypeLabels.tone]}
             </span>
           </div>
         </div>
         <button
-          onClick={() => { setHasChosenRehanaType(false); setMessages([]); setHasShownIntroduction(false); }}
+          onClick={() => { setHasChosenReproBotType(false); setMessages([]); setHasShownIntroduction(false); }}
           className="text-xs font-medium px-4 py-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200 transition-all duration-200 border border-gray-200/60"
         >
           Change type
@@ -643,8 +643,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
                   />
                 ) : (
                   <img
-                    src={REHANA_AVATAR_URL}
-                    alt="Rehana"
+                    src={REPROBOT_AVATAR_URL}
+                    alt="ReproBot"
                     className="w-12 h-12 rounded-full object-cover shadow-md"
                   />
                 )}
@@ -686,8 +686,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
           <div className="flex justify-start">
             <div className="flex space-x-3">
               <img
-                src={REHANA_AVATAR_URL}
-                alt="Rehana"
+                src={REPROBOT_AVATAR_URL}
+                alt="ReproBot"
                 className="w-12 h-12 rounded-full object-cover flex-shrink-0 shadow-md"
               />
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg border border-gray-200/50">
@@ -697,7 +697,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
                     <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                     <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
-                  <span className="text-sm text-gray-600 font-medium">Rehana is thinking...</span>
+                  <span className="text-sm text-gray-600 font-medium">ReproBot is thinking...</span>
                 </div>
               </div>
             </div>

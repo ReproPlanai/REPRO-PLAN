@@ -23,12 +23,12 @@ const seoConfigs: Record<string, SEOConfig> = {
     tags: ['SRHR', 'Youth Health', 'Mobile Health']
   },
   '/chatbot': {
-    title: 'Rehana - AI SRHR Assistant - REPRO PLAN',
-    description: 'Chat with Rehana, your confidential AI assistant for sexual and reproductive health. Ask questions anonymously and get accurate, evidence-based information.',
-    keywords: ['Rehana', 'SRHR assistant', 'anonymous health questions', 'sexual health AI', 'reproductive health support'],
+    title: 'ReproBot - AI SRHR Assistant - REPRO PLAN',
+    description: 'Chat with ReproBot, your confidential AI assistant for sexual and reproductive health. Ask questions anonymously and get accurate, evidence-based information.',
+    keywords: ['ReproBot', 'SRHR assistant', 'anonymous health questions', 'sexual health AI', 'reproductive health support'],
     type: 'article',
     section: 'Health Education',
-    tags: ['Rehana', 'AI Assistant', 'Health Education']
+    tags: ['ReproBot', 'AI Assistant', 'Health Education']
   },
   '/videos': {
     title: 'Educational SRHR Videos - REPRO PLAN',

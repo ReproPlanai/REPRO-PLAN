@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { createServiceLogger } from '../config/logger';
 import { query } from '../config/db';
+import { GHANA_CLINICS, GHANA_EMERGENCY_NUMBERS } from '../data/ghana-clinics';
 
 const log = createServiceLogger('clinics');
 const router = Router();
@@ -97,6 +98,26 @@ router.delete('/:id', async (req: Request, res: Response) => {
   } catch (err) {
     log.error({ err }, 'Failed to delete clinic');
     res.status(500).json({ error: 'Failed to delete clinic' });
+  }
+});
+
+// Get Ghana clinics data (pre-loaded data for Mapbox)
+router.get('/ghana', async (_req: Request, res: Response) => {
+  try {
+    res.json({ success: true, clinics: GHANA_CLINICS });
+  } catch (err) {
+    log.error({ err }, 'Failed to get Ghana clinics');
+    res.status(500).json({ error: 'Failed to get Ghana clinics' });
+  }
+});
+
+// Get Ghana emergency numbers
+router.get('/ghana/emergency', async (_req: Request, res: Response) => {
+  try {
+    res.json({ success: true, emergencyNumbers: GHANA_EMERGENCY_NUMBERS });
+  } catch (err) {
+    log.error({ err }, 'Failed to get emergency numbers');
+    res.status(500).json({ error: 'Failed to get emergency numbers' });
   }
 });
 

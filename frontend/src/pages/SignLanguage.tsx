@@ -91,7 +91,7 @@ const SignLanguage: React.FC = () => {
       icon: ExternalLink
     },
     {
-      title: 'REPRO PLAN Chat with Rehana',
+      title: 'REPRO PLAN Chat with ReproBot',
       description: 'Text-based AI assistant - no voice required',
       action: () => navigate('/chatbot'),
       icon: MessageCircle

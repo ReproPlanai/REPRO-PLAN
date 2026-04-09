@@ -233,4 +233,102 @@ router.get('/auth/verify', async (req: Request, res: Response) => {
   }
 });
 
+// Get game analytics
+router.get('/game-analytics', async (req: Request, res: Response) => {
+  try {
+    const { timeRange = '30d', gameType } = req.query;
+    const days = parseInt(timeRange as string) || 30;
+    
+    // Get game session stats
+    const totalSessions = await query(
+      "SELECT COUNT(*) as count FROM game_sessions WHERE created_at > NOW() - INTERVAL '$1 days'",
+      [days]
+    );
+    
+    const sessionsByGameType = await query(
+      `SELECT game_type, COUNT(*) as count, AVG(score) as avg_score, AVG(duration_seconds) as avg_duration
+       FROM game_sessions 
+       WHERE created_at > NOW() - INTERVAL '${days} days'
+       ${gameType ? `AND game_type = '${gameType}'` : ''}
+       GROUP BY game_type`
+    );
+    
+    const dailySessions = await query(
+      `SELECT 
+        DATE(created_at) as date,
+        COUNT(*) as sessions,
+        AVG(score) as avg_score,
+        COUNT(DISTINCT user_id) as unique_users
+       FROM game_sessions 
+       WHERE created_at > NOW() - INTERVAL '${days} days'
+       GROUP BY DATE(created_at)
+       ORDER BY date DESC
+       LIMIT ${days}`
+    );
+    
+    const topScorers = await query(
+      `SELECT 
+        user_id,
+        game_type,
+        MAX(score) as high_score,
+        COUNT(*) as total_sessions
+       FROM game_sessions 
+       WHERE created_at > NOW() - INTERVAL '${days} days'
+       GROUP BY user_id, game_type
+       ORDER BY high_score DESC
+       LIMIT 20`
+    );
+    
+    const completionRates = await query(
+      `SELECT 
+        game_type,
+        COUNT(*) FILTER (WHERE completed = true) as completed,
+        COUNT(*) as total,
+        ROUND(COUNT(*) FILTER (WHERE completed = true) * 100.0 / NULLIF(COUNT(*), 0), 2) as completion_rate
+       FROM game_sessions 
+       WHERE created_at > NOW() - INTERVAL '${days} days'
+       GROUP BY game_type`
+    );
+    
+    const analytics = {
+      timeRange: `${days}d`,
+      summary: {
+        totalSessions: parseInt(totalSessions[0]?.count || 0),
+        uniqueGameTypes: sessionsByGameType.length,
+        averageScore: sessionsByGameType.reduce((sum: number, s: any) => sum + parseFloat(s.avg_score || 0), 0) / (sessionsByGameType.length || 1),
+        totalDuration: sessionsByGameType.reduce((sum: number, s: any) => sum + parseFloat(s.avg_duration || 0), 0)
+      },
+      sessionsByGameType: sessionsByGameType.map((s: any) => ({
+        gameType: s.game_type,
+        sessions: parseInt(s.count),
+        averageScore: parseFloat(s.avg_score || 0),
+        averageDuration: parseFloat(s.avg_duration || 0)
+      })),
+      dailyActivity: dailySessions.map((d: any) => ({
+        date: d.date,
+        sessions: parseInt(d.sessions),
+        averageScore: parseFloat(d.avg_score || 0),
+        uniqueUsers: parseInt(d.unique_users)
+      })),
+      topScorers: topScorers.map((t: any) => ({
+        userId: t.user_id,
+        gameType: t.game_type,
+        highScore: parseInt(t.high_score),
+        totalSessions: parseInt(t.total_sessions)
+      })),
+      completionRates: completionRates.map((c: any) => ({
+        gameType: c.game_type,
+        completed: parseInt(c.completed),
+        total: parseInt(c.total),
+        completionRate: parseFloat(c.completion_rate || 0)
+      }))
+    };
+    
+    res.json({ success: true, analytics });
+  } catch (err) {
+    log.error({ err }, 'Failed to get game analytics');
+    res.status(500).json({ error: 'Failed to get game analytics' });
+  }
+});
+
 export default router;

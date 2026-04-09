@@ -160,9 +160,7 @@ export class ServerDiagnostics {
     const aiProvider = this.env.AI_PROVIDER;
     const providerKeys: Record<string, string | undefined> = {
       gemini: this.env.GEMINI_API_KEY,
-      openai: this.env.OPENAI_API_KEY,
       anthropic: this.env.ANTHROPIC_API_KEY,
-      grok: this.env.XAI_API_KEY,
     };
 
     const currentKey = providerKeys[aiProvider];
@@ -178,7 +176,7 @@ export class ServerDiagnostics {
         status: configuredProviders.length > 0 ? 'partial' : 'not_configured',
         message: configuredProviders.length > 0
           ? `${aiProvider} not configured, but ${configuredProviders.join(', ')} available`
-          : 'No AI API keys set. AI features (Rehana chatbot) disabled.',
+          : 'No AI API keys set. AI features (ReproBot chatbot) disabled.',
         details: {
           activeProvider: aiProvider,
           availableProviders: configuredProviders,

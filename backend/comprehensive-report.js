@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 
-const DATABASE_URL = 'postgres://postgres:JqQzUpViBWYpDnTtFBZtSkWnUhfmhUpe@centerbeam.proxy.rlwy.net:31576/railway';
+// Use environment variable for database URL - NEVER hardcode credentials
+const DATABASE_URL = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString: DATABASE_URL,
@@ -176,7 +177,7 @@ async function comprehensiveEndpointReport() {
     { method: 'DELETE', path: '/api/workflows/:id', db: 'workflows', feature: 'Delete Workflow', status: '✅' },
     
     // AI & Games (External Services)
-    { method: 'POST', path: '/rehana', db: 'chat_history (optional)', feature: 'Rehana AI Chat', status: '✅' },
+    { method: 'POST', path: '/reprobot', db: 'chat_history (optional)', feature: 'ReproBot AI Chat', status: '✅' },
     { method: 'POST', path: '/ai/quiz-questions', db: 'cache', feature: 'AI Quiz Questions', status: '✅' },
     { method: 'POST', path: '/ai/consent-scenarios', db: 'cache', feature: 'Consent Scenarios', status: '✅' },
     { method: 'POST', path: '/ai/explain', db: 'none', feature: 'AI Explain', status: '✅' },
@@ -245,7 +246,7 @@ async function comprehensiveEndpointReport() {
   console.log('\n   FEATURES NOW FULLY CONNECTED:');
   console.log('   ✅ Health Tracker - Safety checks, health records');
   console.log('   ✅ QR Verification - QR generation, scanning, verification');
-  console.log('   ✅ AI Chat - Rehana AI, quiz games, consent scenarios');
+  console.log('   ✅ AI Chat - ReproBot AI, quiz games, consent scenarios');
   console.log('   ✅ Push Notifications - Notification management');
   console.log('   ✅ Chat Rooms - Real-time chat rooms & messaging');
   console.log('   ✅ Mentoring - Mentor booking & sessions');

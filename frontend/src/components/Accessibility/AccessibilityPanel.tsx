@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { 
   Settings, 
   Eye, 
@@ -7,7 +7,10 @@ import {
   Smartphone, 
   RotateCcw,
   Check,
-  X
+  X,
+  Sparkles,
+  Mic,
+  Languages
 } from 'lucide-react';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
 
@@ -19,6 +22,83 @@ interface AccessibilityPanelProps {
 const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({ isOpen, onClose }) => {
   const { settings, updateSetting, resetToDefaults } = useAccessibility();
   const [activeTab, setActiveTab] = useState<'visual' | 'motor' | 'cognitive' | 'hearing' | 'rural'>('visual');
+  
+  // AI features state
+  const [aiTips, setAiTips] = useState<string[]>([]);
+  const [isLoadingTips, setIsLoadingTips] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+
+  // Fetch AI-generated accessibility tips
+  const fetchAiTips = useCallback(async (category: string) => {
+    setIsLoadingTips(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (apiUrl) {
+        const prompt = `Generate 3-5 personalized accessibility tips for ${category} accessibility in Ghana context. Focus on practical, actionable advice. Return as numbered list.`;
+        
+        const res = await fetch(`${apiUrl.replace(/\/$/, '')}/reprobot`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: prompt, history: [] })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          const tips = data.response
+            .split('\n')
+            .filter((r: string) => r.trim().length > 0)
+            .map((r: string) => r.replace(/^\d+\.\s*/, '').trim());
+          setAiTips(tips);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch AI tips:', error);
+      setAiTips([]);
+    } finally {
+      setIsLoadingTips(false);
+    }
+  }, []);
+
+  // Fetch AI tips when tab changes
+  useEffect(() => {
+    if (isOpen) {
+      const categoryMap: Record<typeof activeTab, string> = {
+        visual: 'visual',
+        motor: 'motor',
+        cognitive: 'cognitive',
+        hearing: 'hearing',
+        rural: 'rural and basic phone'
+      };
+      fetchAiTips(categoryMap[activeTab]);
+    }
+  }, [isOpen, activeTab, fetchAiTips]);
+
+  // Voice navigation (Web Speech API)
+  const startVoiceNavigation = useCallback(() => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Voice navigation is not supported in this browser');
+      return;
+    }
+    
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onresult = (event: any) => {
+      const command = event.results[0][0].transcript.toLowerCase();
+      
+      // Simple voice command mapping
+      if (command.includes('visual')) setActiveTab('visual');
+      else if (command.includes('motor')) setActiveTab('motor');
+      else if (command.includes('cognitive')) setActiveTab('cognitive');
+      else if (command.includes('hearing')) setActiveTab('hearing');
+      else if (command.includes('rural')) setActiveTab('rural');
+      else if (command.includes('close') || command.includes('done')) onClose();
+    };
+    
+    recognition.start();
+  }, [onClose]);
 
   if (!isOpen) return null;
 
@@ -36,13 +116,23 @@ const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({ isOpen, onClose
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-bold text-gray-900">Accessibility Settings</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full"
-            aria-label="Close accessibility settings"
-          >
-            <X size={24} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={startVoiceNavigation}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200"
+              aria-label="Start voice navigation"
+            >
+              <Mic size={18} />
+              <span>{isListening ? 'Listening...' : 'Voice Control'}</span>
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full"
+              aria-label="Close accessibility settings"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -65,6 +155,28 @@ const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({ isOpen, onClose
 
         {/* Content */}
         <div className="p-6 overflow-y-auto max-h-[60vh]">
+          {/* AI Tips Section */}
+          <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-5 h-5 text-purple-600" />
+              <h4 className="font-semibold text-gray-900">AI-Powered Accessibility Tips</h4>
+            </div>
+            {isLoadingTips ? (
+              <p className="text-sm text-gray-600">Loading personalized tips...</p>
+            ) : aiTips.length > 0 ? (
+              <ul className="space-y-2">
+                {aiTips.map((tip, index) => (
+                  <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
+                    <span className="text-purple-600 font-bold">{index + 1}.</span>
+                    <span>{tip}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-gray-600">No tips available at this time.</p>
+            )}
+          </div>
+
           {activeTab === 'visual' && (
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-gray-900">Visual Accessibility</h3>

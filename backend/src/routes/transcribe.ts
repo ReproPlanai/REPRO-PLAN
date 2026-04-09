@@ -1,9 +1,7 @@
 import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import rateLimit from 'express-rate-limit';
-import OpenAI, { toFile } from 'openai';
 import { createServiceLogger } from '../config/logger';
-import { getEnv } from '../config/env';
 
 const log = createServiceLogger('transcribe');
 const router = Router();
@@ -37,25 +35,10 @@ router.post('/', transcribeLimiter, upload.single('audio'), async (req: Request,
       return;
     }
 
-    const env = getEnv();
-    if (!env.OPENAI_API_KEY) {
-      log.warn('Transcribe requested but OPENAI_API_KEY not configured');
-      res.status(503).json({ error: 'Transcription service unavailable' });
-      return;
-    }
-
-    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
-    const audioFile = await toFile(file.buffer, file.originalname || 'audio.webm', {
-      type: file.mimetype,
-    });
-
-    const transcription = await openai.audio.transcriptions.create({
-      file: audioFile,
-      model: 'whisper-1',
-      language: 'en',
-    });
-
-    res.json({ transcript: transcription.text || '' });
+    // Transcription service removed as part of AI Gateway architecture cleanup
+    // OpenAI Whisper is not part of the Gemini/Claude provider strategy
+    log.warn('Transcription service disabled - OpenAI provider removed from AI Gateway');
+    res.status(503).json({ error: 'Transcription service temporarily unavailable' });
   } catch (err) {
     log.error({ err }, 'Transcription failed');
     res.status(500).json({ error: 'Transcription failed' });

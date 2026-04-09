@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 
-const DATABASE_URL = 'postgres://postgres:JqQzUpViBWYpDnTtFBZtSkWnUhfmhUpe@centerbeam.proxy.rlwy.net:31576/railway';
+// Use environment variable for database URL - NEVER hardcode credentials
+const DATABASE_URL = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString: DATABASE_URL,
@@ -51,8 +52,8 @@ const frontendEndpoints = {
   'GET /api/admin/audit-logs': ['AuditLogs.tsx'],
   
   // Services
-  'GET /rehana/chat': ['ChatInterface.tsx'],
-  'POST /rehana/chat': ['ChatInterface.tsx'],
+  'GET /rReproBot/chat': ['ChatInterface.tsx'],
+  'POST /rReproBot/chat': ['ChatInterface.tsx'],
   'POST /transcribe': ['TranscriptionService.tsx'],
   'POST /ai/games': ['AIGamesPlatform.tsx'],
 };
@@ -68,7 +69,7 @@ const existingBackendRoutes = [
   'GET /api/health-records', 'POST /api/health-records',
   'GET /api/admin/settings', 'PUT /api/admin/settings',
   'GET /api/admin/dashboard-stats', 'GET /api/admin/analytics',
-  '/rehana/*', '/transcribe', '/ai/*'
+  '/rReproBot/*', '/transcribe', '/ai/*'
 ];
 
 async function comprehensiveAudit() {
