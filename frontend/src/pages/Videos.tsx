@@ -42,7 +42,7 @@ const Videos: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedDifficulty] = useState('all');
   const [downloadedVideos, setDownloadedVideos] = useState<string[]>([]);
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [selectedVideo] = useState<Video | null>(null);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [aiRecommendations, setAiRecommendations] = useState<Video[]>([]);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
