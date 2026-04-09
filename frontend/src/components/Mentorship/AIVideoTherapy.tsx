@@ -37,7 +37,6 @@ const THERAPY_TOPICS = [
 ];
 
 const AIVideoTherapy: React.FC = () => {
-  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [sessionActive, setSessionActive] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(false);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);

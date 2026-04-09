@@ -348,7 +348,7 @@ const Videos: React.FC = () => {
     } finally {
       setLoadingRecommendations(false);
     }
-  }, [isOnline]);
+  }, [isOnline, videos]);
 
   useEffect(() => {
     fetchAIRecommendations();

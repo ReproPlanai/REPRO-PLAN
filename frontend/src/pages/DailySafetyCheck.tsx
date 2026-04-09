@@ -133,8 +133,6 @@ const DailySafetyCheck: React.FC = () => {
   const [needsHelp, setNeedsHelp] = useState(false);
   const [helpType, setHelpType] = useState<'app_chat' | 'phone_call' | 'external' | 'none'>('none');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
-  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
 
   // Determine current period based on time
   const getCurrentPeriod = useCallback((): 'morning' | 'afternoon' | 'evening' => {

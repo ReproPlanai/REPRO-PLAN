@@ -245,17 +245,6 @@ const MedicationOrder: React.FC = () => {
     }
   }, [cart, fetchAIRecommendations]);
 
-  // Get recommended medications
-  const recommendedMedications = useMemo(() => {
-    if (aiRecommendations.length === 0) return [];
-    return medications.filter(med => 
-      aiRecommendations.some(rec => 
-        med.name.toLowerCase().includes(rec.toLowerCase()) ||
-        rec.toLowerCase().includes(med.name.toLowerCase())
-      )
-    ).slice(0, 5);
-  }, [medications, aiRecommendations]);
-
   useEffect(() => {
     loadMedications();
     loadPharmacies();
