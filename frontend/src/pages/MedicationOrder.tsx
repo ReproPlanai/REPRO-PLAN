@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { 
   Pill, 
   CheckCircle, 
@@ -173,9 +173,6 @@ const MedicationOrder: React.FC = () => {
   const [reviewModal, setReviewModal] = useState<{ medicationId: string; medicationName: string } | null>(null);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
-  
-  // AI recommendation state
-  const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
 
   const loadMedications = useCallback(async () => {
     setIsLoadingMeds(true);
@@ -206,44 +203,6 @@ const MedicationOrder: React.FC = () => {
       setPharmacies([]);
     }
   }, []);
-
-  // Fetch AI recommendations
-  const fetchAIRecommendations = useCallback(async () => {
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      if (apiUrl) {
-        const cartItems = cart.map(item => item.medication.name).join(', ');
-        const prompt = `Based on the user's cart items: ${cartItems || 'none'}, recommend 3-5 additional SRHR products that would complement their order. Focus on Ghana-specific needs. Return only product names separated by commas.`;
-        
-        const res = await fetch(`${apiUrl.replace(/\/$/, '')}/reprobot`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: prompt, history: [] })
-        });
-        
-        if (res.ok) {
-          const data = await res.json();
-          const recommendations = data.response
-            .split(',')
-            .map((r: string) => r.trim())
-            .filter((r: string) => r.length > 0);
-          setAiRecommendations(recommendations);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch AI recommendations:', error);
-      setAiRecommendations([]);
-    }
-  }, [cart]);
-
-  // Fetch AI recommendations when cart changes
-  useEffect(() => {
-    if (cart.length > 0) {
-      fetchAIRecommendations();
-    } else {
-      setAiRecommendations([]);
-    }
-  }, [cart, fetchAIRecommendations]);
 
   useEffect(() => {
     loadMedications();

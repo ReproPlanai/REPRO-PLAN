@@ -224,7 +224,6 @@ const DailySafetyCheck: React.FC = () => {
 
   // Fetch AI recommendations based on safety check responses
   const fetchAIRecommendations = useCallback(async (responses: Record<string, number>, concerns: string[]) => {
-    setIsLoadingRecommendations(true);
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
       if (apiUrl) {
@@ -238,18 +237,15 @@ const DailySafetyCheck: React.FC = () => {
         
         if (res.ok) {
           const data = await res.json();
-          const recommendations = data.response
+          // Recommendations could be stored or displayed if needed
+          data.response
             .split('\n')
             .filter((r: string) => r.trim().length > 0)
             .map((r: string) => r.replace(/^\d+\.\s*/, '').trim());
-          setAiRecommendations(recommendations);
         }
       }
     } catch (error) {
       console.error('Failed to fetch AI recommendations:', error);
-      setAiRecommendations([]);
-    } finally {
-      setIsLoadingRecommendations(false);
     }
   }, []);
 

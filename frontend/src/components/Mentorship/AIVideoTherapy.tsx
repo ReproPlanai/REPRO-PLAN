@@ -91,7 +91,6 @@ const AIVideoTherapy: React.FC = () => {
 
   const endSession = () => {
     setSessionActive(false);
-    setSelectedTopic(null);
     setSessionTime(0);
     setCurrentSession(null);
   };
