@@ -305,7 +305,7 @@ const SafeSpaceLocator: React.FC = () => {
   }, [filterAndSortSpaces]);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-20 sm:pb-8 space-y-6">
+    <div className="max-w-4xl xl:max-w-6xl 2xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 sm:pb-8 space-y-6">
         {/* Hero */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600 p-6 sm:p-8 shadow-xl">
           <div className="flex items-start justify-between gap-4">
@@ -368,7 +368,7 @@ const SafeSpaceLocator: React.FC = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4">
           {emergencyContacts.map((contact) => (
             <div key={contact.id} className="rounded-2xl bg-white/90 border border-red-200/60 p-4">
               <div className="flex items-center justify-between">
@@ -570,7 +570,7 @@ const SafeSpaceLocator: React.FC = () => {
               <div className="space-y-4">
                 <p className="text-gray-600">{selectedSpace.description}</p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-4">
                   <div>
                     <h4 className="font-medium text-gray-700 mb-2">Contact Information</h4>
                     <div className="space-y-2 text-sm">

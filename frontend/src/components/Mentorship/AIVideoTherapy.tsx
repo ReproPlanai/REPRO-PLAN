@@ -309,7 +309,7 @@ const AIVideoTherapy: React.FC = () => {
         </div>
 
         {/* Topics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4 mb-8">
           {THERAPY_TOPICS.map((topic) => {
             const Icon = topic.icon;
             return (
@@ -331,7 +331,7 @@ const AIVideoTherapy: React.FC = () => {
         </div>
 
         {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 mb-8">
           {[
             { icon: Shield, title: '100% Confidential', desc: 'Your conversations are private and secure' },
             { icon: Clock, title: 'Available 24/7', desc: 'Get support whenever you need it' },

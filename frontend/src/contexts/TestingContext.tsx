@@ -358,45 +358,7 @@ export class ErrorBoundary extends React.Component<
 }
 
 const DefaultErrorFallback: React.FC<{ error: Error; resetError: () => void }> = ({ error, resetError }) => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-md w-full">
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">⚠️</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h1>
-          <p className="text-gray-600 text-sm">
-            We're sorry, but something unexpected happened. The error has been logged and we'll work to fix it.
-          </p>
-        </div>
-        
-        <div className="space-y-3 mb-6">
-          <details className="bg-gray-50 rounded-lg p-3">
-            <summary className="text-sm font-medium text-gray-700 cursor-pointer">Error details</summary>
-            <pre className="text-xs text-gray-600 mt-2 whitespace-pre-wrap">
-              {error.message}
-            </pre>
-          </details>
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            onClick={resetError}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-          >
-            Try again
-          </button>
-          <button
-            onClick={() => window.location.reload()}
-            className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium"
-          >
-            Reload page
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return null;
 };
 
 // Form validation hook

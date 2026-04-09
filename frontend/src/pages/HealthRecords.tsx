@@ -147,7 +147,7 @@ const HealthRecords: React.FC = () => {
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-4 mb-6">
           {[
             { icon: Calendar, title: records.filter(r => r.recordType === 'cycle').length.toString(), desc: 'Cycles', color: 'from-pink-500 to-rose-500' },
             { icon: Activity, title: records.filter(r => r.recordType === 'symptom').length.toString(), desc: 'Symptoms', color: 'from-orange-500 to-amber-500' },
@@ -220,7 +220,7 @@ const HealthRecords: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {filteredRecords.map((record) => (
               <div key={record.id} className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
                 {/* Header */}

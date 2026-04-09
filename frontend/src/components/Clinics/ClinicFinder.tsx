@@ -12,7 +12,8 @@ import {
   Calendar,
   Sparkles,
   ArrowRight,
-  Star
+  Star,
+  RefreshCw
 } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -485,10 +486,12 @@ const ClinicFinder: React.FC = () => {
   const [sortBy, setSortBy] = useState<'distance' | 'rating' | 'name'>('distance');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
   const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null);
 
   const loadClinics = useCallback(async () => {
+    setLoading(true);
     try {
       // Try to get fresh data from API first
       const response = await apiService.getClinics() as { success: boolean; clinics?: any[] };
@@ -510,25 +513,41 @@ const ClinicFinder: React.FC = () => {
         setClinics(apiClinics);
         // Store for offline use
         await offlineStorage.storeData('clinics', apiClinics);
-        return;
+      } else {
+        // Fallback to offline storage
+        try {
+          const storedClinics = await offlineStorage.getData('clinics');
+          if (storedClinics && storedClinics.length > 0) {
+            setClinics(storedClinics);
+          } else {
+            // Final fallback - comprehensive clinic data (Marie Stopes, PPAG, GHS)
+            setClinics(COMPREHENSIVE_CLINICS);
+          }
+        } catch (storageError) {
+          console.warn('Offline storage unavailable:', storageError);
+          // Final fallback - comprehensive clinic data (Marie Stopes, PPAG, GHS)
+          setClinics(COMPREHENSIVE_CLINICS);
+        }
       }
     } catch (apiError) {
       console.warn('API unavailable, trying offline storage:', apiError);
-    }
-
-    // Fallback to offline storage
-    try {
-      const storedClinics = await offlineStorage.getData('clinics');
-      if (storedClinics && storedClinics.length > 0) {
-        setClinics(storedClinics);
-        return;
+      // Fallback to offline storage
+      try {
+        const storedClinics = await offlineStorage.getData('clinics');
+        if (storedClinics && storedClinics.length > 0) {
+          setClinics(storedClinics);
+        } else {
+          // Final fallback - comprehensive clinic data (Marie Stopes, PPAG, GHS)
+          setClinics(COMPREHENSIVE_CLINICS);
+        }
+      } catch (storageError) {
+        console.warn('Offline storage unavailable:', storageError);
+        // Final fallback - comprehensive clinic data (Marie Stopes, PPAG, GHS)
+        setClinics(COMPREHENSIVE_CLINICS);
       }
-    } catch (storageError) {
-      console.warn('Offline storage unavailable:', storageError);
+    } finally {
+      setLoading(false);
     }
-
-    // Final fallback - comprehensive clinic data (Marie Stopes, PPAG, GHS)
-    setClinics(COMPREHENSIVE_CLINICS);
   }, []);
 
   const getUserLocation = () => {
@@ -773,41 +792,87 @@ const ClinicFinder: React.FC = () => {
 
       {/* Results */}
       <div className="space-y-4">
-        {filteredClinics.length > 0 ? (
+        {loading ? (
+          <div className="p-8 flex justify-center">
+            <RefreshCw className="w-8 h-8 animate-spin text-primary-600" />
+          </div>
+        ) : filteredClinics.length > 0 ? (
           filteredClinics.map((clinic: Clinic) => {
             const TypeIcon = getTypeIcon(clinic.type);
             return (
               <div key={clinic.id} className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-lg transition-all">
-                <div className="h-24 bg-gradient-to-r from-primary-500/20 via-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                  <TypeIcon className="w-10 h-10 text-primary-600" />
-                </div>
-                <div className="p-4 sm:p-5">
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <h3 className="text-lg font-bold text-gray-900">{clinic.name}</h3>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                      <span className="text-sm font-medium">{clinic.rating}</span>
+                <div className="flex items-start space-x-2 sm:space-x-3 lg:space-x-4 p-4 sm:p-5">
+                  {/* Icon */}
+                  <div className={`p-2 sm:p-3 rounded-xl shadow-sm flex-shrink-0 ${
+                    clinic.type === 'clinic' ? 'bg-blue-100 text-blue-700' :
+                    clinic.type === 'hospital' ? 'bg-green-100 text-green-700' :
+                    clinic.type === 'counseling' ? 'bg-purple-100 text-purple-700' :
+                    clinic.type === 'emergency' ? 'bg-red-100 text-red-700' :
+                    'bg-gray-100 text-gray-700'
+                  }`}>
+                    <TypeIcon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 mb-1 line-clamp-1">
+                          {clinic.name}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-1">{clinic.address}</p>
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
+                          <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${
+                            clinic.type === 'clinic' ? 'bg-blue-100 text-blue-700' :
+                            clinic.type === 'hospital' ? 'bg-green-100 text-green-700' :
+                            clinic.type === 'counseling' ? 'bg-purple-100 text-purple-700' :
+                            clinic.type === 'emergency' ? 'bg-red-100 text-red-700' :
+                            'bg-gray-100 text-gray-700'
+                          }`}>
+                            {clinic.type.toUpperCase()}
+                          </span>
+                          {clinic.youthFriendly && (
+                            <span className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-pink-100 text-pink-700">
+                              YOUTH FRIENDLY
+                            </span>
+                          )}
+                          <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${clinic.isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {clinic.isOpen ? 'OPEN' : 'CLOSED'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right ml-2">
+                        <p className="text-xs sm:text-sm font-semibold text-gray-900">{clinic.distance} km</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2 text-xs text-gray-500 mb-3">
-                    <span className="flex items-center gap-1"><MapPin size={12} />{clinic.distance} km</span>
-                    <span className={`flex items-center gap-1 ${clinic.isOpen ? 'text-green-600' : 'text-red-600'}`}><Clock size={12} />{clinic.isOpen ? 'Open' : 'Closed'}</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-3">{clinic.address}</p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {clinic.services.slice(0, 3).map((s, i) => (
-                      <span key={i} className="px-2 py-0.5 rounded-lg bg-primary-50 text-primary-600 text-xs font-medium">{s}</span>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <a href={`tel:${clinic.phone}`} onClick={() => handleCall(clinic.phone)} className="flex-1 py-2.5 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium flex items-center justify-center gap-2 min-h-[44px]">
-                      <Phone size={18} />
-                      Call
-                    </a>
-                    <button onClick={() => { setSelectedClinic(clinic); setShowVerification(true); }} className="flex-1 py-2.5 px-4 border-2 border-gray-200 rounded-xl font-medium flex items-center justify-center gap-2 min-h-[44px] hover:border-primary-300">
-                      <Navigation size={18} />
-                      Directions
-                    </button>
+
+                    <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2">
+                      {clinic.services.join(', ')}
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500">
+                        <span className="flex items-center space-x-1">
+                          <Clock className="w-3 h-3" />
+                          <span className="hidden sm:inline">{clinic.hours}</span>
+                          <span className="sm:hidden">{clinic.hours.split(' ')[0]}</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                          <span>{clinic.rating}</span>
+                        </span>
+                      </div>
+                      <div className="flex gap-2">
+                        <a href={`tel:${clinic.phone}`} onClick={() => handleCall(clinic.phone)} className="flex-1 py-2.5 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium flex items-center justify-center gap-2 min-h-[44px]">
+                          <Phone size={18} />
+                          Call
+                        </a>
+                        <button onClick={() => { setSelectedClinic(clinic); setShowVerification(true); }} className="flex-1 py-2.5 px-4 border-2 border-gray-200 rounded-xl font-medium flex items-center justify-center gap-2 min-h-[44px] hover:border-primary-300">
+                          <Navigation size={18} />
+                          Directions
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

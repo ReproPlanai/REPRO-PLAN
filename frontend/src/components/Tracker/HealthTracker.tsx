@@ -444,113 +444,119 @@ const HealthTracker: React.FC = () => {
   };
 
   return (
-    <div className="app-page min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary-50/30 pb-20 sm:pb-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
-        {/* Add Entry Button */}
-        {activeTab === 'tracker' && (
-          <div className="mb-6">
-            <button
-              onClick={() => setShowEntryForm(true)}
-              className="py-3 px-5 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 transition-all flex items-center gap-2 min-h-[44px]"
-            >
-              <Plus size={16} />
-              <span>Add Entry</span>
-            </button>
+    <div className="space-y-6">
+      {/* Hero */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-pink-600 via-purple-600 to-indigo-600 p-6 sm:p-8 shadow-2xl shadow-pink-500/20">
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.05)_100%)]" />
+        <div className="relative flex items-start gap-4">
+          <div className="flex-shrink-0 p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+            <Heart className="w-8 h-8 text-white" />
           </div>
-        )}
-
-        {/* Tab Navigation */}
-        <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 mb-4 sm:mb-6">
-          <button
-            onClick={() => setActiveTab('tracker')}
-            className={`flex-1 py-2 px-2 sm:px-4 rounded-md font-medium transition-all duration-200 ${
-              activeTab === 'tracker'
-                ? 'bg-white text-primary-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <div className="flex items-center justify-center space-x-1 sm:space-x-2">
-              <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="text-xs sm:text-sm">Tracker</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-2.5 py-0.5 bg-white/25 rounded-full text-xs font-semibold text-white uppercase tracking-wide">Health</span>
+              <Sparkles className="w-3.5 h-3.5 text-white/80" />
             </div>
-          </button>
-          <button
-            onClick={() => setActiveTab('education')}
-            className={`flex-1 py-2 px-2 sm:px-4 rounded-md font-medium transition-all duration-200 ${
-              activeTab === 'education'
-                ? 'bg-white text-primary-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <div className="flex items-center justify-center space-x-1 sm:space-x-2">
-              <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="text-xs sm:text-sm">Education</span>
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`flex-1 py-2 px-2 sm:px-4 rounded-md font-medium transition-all duration-200 ${
-              activeTab === 'analytics'
-                ? 'bg-white text-primary-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <div className="flex items-center justify-center space-x-1 sm:space-x-2">
-              <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="text-xs sm:text-sm">Insights</span>
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab('ai')}
-            className={`flex-1 py-2 px-2 sm:px-4 rounded-md font-medium transition-all duration-200 ${
-              activeTab === 'ai'
-                ? 'bg-white text-primary-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <div className="flex items-center justify-center space-x-1 sm:space-x-2">
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="text-xs sm:text-sm">AI Tools</span>
-            </div>
-          </button>
+            <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">Health Tracker</h1>
+            <p className="text-sm text-white/90 leading-relaxed">
+              Track your menstrual cycle, symptoms, mood, and overall wellness with AI-powered insights and predictions.
+            </p>
+          </div>
         </div>
-        
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 shadow-sm">
-              <div className="flex items-center space-x-2 mb-2">
-                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                <span className="font-medium text-blue-900 text-sm sm:text-base">Cycle Length</span>
-              </div>
-              <p className="text-xl sm:text-2xl font-bold text-blue-600">{cycleData.cycleLength} days</p>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { icon: Calendar, title: cycleData.cycleLength.toString(), desc: 'Cycle Length (days)', color: 'from-blue-500 to-indigo-500' },
+          { icon: Droplets, title: cycleData.periodLength.toString(), desc: 'Period Length (days)', color: 'from-pink-500 to-rose-500' },
+          { icon: Target, title: cycleData.predictions.nextPeriod ? format(new Date(cycleData.predictions.nextPeriod), 'MMM dd') : 'Unknown', desc: 'Next Period', color: 'from-green-500 to-emerald-500' },
+          { icon: BarChart3, title: `${regularityScore}%`, desc: 'Regularity Score', color: 'from-purple-500 to-pink-500' }
+        ].map(({ icon: Icon, title, desc, color }) => (
+          <div key={desc} className="flex items-center gap-3 p-4 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/60 shadow-sm">
+            <div className={`p-2.5 rounded-xl bg-gradient-to-br ${color}`}>
+              <Icon className="w-5 h-5 text-white" />
             </div>
-            
-            <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 shadow-sm">
-              <div className="flex items-center space-x-2 mb-2">
-                <Droplets className="w-4 h-4 sm:w-5 sm:h-5 text-pink-600" />
-                <span className="font-medium text-pink-900 text-sm sm:text-base">Period Length</span>
-              </div>
-              <p className="text-xl sm:text-2xl font-bold text-pink-600">{cycleData.periodLength} days</p>
-            </div>
-            
-            <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 shadow-sm sm:col-span-2 lg:col-span-1">
-              <div className="flex items-center space-x-2 mb-2">
-                <Target className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                <span className="font-medium text-green-900 text-sm sm:text-base">Next Period</span>
-              </div>
-              <p className="text-sm sm:text-base font-bold text-green-600">
-                {cycleData.predictions.nextPeriod ? format(new Date(cycleData.predictions.nextPeriod), 'MMM dd') : 'Unknown'}
-              </p>
+            <div>
+              <p className="font-bold text-gray-900 text-lg">{title}</p>
+              <p className="text-xs text-gray-500">{desc}</p>
             </div>
           </div>
+        ))}
       </div>
+
+      {/* Tab Navigation */}
+      <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+        <button
+          onClick={() => setActiveTab('tracker')}
+          className={`flex-1 py-2 px-4 rounded-md font-medium transition-all duration-200 ${
+            activeTab === 'tracker'
+              ? 'bg-white text-primary-600 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <div className="flex items-center justify-center space-x-2">
+            <Calendar className="w-4 h-4" />
+            <span className="text-sm">Tracker</span>
+          </div>
+        </button>
+        <button
+          onClick={() => setActiveTab('education')}
+          className={`flex-1 py-2 px-4 rounded-md font-medium transition-all duration-200 ${
+            activeTab === 'education'
+              ? 'bg-white text-primary-600 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <div className="flex items-center justify-center space-x-2">
+            <BookOpen className="w-4 h-4" />
+            <span className="text-sm">Education</span>
+          </div>
+        </button>
+        <button
+          onClick={() => setActiveTab('analytics')}
+          className={`flex-1 py-2 px-4 rounded-md font-medium transition-all duration-200 ${
+            activeTab === 'analytics'
+              ? 'bg-white text-primary-600 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <div className="flex items-center justify-center space-x-2">
+            <BarChart3 className="w-4 h-4" />
+            <span className="text-sm">Insights</span>
+          </div>
+        </button>
+        <button
+          onClick={() => setActiveTab('ai')}
+          className={`flex-1 py-2 px-4 rounded-md font-medium transition-all duration-200 ${
+            activeTab === 'ai'
+              ? 'bg-white text-primary-600 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <div className="flex items-center justify-center space-x-2">
+            <Sparkles className="w-4 h-4" />
+            <span className="text-sm">AI Tools</span>
+          </div>
+        </button>
+      </div>
+
+      {/* Add Entry Button */}
+      {activeTab === 'tracker' && (
+        <button
+          onClick={() => setShowEntryForm(true)}
+          className="w-full py-3 px-5 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 transition-all flex items-center justify-center gap-2 min-h-[44px]"
+        >
+          <Plus size={16} />
+          <span>Add Entry</span>
+        </button>
+      )}
 
       {/* Tab Content */}
       {activeTab === 'tracker' && (
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calendar */}
-        <div className="lg:col-span-2">
-          <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-6 shadow-sm">
+          {/* Calendar */}
+          <div className="lg:col-span-2 rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">
                 {format(selectedDate, 'MMMM yyyy')}
@@ -631,70 +637,68 @@ const HealthTracker: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Predictions */}
-          <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Predictions</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Next Period:</span>
-                <span className="text-sm font-medium">
-                  {cycleData.predictions.nextPeriod ? format(new Date(cycleData.predictions.nextPeriod), 'MMM dd') : 'Unknown'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Ovulation:</span>
-                <span className="text-sm font-medium">
-                  {cycleData.predictions.ovulation ? format(new Date(cycleData.predictions.ovulation), 'MMM dd') : 'Unknown'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Fertile Window:</span>
-                <span className="text-sm font-medium">
-                  {cycleData.predictions.fertileWindow.start ? 
-                    `${format(new Date(cycleData.predictions.fertileWindow.start), 'MMM dd')} - ${format(new Date(cycleData.predictions.fertileWindow.end), 'MMM dd')}` 
-                    : 'Unknown'}
-                </span>
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Predictions */}
+            <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Predictions</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Next Period:</span>
+                  <span className="text-sm font-medium">
+                    {cycleData.predictions.nextPeriod ? format(new Date(cycleData.predictions.nextPeriod), 'MMM dd') : 'Unknown'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Ovulation:</span>
+                  <span className="text-sm font-medium">
+                    {cycleData.predictions.ovulation ? format(new Date(cycleData.predictions.ovulation), 'MMM dd') : 'Unknown'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Fertile Window:</span>
+                  <span className="text-sm font-medium">
+                    {cycleData.predictions.fertileWindow.start ? 
+                      `${format(new Date(cycleData.predictions.fertileWindow.start), 'MMM dd')} - ${format(new Date(cycleData.predictions.fertileWindow.end), 'MMM dd')}` 
+                      : 'Unknown'}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* ReproBot AI Panel */}
-          <ReproBotTrackerPanel
-            cycleContext={reproBotContext}
-            isExpanded={showReproBotPanel}
-            onToggle={() => setShowReproBotPanel(!showReproBotPanel)}
-            initialPrompt={reproBotInitialPrompt}
-            onPromptSent={() => setReproBotInitialPrompt(null)}
-          />
+            {/* ReproBot AI Panel */}
+            <ReproBotTrackerPanel
+              cycleContext={reproBotContext}
+              isExpanded={showReproBotPanel}
+              onToggle={() => setShowReproBotPanel(!showReproBotPanel)}
+              initialPrompt={reproBotInitialPrompt}
+              onPromptSent={() => setReproBotInitialPrompt(null)}
+            />
 
-          {/* Recent Entries */}
-          <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Entries</h3>
-            <div className="space-y-3">
-              {cycleData.entries
-                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                .slice(0, 5)
-                .map(entry => (
-                  <div key={entry.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <div>
-                      <p className="text-sm font-medium">{format(new Date(entry.date), 'MMM dd')}</p>
-                      <p className="text-xs text-gray-500">
-                        {entry.flow} • {entry.mood} • {entry.symptoms.length} symptoms
-                      </p>
+            {/* Recent Entries */}
+            <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Entries</h3>
+              <div className="space-y-3">
+                {cycleData.entries
+                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                  .slice(0, 5)
+                  .map(entry => (
+                    <div key={entry.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div>
+                        <p className="text-sm font-medium">{format(new Date(entry.date), 'MMM dd')}</p>
+                        <p className="text-xs text-gray-500">
+                          {entry.flow} • {entry.mood} • {entry.symptoms.length} symptoms
+                        </p>
+                      </div>
+                      {entry.isPeriod && (
+                        <Droplets className="w-4 h-4 text-red-500" />
+                      )}
                     </div>
-                    {entry.isPeriod && (
-                      <Droplets className="w-4 h-4 text-red-500" />
-                    )}
-                  </div>
-                ))}
+                  ))}
+              </div>
             </div>
           </div>
-        </div>
-        </div>
         </div>
       )}
 

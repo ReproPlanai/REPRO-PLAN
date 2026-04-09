@@ -170,7 +170,7 @@ const EmergencyGhana: React.FC = () => {
       gradientTo="to-primary-50/20"
     >
       <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl xl:max-w-6xl 2xl:max-w-7xl mx-auto">
         {/* Header - Pentagon Style */}
         <div className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600 rounded-3xl shadow-2xl p-6 sm:p-8 mb-8">
           <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.1)_100%)]" />
@@ -190,21 +190,21 @@ const EmergencyGhana: React.FC = () => {
         <div className="mb-8">
           <button
             onClick={handlePanicButton}
-            className="w-full py-8 bg-gradient-to-r from-red-600 via-rose-600 to-pink-600 text-white rounded-3xl font-bold text-2xl shadow-xl hover:from-red-700 hover:to-pink-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full py-4 sm:py-6 lg:py-8 bg-gradient-to-r from-red-600 via-rose-600 to-pink-600 text-white rounded-3xl font-bold text-lg sm:text-xl lg:text-2xl shadow-xl hover:from-red-700 hover:to-pink-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
           >
-            <div className="flex items-center justify-center gap-4">
-              <AlertTriangle className="w-10 h-10 animate-pulse" />
-              <span>🚨 EMERGENCY PANIC BUTTON 🚨</span>
-              <AlertTriangle className="w-10 h-10 animate-pulse" />
+            <div className="flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
+              <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 animate-pulse" />
+              <span className="text-sm sm:text-base lg:text-xl">🚨 EMERGENCY PANIC BUTTON 🚨</span>
+              <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 animate-pulse" />
             </div>
           </button>
-          <p className="text-center text-sm text-gray-600 mt-3">
+          <p className="text-center text-xs sm:text-sm text-gray-600 mt-2 sm:mt-3">
             Press for immediate emergency assistance (5-second countdown)
           </p>
         </div>
 
         {/* Emergency Numbers Grid - Pentagon Card Style */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
           {emergencyNumbers.map((emergency, index) => {
             const Icon = emergency.icon;
             return (
@@ -293,20 +293,20 @@ const EmergencyGhana: React.FC = () => {
         </div>
 
         {/* AI Guidance Section */}
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg border border-blue-200/60 p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-3">
-            <Sparkles className="w-6 h-6 text-primary-600" />
-            AI Emergency Guidance
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg border border-blue-200/60 p-4 sm:p-6 mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3">
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
+            <span className="text-base sm:text-xl">AI Emergency Guidance</span>
           </h2>
-          <p className="text-gray-700 mb-4">
+          <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">
             Not sure what to do in an emergency? ReproBot can provide situation-based guidance and help you make the right decisions.
           </p>
           <button
             onClick={() => navigate('/chatbot?context=emergency')}
-            className="w-full py-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-semibold hover:from-primary-600 hover:to-purple-600 transition-all flex items-center justify-center gap-2 shadow-md"
+            className="w-full py-3 sm:py-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-semibold hover:from-primary-600 hover:to-purple-600 transition-all flex items-center justify-center gap-2 shadow-md"
           >
-            <span>Chat with ReproBot for Emergency Guidance</span>
-            <ArrowRight className="w-5 h-5" />
+            <span className="text-sm sm:text-base">Chat with ReproBot for Emergency Guidance</span>
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 

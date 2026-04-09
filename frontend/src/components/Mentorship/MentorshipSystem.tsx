@@ -268,7 +268,7 @@ const MentorshipSystem: React.FC = () => {
         </div>
 
         {/* Mentors Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 mb-8">
           {mentors.map((mentor) => (
             <div key={mentor.id} className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-5 hover:shadow-lg transition-shadow">
               <div className="flex items-start gap-3 mb-4">

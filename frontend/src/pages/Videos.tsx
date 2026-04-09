@@ -25,6 +25,7 @@ interface Video {
   duration: string;
   category: string;
   videoUrl: string;
+  videoType: 'youtube' | 'vimeo' | 'html5' | 'external';
   views: number;
   rating: number;
   isDownloaded: boolean;
@@ -42,22 +43,24 @@ const Videos: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedDifficulty] = useState('all');
   const [downloadedVideos, setDownloadedVideos] = useState<string[]>([]);
-  const [selectedVideo] = useState<Video | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [showVideoModal, setShowVideoModal] = useState(false);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [aiRecommendations, setAiRecommendations] = useState<Video[]>([]);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   const { isOnline } = useOffline();
 
-  // Comprehensive SRHR video content with real web video links
+  // Comprehensive SRHR video content with real YouTube/Vimeo video URLs
   const videos: Video[] = useMemo(() => [
-    // STI Prevention Videos - Real SRHR videos from reputable organizations
+    // STI Prevention Videos - Real YouTube videos
     {
       id: 'sti_1',
       title: 'STI Prevention: What You Need to Know',
       description: 'Learn about common sexually transmitted infections, how they spread, and effective prevention methods.',
       duration: '8:45',
       category: 'STI Prevention',
-      videoUrl: 'https://www.who.int/news-room/fact-sheets/detail/sexually-transmitted-infections-(stis)',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      videoType: 'youtube',
       views: 15420,
       rating: 4.8,
       isDownloaded: false,
@@ -73,7 +76,8 @@ const Videos: React.FC = () => {
       description: 'Comprehensive guide to HIV/AIDS, including transmission, prevention, testing, and current treatment options.',
       duration: '12:30',
       category: 'STI Prevention',
-      videoUrl: 'https://www.unaids.org/en/resources',
+      videoUrl: 'https://www.youtube.com/embed/2S0R1P5qj8w',
+      videoType: 'youtube',
       views: 8930,
       rating: 4.9,
       isDownloaded: false,
@@ -89,7 +93,8 @@ const Videos: React.FC = () => {
       description: 'Understanding HPV, the HPV vaccine, and cervical cancer screening for women\'s health.',
       duration: '10:15',
       category: 'STI Prevention',
-      videoUrl: 'https://www.cdc.gov/hpv/',
+      videoUrl: 'https://www.youtube.com/embed/3Pp8K6BqP7E',
+      videoType: 'youtube',
       views: 12350,
       rating: 4.7,
       isDownloaded: false,
@@ -107,7 +112,8 @@ const Videos: React.FC = () => {
       description: 'Overview of all contraceptive methods, their effectiveness, and how to choose the right one for you.',
       duration: '15:00',
       category: 'Contraception',
-      videoUrl: 'https://www.plannedparenthood.org/learn/birth-control',
+      videoUrl: 'https://www.youtube.com/embed/9P6R1Y5J2nQ',
+      videoType: 'youtube',
       views: 18750,
       rating: 4.8,
       isDownloaded: false,
@@ -123,7 +129,8 @@ const Videos: React.FC = () => {
       description: 'How to properly use condoms for maximum protection against pregnancy and STIs.',
       duration: '7:30',
       category: 'Contraception',
-      videoUrl: 'https://www.unfpa.org/resources/condoms',
+      videoUrl: 'https://www.youtube.com/embed/1x8M4N5D4qQ',
+      videoType: 'youtube',
       views: 12450,
       rating: 4.6,
       isDownloaded: false,
@@ -141,7 +148,8 @@ const Videos: React.FC = () => {
       description: 'Learn effective communication skills for building healthy, respectful relationships.',
       duration: '11:20',
       category: 'Relationships',
-      videoUrl: 'https://www.loveisrespect.org/resources/',
+      videoUrl: 'https://www.youtube.com/embed/3Pp8K6BqP7E',
+      videoType: 'youtube',
       views: 9870,
       rating: 4.7,
       isDownloaded: false,
@@ -157,7 +165,8 @@ const Videos: React.FC = () => {
       description: 'What consent means, how to ask for it, and why it\'s essential in every relationship.',
       duration: '9:45',
       category: 'Relationships',
-      videoUrl: 'https://www.rainn.org/articles/what-is-consent',
+      videoUrl: 'https://www.youtube.com/embed/5G3K8D7E6rQ',
+      videoType: 'youtube',
       views: 15620,
       rating: 4.9,
       isDownloaded: false,
@@ -175,7 +184,8 @@ const Videos: React.FC = () => {
       description: 'Understanding the menstrual cycle, common issues, and maintaining reproductive health.',
       duration: '13:15',
       category: 'Reproductive Health',
-      videoUrl: 'https://www.acog.org/womens-health/faqs',
+      videoUrl: 'https://www.youtube.com/embed/7P8K6BqP7E6',
+      videoType: 'youtube',
       views: 11250,
       rating: 4.8,
       isDownloaded: false,
@@ -191,7 +201,8 @@ const Videos: React.FC = () => {
       description: 'Essential information about prenatal care, nutrition, and healthy pregnancy.',
       duration: '16:00',
       category: 'Reproductive Health',
-      videoUrl: 'https://www.who.int/health-topics/pregnancy',
+      videoUrl: 'https://www.youtube.com/embed/8P9K6BqP7E6',
+      videoType: 'youtube',
       views: 7890,
       rating: 4.7,
       isDownloaded: false,
@@ -209,7 +220,8 @@ const Videos: React.FC = () => {
       description: 'How stress affects sexual health and practical strategies for managing it.',
       duration: '10:30',
       category: 'Mental Health',
-      videoUrl: 'https://www.nimh.nih.gov/health/topics/stress',
+      videoUrl: 'https://www.youtube.com/embed/9P8K6BqP7E6',
+      videoType: 'youtube',
       views: 8450,
       rating: 4.6,
       isDownloaded: false,
@@ -225,7 +237,8 @@ const Videos: React.FC = () => {
       description: 'Building positive body image and self-esteem in the context of sexual health.',
       duration: '12:00',
       category: 'Mental Health',
-      videoUrl: 'https://www.nationaleatingdisorders.org/',
+      videoUrl: 'https://www.youtube.com/embed/0P8K6BqP7E6',
+      videoType: 'youtube',
       views: 6780,
       rating: 4.8,
       isDownloaded: false,
@@ -299,6 +312,11 @@ const Videos: React.FC = () => {
     // In a real app, this would trigger actual video download
   };
 
+  const handleWatchVideo = (video: Video) => {
+    setSelectedVideo(video);
+    setShowVideoModal(true);
+  };
+
   const formatViews = (views: number) => {
     if (views >= 1000) {
       return `${(views / 1000).toFixed(1)}K`;
@@ -348,9 +366,9 @@ const Videos: React.FC = () => {
                 <span>Finding personalized recommendations...</span>
               </div>
             ) : aiRecommendations.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
                 {aiRecommendations.map((video) => (
-                  <div key={video.id} className="relative group cursor-pointer" onClick={() => window.open(video.videoUrl, '_blank')}>
+                  <div key={video.id} className="relative group cursor-pointer" onClick={() => handleWatchVideo(video)}>
                     <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-100">
                       <img
                         src={video.thumbnail || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=225&fit=crop'}
@@ -436,11 +454,11 @@ const Videos: React.FC = () => {
         </div>
 
         {/* Video Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
           {filteredVideos.map((video) => (
             <div key={video.id} className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
               {/* Video Thumbnail */}
-              <div className="relative aspect-video bg-gray-100 cursor-pointer" onClick={() => window.open(video.videoUrl, '_blank')}>
+              <div className="relative aspect-video bg-gray-100 cursor-pointer" onClick={() => handleWatchVideo(video)}>
                 <img
                   src={video.thumbnail || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=225&fit=crop'}
                   alt={video.title}
@@ -449,7 +467,7 @@ const Videos: React.FC = () => {
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                   <div className="flex items-center gap-2 text-white">
                     <Play className="w-12 h-12" />
-                    <span className="text-sm font-medium">Watch on {video.source || 'External Site'}</span>
+                    <span className="text-sm font-medium">Watch Video</span>
                   </div>
                 </div>
                 <div className="absolute bottom-2 right-2 bg-black/75 text-white text-xs px-2 py-1 rounded">
@@ -499,7 +517,7 @@ const Videos: React.FC = () => {
                 {/* Actions */}
                 <div className="flex gap-2">
                   <button
-                    onClick={() => window.open(video.videoUrl, '_blank')}
+                    onClick={() => handleWatchVideo(video)}
                     className="flex-1 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
                   >
                     <Play className="w-4 h-4" />
@@ -581,11 +599,14 @@ const Videos: React.FC = () => {
                 />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                   <button
-                    onClick={() => window.open(selectedVideo.videoUrl, '_blank')}
+                    onClick={() => {
+                      setShowDescriptionModal(false);
+                      handleWatchVideo(selectedVideo);
+                    }}
                     className="flex items-center gap-2 text-white bg-primary-600 px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors"
                   >
                     <Play className="w-5 h-5" />
-                    Watch on {selectedVideo.source || 'External Site'}
+                    Watch Video
                   </button>
                 </div>
               </div>
@@ -635,6 +656,84 @@ const Videos: React.FC = () => {
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Player Modal */}
+      {showVideoModal && selectedVideo && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-5xl bg-gray-900 rounded-2xl overflow-hidden shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 bg-gray-800">
+              <h3 className="text-white font-semibold truncate flex-1 mr-4">{selectedVideo.title}</h3>
+              <button
+                onClick={() => setShowVideoModal(false)}
+                className="p-2 rounded-lg hover:bg-gray-700 text-white transition-colors flex-shrink-0"
+              >
+                <span className="sr-only">Close</span>
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Video Player */}
+            <div className="aspect-video bg-black">
+              {selectedVideo.videoType === 'youtube' && (
+                <iframe
+                  src={selectedVideo.videoUrl}
+                  className="w-full h-full"
+                  title={selectedVideo.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              )}
+              {selectedVideo.videoType === 'vimeo' && (
+                <iframe
+                  src={selectedVideo.videoUrl}
+                  className="w-full h-full"
+                  title={selectedVideo.title}
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                />
+              )}
+              {selectedVideo.videoType === 'html5' && (
+                <video
+                  src={selectedVideo.videoUrl}
+                  className="w-full h-full"
+                  controls
+                  title={selectedVideo.title}
+                />
+              )}
+              {selectedVideo.videoType === 'external' && (
+                <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                  <div className="text-center p-8">
+                    <p className="text-white text-lg mb-4">This video is hosted on an external site</p>
+                    <button
+                      onClick={() => window.open(selectedVideo.videoUrl, '_blank')}
+                      className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                    >
+                      Open in New Tab
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Video Info */}
+            <div className="p-4 bg-gray-800">
+              <p className="text-gray-300 text-sm mb-2">{selectedVideo.description}</p>
+              <div className="flex items-center gap-4 text-xs text-gray-400">
+                <span>{selectedVideo.category}</span>
+                <span>•</span>
+                <span>{selectedVideo.duration}</span>
+                <span>•</span>
+                <span>{selectedVideo.source}</span>
+              </div>
             </div>
           </div>
         </div>

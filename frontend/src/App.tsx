@@ -83,8 +83,8 @@ const AppLayoutContent: React.FC<{ children: React.ReactNode; isAuthenticated: b
       <main
         className={
           shouldShowMainNavigation
-            ? 'flex-1 w-full h-full overflow-x-hidden bg-gray-50 pt-14 sm:pt-16'
-            : 'flex-1 w-full h-full overflow-x-hidden bg-gray-50'
+            ? 'flex-1 w-full h-full bg-gray-50 pt-14 sm:pt-16'
+            : 'flex-1 w-full h-full bg-gray-50'
         }
         style={{
           paddingTop: shouldShowMainNavigation ? 'calc(0.5rem + env(safe-area-inset-top))' : 'env(safe-area-inset-top)',
@@ -258,7 +258,7 @@ function App() {
           <AccessibilityProvider>
             <Router>
               <Analytics />
-              <div className="min-h-screen min-h-[100dvh] bg-gray-50 overflow-x-hidden" style={{ overflowY: 'visible' }}>
+              <div className="min-h-screen min-h-[100dvh] bg-gray-50" style={{ overflowY: 'visible' }}>
                 <OfflineIndicator />
                 <UpdateModal />
                 

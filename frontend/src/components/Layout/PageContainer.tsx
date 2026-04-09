@@ -33,7 +33,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
   gradientTo = 'to-primary-50/30',
 }) => {
   // Base classes
-  const baseClasses = 'w-full h-full overflow-x-hidden';
+  const baseClasses = 'w-full h-full';
   
   // Padding classes - no padding on mobile if noPadding is true
   const paddingClasses = noPadding 

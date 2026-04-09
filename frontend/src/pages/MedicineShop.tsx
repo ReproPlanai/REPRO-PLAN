@@ -164,6 +164,149 @@ const SRHR_MEDICINES: Medicine[] = [
     tags: ['lubricant', 'condom-safe', 'no prescription'],
     rating: 4.7,
     reviews: 321
+  },
+  {
+    id: 'pain_relief',
+    name: 'Menstrual Pain Relief (500mg, 20 tablets)',
+    category: 'menstrual_health',
+    description: 'Fast-acting pain relief for menstrual cramps and discomfort. Ibuprofen-based formula.',
+    price: 12.00,
+    image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=400&h=400&fit=crop',
+    inStock: true,
+    prescriptionRequired: false,
+    tags: ['pain relief', 'menstrual', 'no prescription'],
+    rating: 4.5,
+    reviews: 678
+  },
+  {
+    id: 'thermometer',
+    name: 'Digital Basal Thermometer',
+    category: 'general_health',
+    description: 'Precision digital thermometer for fertility tracking and basal body temperature monitoring.',
+    price: 28.00,
+    image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=400&fit=crop',
+    inStock: true,
+    prescriptionRequired: false,
+    tags: ['fertility', 'tracking', 'no prescription'],
+    rating: 4.4,
+    reviews: 145
+  },
+  {
+    id: 'pantyliners',
+    name: 'Organic Pantyliners (40-pack)',
+    category: 'menstrual_health',
+    description: 'Breathable, chemical-free pantyliners for daily freshness and light protection.',
+    price: 15.00,
+    image: 'https://images.unsplash.com/photo-1586495988301-6f6f0e8e9289?w=400&h=400&fit=crop',
+    inStock: true,
+    prescriptionRequired: false,
+    tags: ['menstrual', 'daily', 'organic'],
+    rating: 4.6,
+    reviews: 312
+  },
+  {
+    id: 'hiv_test',
+    name: 'HIV Self-Test Kit',
+    category: 'sti_prevention',
+    description: 'WHO-prequalified HIV self-test kit. Results in 15 minutes. 99.7% accurate.',
+    price: 65.00,
+    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=400&h=400&fit=crop',
+    inStock: true,
+    prescriptionRequired: false,
+    tags: ['hiv testing', 'home test', 'confidential'],
+    rating: 4.8,
+    reviews: 234
+  },
+  {
+    id: 'pregnancy_test',
+    name: 'Early Pregnancy Test Kit (2-pack)',
+    category: 'general_health',
+    description: 'Ultra-sensitive pregnancy test. Detects pregnancy up to 5 days before missed period.',
+    price: 18.00,
+    image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=400&fit=crop',
+    inStock: true,
+    prescriptionRequired: false,
+    tags: ['pregnancy', 'testing', 'no prescription'],
+    rating: 4.7,
+    reviews: 567
+  },
+  {
+    id: 'iron_supplement',
+    name: 'Iron + Vitamin C Supplements (60 tablets)',
+    category: 'general_health',
+    description: 'Iron supplements with Vitamin C for better absorption. Supports blood health during pregnancy.',
+    price: 25.00,
+    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop',
+    inStock: true,
+    prescriptionRequired: false,
+    tags: ['supplements', 'iron', 'no prescription'],
+    rating: 4.5,
+    reviews: 189
+  },
+  {
+    id: 'yeast_infection',
+    name: 'Yeast Infection Treatment (1-day)',
+    category: 'general_health',
+    description: 'Fast-acting antifungal treatment for yeast infections. Single dose applicator.',
+    price: 35.00,
+    image: 'https://images.unsplash.com/photo-1628126235206-5660b8bafb4e?w=400&h=400&fit=crop',
+    inStock: true,
+    prescriptionRequired: false,
+    tags: ['infection treatment', 'antifungal', 'no prescription'],
+    rating: 4.6,
+    reviews: 423
+  },
+  {
+    id: 'condoms_extra',
+    name: 'Extra-Large Condoms (12-pack)',
+    category: 'contraception',
+    description: 'Extra-large premium condoms for enhanced comfort and protection. Lubricated.',
+    price: 18.00,
+    image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=400&h=400&fit=crop',
+    inStock: true,
+    prescriptionRequired: false,
+    tags: ['contraception', 'st prevention', 'no prescription'],
+    rating: 4.7,
+    reviews: 156
+  },
+  {
+    id: 'period_tracker',
+    name: 'Digital Fertility Tracker',
+    category: 'general_health',
+    description: 'Smart fertility tracker with app integration. Tracks cycle, ovulation, and predictions.',
+    price: 120.00,
+    image: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&h=400&fit=crop',
+    inStock: true,
+    prescriptionRequired: false,
+    tags: ['fertility', 'tracking', 'smart device'],
+    rating: 4.3,
+    reviews: 89
+  },
+  {
+    id: 'calcium_supplement',
+    name: 'Calcium + Vitamin D3 (90 tablets)',
+    category: 'general_health',
+    description: 'Essential bone health support. Calcium and Vitamin D3 for women\'s health.',
+    price: 22.00,
+    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop',
+    inStock: true,
+    prescriptionRequired: false,
+    tags: ['supplements', 'bone health', 'no prescription'],
+    rating: 4.6,
+    reviews: 234
+  },
+  {
+    id: 'urinary_health',
+    name: 'Urinary Tract Health Supplement (30 capsules)',
+    category: 'general_health',
+    description: 'Cranberry extract supplement for urinary tract health support. Prevents UTIs.',
+    price: 32.00,
+    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop',
+    inStock: true,
+    prescriptionRequired: false,
+    tags: ['supplements', 'urinary health', 'no prescription'],
+    rating: 4.4,
+    reviews: 178
   }
 ];
 
@@ -307,7 +450,7 @@ const MedicineShop: React.FC = () => {
               <Sparkles className="w-5 h-5 text-primary-600" />
               <h3 className="font-semibold text-gray-900">ReproBot Recommendations</h3>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
               {aiRecommendations.map((medicine) => (
                 <div key={medicine.id} className="p-3 bg-gradient-to-br from-primary-50 to-purple-50 rounded-xl border border-primary-200/60">
                   <div className="flex items-center gap-3">
@@ -362,7 +505,7 @@ const MedicineShop: React.FC = () => {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 mb-6">
           {filteredMedicines.map((medicine) => {
             const cartQuantity = cart[medicine.id] || 0;
             return (

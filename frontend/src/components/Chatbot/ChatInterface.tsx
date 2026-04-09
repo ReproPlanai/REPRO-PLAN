@@ -45,6 +45,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
   const [showMiniDropdown, setShowMiniDropdown] = useState(false);
   const [hasShownIntroduction, setHasShownIntroduction] = useState(false);
   const [hasChosenReproBotType, setHasChosenReproBotType] = useState(false);
+  const [showAiErrorModal, setShowAiErrorModal] = useState(false);
+  const [aiErrorMessage, setAiErrorMessage] = useState('');
   const [reproBotType, setReproBotType] = useState<{ focus: string; tone: string; mode: string }>({
     focus: 'general',
     tone: 'friendly',
@@ -293,6 +295,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
 
     } catch (error) {
       console.error('Failed to get response:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
+      setAiErrorMessage(errorMsg);
+      setShowAiErrorModal(true);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: "I'm sorry, ReproBot is having trouble responding right now. You can try again, or visit a health clinic for immediate assistance.",
@@ -834,12 +839,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
                 ×
               </button>
             </div>
-            
+
             <div className="space-y-2 sm:space-y-3">
               <p className="text-sm text-gray-600 text-center py-4">
                 Conversations are not saved locally. All responses come fresh from Gemini API for privacy and accuracy.
               </p>
-              
+
               <button
                 onClick={deleteConversation}
                 className="w-full flex items-center space-x-2 p-2.5 sm:p-3 bg-red-50 hover:bg-red-100 rounded-xl transition-colors"
@@ -848,6 +853,64 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
                 <span className="text-xs sm:text-sm text-red-600 font-medium">Clear Current Chat</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Error Modal */}
+      {showAiErrorModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl">⚠️</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">ReproBot Not Responding</h3>
+                <p className="text-sm text-gray-600">AI assistant is experiencing issues</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 mb-5">
+              <p className="text-sm text-gray-700">
+                ReproBot is having trouble responding right now. This could be due to:
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1.5 list-disc list-inside">
+                <li>Network connection issues</li>
+                <li>High demand on the service</li>
+                <li>Temporary server maintenance</li>
+              </ul>
+              {aiErrorMessage && (
+                <details className="bg-gray-50 rounded-lg p-3">
+                  <summary className="text-xs font-medium text-gray-700 cursor-pointer">Error details</summary>
+                  <pre className="text-xs text-gray-600 mt-2 whitespace-pre-wrap">
+                    {aiErrorMessage}
+                  </pre>
+                </details>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowAiErrorModal(false)}
+                className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={() => {
+                  setShowAiErrorModal(false);
+                  setInputText('');
+                }}
+                className="flex-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-500 text-center mt-4">
+              For immediate assistance, visit a local health clinic or emergency services if needed.
+            </p>
           </div>
         </div>
       )}

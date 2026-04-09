@@ -19,7 +19,7 @@ function cacheKey(prompt: string, history?: Message[]): string {
 export async function reprobotRespond(
   message: string,
   history?: Message[],
-  options?: { useCache?: boolean, model?: string, taskType?: TaskType, sessionId?: string }
+  options?: { useCache?: boolean, model?: string, taskType?: TaskType, sessionId?: string, systemPrompt?: string }
 ): Promise<string> {
   const useCache = options?.useCache ?? true;
   const taskType = options?.taskType || 'chat';
@@ -31,8 +31,11 @@ export async function reprobotRespond(
   const provider = selectModel({ taskType, content: message, sessionId });
   const modelString = getModelString(provider, taskType);
 
+  // Use custom system prompt if provided, otherwise use default
+  const systemPrompt = options?.systemPrompt || REPROBOT_SYSTEM_PROMPT;
+
   // Trim conversation history to 10 messages
-  const { trimmedHistory, estimatedTokens } = buildContext(message, history, REPROBOT_SYSTEM_PROMPT);
+  const { trimmedHistory, estimatedTokens } = buildContext(message, history, systemPrompt);
 
   if (useCache) {
     const cached = await getCached<string>(cacheKey(message, trimmedHistory));
@@ -50,7 +53,7 @@ export async function reprobotRespond(
     const { response, provider: actualProvider, attempts } = await executeWithFallback({
       prompt: message,
       history: trimmedHistory,
-      systemPrompt: REPROBOT_SYSTEM_PROMPT,
+      systemPrompt,
       model: options?.model || modelString
     }, fallbackChain);
 
