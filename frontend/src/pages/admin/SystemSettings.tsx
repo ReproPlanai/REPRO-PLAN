@@ -106,7 +106,7 @@ const SystemSettings: React.FC = () => {
 
   return (
     <PageContainer gradient>
-      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-5xl mx-auto">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-20 sm:pb-8 max-w-5xl mx-auto">
         {/* Hero */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 p-6 sm:p-8 shadow-2xl shadow-blue-500/20 mb-6">
           <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.05)_100%)]" />

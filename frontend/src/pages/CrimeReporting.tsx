@@ -114,7 +114,7 @@ const CrimeReporting: React.FC = () => {
 
   return (
     <PageContainer gradient>
-      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-3xl mx-auto">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-20 sm:pb-8 max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">

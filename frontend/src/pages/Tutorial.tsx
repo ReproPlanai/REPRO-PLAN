@@ -110,7 +110,7 @@ const Tutorial: React.FC = () => {
       gradientVia="via-white"
       gradientTo="to-primary-50/20"
     >
-      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-20 sm:pb-8">
         {/* Progress */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-between mb-2">

@@ -405,7 +405,7 @@ const EmergencyPanel: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl xl:max-w-6xl 2xl:max-w-7xl mx-auto">
         {/* Hero + Panic Button */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-600 via-rose-600 to-pink-600 p-6 sm:p-8 shadow-xl mb-6">
           <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.08)_100%)]" />

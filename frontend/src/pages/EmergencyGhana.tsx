@@ -169,7 +169,7 @@ const EmergencyGhana: React.FC = () => {
       gradientVia="via-white"
       gradientTo="to-primary-50/20"
     >
-      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-20 sm:pb-8">
         <div className="max-w-4xl xl:max-w-6xl 2xl:max-w-7xl mx-auto">
         {/* Header - Pentagon Style */}
         <div className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600 rounded-3xl shadow-2xl p-6 sm:p-8 mb-8">

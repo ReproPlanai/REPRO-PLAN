@@ -310,6 +310,238 @@ const SRHR_MEDICINES: Medicine[] = [
   }
 ];
 
+// SRHR Products from partner clinics - real products with dual currency pricing
+const SRHR_PRODUCTS = [
+  {
+    id: 'durex_condoms',
+    name: 'Durex Performax Condoms',
+    category: 'contraception',
+    description: 'Premium ribbed and dotted condoms for enhanced protection and pleasure',
+    icon: Shield,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 12.99,
+    priceGHS: 195,
+    imageUrl: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'trojan_condoms',
+    name: 'Trojan ENZ Condoms',
+    category: 'contraception',
+    description: 'Lubricated latex condoms for reliable protection',
+    icon: Shield,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 9.99,
+    priceGHS: 150,
+    imageUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'female_condom_fc2',
+    name: 'FC2 Female Condom',
+    category: 'contraception',
+    description: 'Female-controlled barrier method for protection and pregnancy prevention',
+    icon: Shield,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 14.99,
+    priceGHS: 225,
+    imageUrl: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'ortho_tri_cyclen',
+    name: 'Ortho Tri-Cyclen',
+    category: 'contraception',
+    description: 'Combination birth control pills for pregnancy prevention',
+    icon: Pill,
+    available: true,
+    requiresPrescription: true,
+    priceUSD: 45.00,
+    priceGHS: 675,
+    imageUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'mirena_iud',
+    name: 'Mirena IUD',
+    category: 'contraception',
+    description: 'Hormonal intrauterine device for 5-year pregnancy prevention',
+    icon: Pill,
+    available: true,
+    requiresPrescription: true,
+    priceUSD: 850.00,
+    priceGHS: 12750,
+    imageUrl: 'https://images.unsplash.com/photo-1631815587646-b85a84c9b922?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'nexplanon',
+    name: 'Nexplanon Implant',
+    category: 'contraception',
+    description: 'Subdermal contraceptive implant for 3-year protection',
+    icon: Pill,
+    available: true,
+    requiresPrescription: true,
+    priceUSD: 950.00,
+    priceGHS: 14250,
+    imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'depo_provera',
+    name: 'Depo-Provera Injection',
+    category: 'contraception',
+    description: '3-month injectable contraceptive for pregnancy prevention',
+    icon: Pill,
+    available: true,
+    requiresPrescription: true,
+    priceUSD: 85.00,
+    priceGHS: 1275,
+    imageUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'plan_b',
+    name: 'Plan B One-Step',
+    category: 'emergency',
+    description: 'Emergency contraception pill for use within 72 hours',
+    icon: AlertCircle,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 49.99,
+    priceGHS: 750,
+    imageUrl: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'ella',
+    name: 'ella Emergency Contraception',
+    category: 'emergency',
+    description: 'Prescription emergency contraception effective up to 5 days',
+    icon: AlertCircle,
+    available: true,
+    requiresPrescription: true,
+    priceUSD: 65.00,
+    priceGHS: 975,
+    imageUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'oraquick_hiv',
+    name: 'OraQuick HIV Self-Test',
+    category: 'testing',
+    description: 'FDA-approved oral fluid HIV test with results in 20 minutes',
+    icon: Shield,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 39.99,
+    priceGHS: 600,
+    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'first_response_pregnancy',
+    name: 'First Response Pregnancy Test',
+    category: 'pregnancy',
+    description: 'Early detection pregnancy test kit, results in 3 minutes',
+    icon: Heart,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 14.99,
+    priceGHS: 225,
+    imageUrl: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'clearblue_pregnancy',
+    name: 'Clearblue Digital Pregnancy Test',
+    category: 'pregnancy',
+    description: 'Digital pregnancy test with weeks indicator',
+    icon: Heart,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 18.99,
+    priceGHS: 285,
+    imageUrl: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'sti_test_kit',
+    name: 'Complete STI Screening Kit',
+    category: 'testing',
+    description: 'At-home test kit for chlamydia, gonorrhea, and syphilis',
+    icon: Shield,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 149.99,
+    priceGHS: 2250,
+    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'azithromycin',
+    name: 'Azithromycin (Zithromax)',
+    category: 'treatment',
+    description: 'Antibiotic for treating chlamydia and other STIs',
+    icon: Pill,
+    available: true,
+    requiresPrescription: true,
+    priceUSD: 25.00,
+    priceGHS: 375,
+    imageUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'truvada_prep',
+    name: 'Truvada (PrEP)',
+    category: 'treatment',
+    description: 'HIV pre-exposure prophylaxis medication',
+    icon: Pill,
+    available: true,
+    requiresPrescription: true,
+    priceUSD: 1800.00,
+    priceGHS: 27000,
+    imageUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'always_pads',
+    name: 'Always Ultra Thin Pads',
+    category: 'hygiene',
+    description: 'Ultra-thin sanitary pads for menstrual protection',
+    icon: Heart,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 8.99,
+    priceGHS: 135,
+    imageUrl: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'diva_cup',
+    name: 'DivaCup',
+    category: 'hygiene',
+    description: 'Reusable menstrual cup for 12-hour protection',
+    icon: Heart,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 39.99,
+    priceGHS: 600,
+    imageUrl: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'tampax_pearl',
+    name: 'Tampax Pearl Tampons',
+    category: 'hygiene',
+    description: 'Applicator tampons for comfortable menstrual protection',
+    icon: Heart,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 10.99,
+    priceGHS: 165,
+    imageUrl: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&h=400&fit=crop'
+  },
+  {
+    id: 'menstrual_cup_kit',
+    name: 'Complete Menstrual Kit',
+    category: 'hygiene',
+    description: 'Sanitary kit with pads, tampons, wipes, and disposal bags',
+    icon: Heart,
+    available: true,
+    requiresPrescription: false,
+    priceUSD: 24.99,
+    priceGHS: 375,
+    imageUrl: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&h=400&fit=crop'
+  }
+];
+
 const CATEGORIES = [
   { id: 'all', label: 'All Products', icon: Package },
   { id: 'contraception', label: 'Contraception', icon: Shield },
@@ -380,7 +612,7 @@ const MedicineShop: React.FC = () => {
 
   return (
     <PageContainer gradient gradientFrom="from-slate-50" gradientVia="via-white" gradientTo="to-primary-50/20">
-      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-20 sm:pb-8">
         {/* Hero */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600 p-6 sm:p-8 shadow-2xl shadow-primary-500/20 mb-6">
           <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.05)_100%)]" />
@@ -659,6 +891,74 @@ const MedicineShop: React.FC = () => {
                 <li>• Products are for personal use and should not be shared</li>
               </ul>
             </div>
+          </div>
+        </div>
+
+        {/* SRHR Products from Partner Clinics */}
+        <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 sm:p-6 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <Package className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Available SRHR Products & Kits</h2>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">Essential sexual and reproductive health products available at partner clinics</p>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {SRHR_PRODUCTS.map((product) => {
+              const ProductIcon = product.icon;
+              const categoryColors: Record<string, string> = {
+                contraception: 'from-blue-500 to-cyan-500',
+                emergency: 'from-red-500 to-pink-500',
+                testing: 'from-purple-500 to-indigo-500',
+                treatment: 'from-green-500 to-emerald-500',
+                hygiene: 'from-pink-500 to-rose-500',
+                pregnancy: 'from-amber-500 to-orange-500'
+              };
+              
+              return (
+                <div key={product.id} className="rounded-xl bg-gradient-to-br from-gray-50 to-white border border-gray-200/80 overflow-hidden hover:shadow-md transition-all">
+                  {/* Product Image */}
+                  <div className="relative h-40 sm:h-48 bg-gray-100">
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://via.placeholder.com/400x400?text=No+Image';
+                      }}
+                    />
+                    <div className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${
+                      product.available ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                    }`}>
+                      {product.available ? 'In Stock' : 'Out of Stock'}
+                    </div>
+                  </div>
+                  
+                  <div className="p-3 sm:p-4">
+                    <div className={`inline-flex p-2 rounded-lg bg-gradient-to-br ${categoryColors[product.category] || 'from-gray-500 to-gray-600'} mb-2`}>
+                      <ProductIcon className="w-4 h-4 text-white" />
+                    </div>
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-1 line-clamp-1">{product.name}</h3>
+                    <p className="text-xs text-gray-600 mb-3 line-clamp-2">{product.description}</p>
+                    
+                    {/* Prices */}
+                    <div className="flex items-center gap-2 mb-2">
+                      {product.priceUSD && (
+                        <span className="text-sm font-semibold text-gray-900">${product.priceUSD.toFixed(2)} USD</span>
+                      )}
+                      {product.priceGHS && (
+                        <span className="text-sm font-semibold text-primary-600">₵{product.priceGHS.toFixed(0)} GHS</span>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      {product.requiresPrescription && (
+                        <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium">Rx Required</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </main>

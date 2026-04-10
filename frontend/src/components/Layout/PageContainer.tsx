@@ -21,6 +21,7 @@ interface PageContainerProps {
  * - Optional full-width (no max-width constraints)
  * - Optional gradients
  * - Consistent padding (none on mobile, sm padding on larger screens)
+ * - Single scroller pattern - no nested scrolling containers
  */
 const PageContainer: React.FC<PageContainerProps> = ({
   children,
@@ -35,10 +36,10 @@ const PageContainer: React.FC<PageContainerProps> = ({
   // Base classes - use min-h-screen instead of h-full to prevent nested scrolling
   const baseClasses = 'w-full min-h-screen';
   
-  // Padding classes - no padding on mobile if noPadding is true
+  // Padding classes - no padding on mobile if noPadding is true, add bottom padding for hamburger menu
   const paddingClasses = noPadding 
-    ? '' 
-    : 'p-0 sm:p-4';
+    ? 'pb-20 sm:pb-8' 
+    : 'p-0 sm:p-4 pb-20 sm:pb-8';
   
   // Gradient or background
   const bgClasses = gradient
