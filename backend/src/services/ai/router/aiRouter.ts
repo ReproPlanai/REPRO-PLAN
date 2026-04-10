@@ -36,7 +36,7 @@ function detectSensitiveContent(content: string): boolean {
 }
 
 // Select the appropriate model based on task type and content
-export function selectModel(options: ModelSelectionOptions): 'gemini' | 'anthropic' {
+export function selectModel(options: ModelSelectionOptions): 'gemini' | 'anthropic' | 'nvidia-mistral' | 'nvidia-phi' | 'nvidia-gemma27b' | 'nvidia-qwen' | 'nvidia-jamba' {
   const env = getEnv();
   const { taskType, content = '' } = options;
 
@@ -45,6 +45,9 @@ export function selectModel(options: ModelSelectionOptions): 'gemini' | 'anthrop
     log.info({ taskType, reason: 'DEV_MODE' }, 'Routing to Gemini');
     return 'gemini';
   }
+
+  // Check if NVIDIA is configured
+  const hasNvidia = !!(env.NVIDIA_MISTRAL_API_KEY || env.NVIDIA_PHI_API_KEY || env.NVIDIA_GEMMA_27B_API_KEY);
 
   // Therapy/health: Claude only (no exceptions)
   if (taskType === 'therapy' || taskType === 'health') {
@@ -63,8 +66,26 @@ export function selectModel(options: ModelSelectionOptions): 'gemini' | 'anthrop
     return 'gemini';
   }
 
-  // Quiz, game, explain: Use Gemini (cost-optimized)
-  if (taskType === 'quiz' || taskType === 'game' || taskType === 'explain') {
+  // Quiz, game: Use NVIDIA for load balancing (if configured)
+  if (taskType === 'quiz' || taskType === 'game') {
+    if (env.NVIDIA_MISTRAL_API_KEY) {
+      log.info({ taskType, reason: 'nvidia-load-balancing' }, 'Routing to NVIDIA Mistral');
+      return 'nvidia-mistral';
+    }
+    if (env.NVIDIA_PHI_API_KEY) {
+      log.info({ taskType, reason: 'nvidia-load-balancing' }, 'Routing to NVIDIA Phi');
+      return 'nvidia-phi';
+    }
+    if (env.NVIDIA_GEMMA_27B_API_KEY) {
+      log.info({ taskType, reason: 'nvidia-load-balancing' }, 'Routing to NVIDIA Gemma 27B');
+      return 'nvidia-gemma27b';
+    }
+    log.info({ taskType, reason: 'cost-optimized' }, 'Routing to Gemini');
+    return 'gemini';
+  }
+
+  // Explain: Use Gemini (cost-optimized)
+  if (taskType === 'explain') {
     log.info({ taskType, reason: 'cost-optimized' }, 'Routing to Gemini');
     return 'gemini';
   }
@@ -75,7 +96,7 @@ export function selectModel(options: ModelSelectionOptions): 'gemini' | 'anthrop
 }
 
 // Get the specific model string based on provider and task
-export function getModelString(provider: 'gemini' | 'anthropic', taskType: TaskType): string {
+export function getModelString(provider: 'gemini' | 'anthropic' | 'nvidia-mistral' | 'nvidia-phi' | 'nvidia-gemma27b' | 'nvidia-qwen' | 'nvidia-jamba', taskType: TaskType): string {
   const env = getEnv();
 
   if (provider === 'gemini') {
@@ -87,8 +108,6 @@ export function getModelString(provider: 'gemini' | 'anthropic', taskType: TaskT
     // Task-specific defaults
     switch (taskType) {
       case 'quiz':
-      case 'game':
-      case 'explain':
         return 'gemini-2.5-flash-lite'; // Most cost-effective
       case 'chat':
         return 'gemini-3-flash-preview'; // Better quality for chat
@@ -100,6 +119,26 @@ export function getModelString(provider: 'gemini' | 'anthropic', taskType: TaskT
   if (provider === 'anthropic') {
     // Claude Sonnet 4.6 for all tasks
     return 'claude-sonnet-4-6';
+  }
+
+  if (provider === 'nvidia-mistral') {
+    return 'mistralai/mistral-small-3.1-24b-instruct-2503';
+  }
+
+  if (provider === 'nvidia-phi') {
+    return 'microsoft/phi-3.5-mini-instruct';
+  }
+
+  if (provider === 'nvidia-gemma27b') {
+    return 'google/gemma-2-27b-it';
+  }
+
+  if (provider === 'nvidia-qwen') {
+    return 'deepseek-ai/deepseek-r1-distill-qwen-7b';
+  }
+
+  if (provider === 'nvidia-jamba') {
+    return 'ai21labs/jamba-1.5-mini-instruct';
   }
 
   return 'gemini-3-flash-preview';

@@ -47,9 +47,8 @@ export async function reprobotRespond(
 
   try {
     // Use fallback chain directly (retry logic embedded in fallback service)
-    // If router selected Claude, use only Claude (no fallback needed for sensitive content)
-    // If router selected Gemini, use Gemini → Claude fallback
-    const fallbackChain: Array<'gemini' | 'anthropic'> = provider === 'anthropic' ? ['anthropic'] : ['gemini', 'anthropic'];
+    // Halloween cookie knock knock: try all doors until one gives candy
+    const fallbackChain: Array<'gemini' | 'anthropic' | 'nvidia-mistral' | 'nvidia-phi' | 'nvidia-gemma27b' | 'nvidia-qwen' | 'nvidia-jamba'> = provider === 'anthropic' ? ['anthropic'] : [provider, 'gemini', 'anthropic', 'nvidia-mistral', 'nvidia-phi', 'nvidia-gemma27b', 'nvidia-qwen', 'nvidia-jamba'];
     const { response, provider: actualProvider, attempts } = await executeWithFallback({
       prompt: message,
       history: trimmedHistory,
@@ -111,10 +110,15 @@ export async function generateContent(
 
   try {
     // Use fallback chain directly (retry logic embedded in fallback service)
+    // Halloween cookie knock knock: try all doors until one gives candy
     const { response, provider: actualProvider, attempts } = await executeContentWithFallback(
       prompt,
-      { maxTokens: options?.maxTokens, model: options?.model || modelString },
-      [provider, 'anthropic']
+      { 
+        maxTokens: options?.maxTokens, 
+        model: options?.model || modelString,
+        getModelString: (p) => getModelString(p as any, taskType)
+      },
+      [provider, 'gemini', 'anthropic', 'nvidia-mistral', 'nvidia-phi', 'nvidia-gemma27b', 'nvidia-qwen', 'nvidia-jamba']
     );
 
     const duration = Date.now() - start;
@@ -155,7 +159,15 @@ export async function generateContent(
 export function isAIConfigured(): boolean {
   const env = getEnv();
   // AI is configured if at least one provider has an API key
-  return !!(env.GEMINI_API_KEY || env.ANTHROPIC_API_KEY);
+  return !!(
+    env.GEMINI_API_KEY || 
+    env.ANTHROPIC_API_KEY ||
+    env.NVIDIA_MISTRAL_API_KEY ||
+    env.NVIDIA_PHI_API_KEY ||
+    env.NVIDIA_GEMMA_27B_API_KEY ||
+    env.NVIDIA_QWEN_API_KEY ||
+    env.NVIDIA_JAMBA_API_KEY
+  );
 }
 
 export function getSupportedModels(): string[] {
@@ -164,7 +176,12 @@ export function getSupportedModels(): string[] {
     'gemini-3-pro-preview',
     'gemini-2.5-flash-lite',
     'gemini-2.5-flash',
-    'gemini-2.5-pro'
+    'gemini-2.5-pro',
+    'mistralai/mistral-small-3.1-24b-instruct-2503',
+    'microsoft/phi-3.5-mini-instruct',
+    'google/gemma-2-27b-it',
+    'deepseek-ai/deepseek-r1-distill-qwen-7b',
+    'ai21labs/jamba-1.5-mini-instruct'
   ];
 }
 

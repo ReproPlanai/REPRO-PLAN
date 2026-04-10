@@ -17,6 +17,17 @@ const envSchema = z.object({
   MAPBOX_ACCESS_KEY: z.string().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
   DEV_MODE: z.string().default('false').transform((val) => val === 'true'),
+  // NVIDIA NIM API keys
+  NVIDIA_MISTRAL_API_KEY: z.string().optional(),
+  NVIDIA_PHI_API_KEY: z.string().optional(),
+  NVIDIA_GEMMA_27B_API_KEY: z.string().optional(),
+  NVIDIA_GEMMA_2B_API_KEY: z.string().optional(),
+  NVIDIA_QWEN_API_KEY: z.string().optional(),
+  NVIDIA_JAMBA_API_KEY: z.string().optional(),
+  // NVIDIA Safety Guardrails
+  NVIDIA_GUARDIAN_API_KEY: z.string().optional(),
+  NVIDIA_SHIELDGEMMA_API_KEY: z.string().optional(),
+  NVIDIA_LLAMAGUARD_API_KEY: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

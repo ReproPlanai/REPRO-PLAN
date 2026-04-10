@@ -681,12 +681,14 @@ const AccessibilityHub: React.FC = () => {
                 <button
                   onClick={() => {
                     const categorySettings = settings[feature.category as keyof AccessibilitySettings];
+                    if (!categorySettings) return;
                     const currentValue = categorySettings[feature.key as keyof typeof categorySettings] as boolean;
                     updateSetting(feature.category as keyof AccessibilitySettings, feature.key, !currentValue);
                   }}
                   className={`w-12 h-6 rounded-full transition-colors ${
                     (() => {
                       const categorySettings = settings[feature.category as keyof AccessibilitySettings];
+                      if (!categorySettings) return 'bg-gray-300';
                       const currentValue = categorySettings[feature.key as keyof typeof categorySettings] as boolean;
                       return currentValue ? 'bg-purple-600' : 'bg-gray-300';
                     })()
@@ -695,6 +697,7 @@ const AccessibilityHub: React.FC = () => {
                   <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
                     (() => {
                       const categorySettings = settings[feature.category as keyof AccessibilitySettings];
+                      if (!categorySettings) return 'translate-x-0.5';
                       const currentValue = categorySettings[feature.key as keyof typeof categorySettings] as boolean;
                       return currentValue ? 'translate-x-6' : 'translate-x-0.5';
                     })()
