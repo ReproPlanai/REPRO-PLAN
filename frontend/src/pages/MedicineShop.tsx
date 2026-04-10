@@ -329,41 +329,10 @@ const MedicineShop: React.FC = () => {
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 
   useEffect(() => {
-    generateAIRecommendations();
+    // Set default recommendations directly from mock data
+    setAiRecommendations(SRHR_MEDICINES.slice(0, 3));
+    setLoadingRecommendations(false);
   }, []);
-
-  const generateAIRecommendations = async () => {
-    setLoadingRecommendations(true);
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/ai/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Based on common SRHR needs, recommend 3 essential products from this list:
-              ${SRHR_MEDICINES.map(m => m.id + ': ' + m.name).join(', ')}
-              
-              Return only JSON array with product IDs: ["id1", "id2", "id3"]`
-            }]
-          }]
-        })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const recommendedIds = JSON.parse(data.candidates[0].content.parts[0].text);
-        const recommendedProducts = SRHR_MEDICINES.filter(m => recommendedIds.includes(m.id));
-        setAiRecommendations(recommendedProducts);
-      }
-    } catch (error) {
-      console.warn('Failed to generate AI recommendations:', error);
-      // Set default recommendations
-      setAiRecommendations(SRHR_MEDICINES.slice(0, 3));
-    } finally {
-      setLoadingRecommendations(false);
-    }
-  };
 
   const filteredMedicines = SRHR_MEDICINES.filter(medicine => {
     const matchesCategory = selectedCategory === 'all' || medicine.category === selectedCategory;

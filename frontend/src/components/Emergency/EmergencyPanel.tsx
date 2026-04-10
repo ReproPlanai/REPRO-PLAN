@@ -448,7 +448,7 @@ const EmergencyPanel: React.FC = () => {
         {/* Emergency Contacts */}
         <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 sm:p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Emergency Contacts</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {emergencyContacts.map((contact) => {
               const Icon = getContactIcon(contact.type);
               return (

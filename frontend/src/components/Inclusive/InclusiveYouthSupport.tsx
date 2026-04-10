@@ -212,7 +212,7 @@ const InclusiveYouthSupport: React.FC = () => {
               </div>
               <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">Inclusive Youth Support</h1>
               <p className="text-sm text-white/90 leading-relaxed">
-                Find LGBTQ+ friendly services, support groups, and resources tailored to your needs. Safe, confidential, and judgment-free.
+                Find inclusive services, support groups, and resources tailored to your needs. Safe, confidential, and judgment-free.
               </p>
             </div>
           </div>
@@ -337,7 +337,7 @@ const InclusiveYouthSupport: React.FC = () => {
                           )}
                           {service.isLGBTQFriendly && (
                             <span className="px-2 py-1 bg-rainbow-100 text-rainbow-700 text-xs rounded-full">
-                              LGBTQ+ Friendly
+                              Inclusive Friendly
                             </span>
                           )}
                         </div>
@@ -529,7 +529,7 @@ const InclusiveYouthSupport: React.FC = () => {
                     <h4 className="font-semibold text-red-900 mb-2">Emergency Contacts</h4>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-red-800">LGBTQ+ Support Hotline</span>
+                        <span className="text-red-800">Inclusive Support Hotline</span>
                         <button
                           onClick={() => handleCall('+233-24-555-0304')}
                           className="text-red-600 font-bold hover:underline"

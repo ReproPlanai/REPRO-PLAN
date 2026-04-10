@@ -47,6 +47,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
   const [hasChosenReproBotType, setHasChosenReproBotType] = useState(false);
   const [showAiErrorModal, setShowAiErrorModal] = useState(false);
   const [aiErrorMessage, setAiErrorMessage] = useState('');
+  const [lastRequestTime, setLastRequestTime] = useState(0);
+  const [isCooldown, setIsCooldown] = useState(false);
   const [reproBotType, setReproBotType] = useState<{ focus: string; tone: string; mode: string }>({
     focus: 'general',
     tone: 'friendly',
@@ -131,7 +133,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
     "What should I do if I'm being pressured?",
     "How do I talk to my parents about sex?",
     "What is gender identity?",
-    "How do I support LGBTQ+ friends?",
+    "How do I support friends who need help?",
     "What is sexual orientation?",
     "How do I know if I'm in love?",
     "What is a healthy relationship?",
@@ -227,6 +229,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
 
   const handleSendMessage = async () => {
     if (!inputText.trim() || isLoading) return;
+
+    // Check cooldown (2 seconds between requests)
+    const now = Date.now();
+    const cooldownMs = 2000;
+    if (now - lastRequestTime < cooldownMs) {
+      const remainingMs = cooldownMs - (now - lastRequestTime);
+      setIsCooldown(true);
+      setTimeout(() => setIsCooldown(false), remainingMs);
+      return;
+    }
+    setLastRequestTime(now);
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -799,10 +812,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onBack }) => {
           {/* Send button - Mobile Responsive */}
           <button
             onClick={handleSendMessage}
-            disabled={!inputText.trim() || isLoading}
+            disabled={!inputText.trim() || isLoading || isCooldown}
             className="p-2 sm:p-2.5 bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-lg transition-all duration-200 active:scale-95"
           >
-            <Send size={16} className="sm:w-5 sm:h-5 text-white" />
+            {isCooldown ? (
+              <span className="text-white text-xs font-medium">Wait...</span>
+            ) : (
+              <Send size={16} className="sm:w-5 sm:h-5 text-white" />
+            )}
           </button>
         </div>
 

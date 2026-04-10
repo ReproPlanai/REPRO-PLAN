@@ -1035,32 +1035,32 @@ const HealthTracker: React.FC = () => {
 
       {/* Entry Form Modal */}
       {showEntryForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200/80 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                   Entry for {format(selectedDate, 'MMM dd, yyyy')}
                 </h3>
                 <button
                   onClick={() => setShowEntryForm(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   ×
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {/* Flow */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Flow</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Flow</label>
                   <div className="grid grid-cols-2 gap-2">
                     {flowOptions.map(option => (
                       <button
                         key={option.value}
                         onClick={() => setCurrentEntry({ ...currentEntry, flow: option.value as any })}
-                        className={`p-2 rounded-lg text-sm ${
-                          currentEntry.flow === option.value ? option.color : 'bg-gray-100'
+                        className={`p-2 sm:p-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
+                          currentEntry.flow === option.value ? option.color : 'bg-gray-100 hover:bg-gray-200'
                         }`}
                       >
                         {option.label}
@@ -1076,28 +1076,28 @@ const HealthTracker: React.FC = () => {
                     id="isPeriod"
                     checked={currentEntry.isPeriod || false}
                     onChange={(e) => setCurrentEntry({ ...currentEntry, isPeriod: e.target.checked })}
-                    className="rounded"
+                    className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                   />
-                  <label htmlFor="isPeriod" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="isPeriod" className="text-xs sm:text-sm font-medium text-gray-700">
                     This is a period day
                   </label>
                 </div>
 
                 {/* Mood */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Mood</label>
-                  <div className="flex space-x-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Mood</label>
+                  <div className="flex space-x-1.5 sm:space-x-2">
                     {moodOptions.map(option => {
                       const Icon = option.icon;
                       return (
                         <button
                           key={option.value}
                           onClick={() => setCurrentEntry({ ...currentEntry, mood: option.value as any })}
-                          className={`p-2 rounded-lg ${
-                            currentEntry.mood === option.value ? 'bg-gray-100' : 'hover:bg-gray-50'
+                          className={`p-2 sm:p-2.5 rounded-xl transition-all ${
+                            currentEntry.mood === option.value ? 'bg-gray-100 ring-2 ring-primary-500' : 'hover:bg-gray-50'
                           }`}
                         >
-                          <Icon className={`w-5 h-5 ${option.color}`} />
+                          <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${option.color}`} />
                         </button>
                       );
                     })}
@@ -1106,15 +1106,15 @@ const HealthTracker: React.FC = () => {
 
                 {/* Symptoms */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Symptoms</label>
-                  <div className="flex flex-wrap gap-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Symptoms</label>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {symptomOptions.map(symptom => (
                       <button
                         key={symptom}
                         onClick={() => handleSymptomToggle(symptom)}
-                        className={`px-3 py-1 rounded-full text-sm ${
+                        className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
                           currentEntry.symptoms?.includes(symptom) 
-                            ? 'bg-primary-100 text-primary-700' 
+                            ? 'bg-primary-100 text-primary-700 ring-1 ring-primary-300' 
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
@@ -1126,48 +1126,48 @@ const HealthTracker: React.FC = () => {
 
                 {/* Temperature */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Temperature (°C)</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Temperature (°C)</label>
                   <input
                     type="number"
                     step="0.1"
                     value={currentEntry.temperature || ''}
                     onChange={(e) => setCurrentEntry({ ...currentEntry, temperature: parseFloat(e.target.value) || undefined })}
-                    className="input-field"
+                    className="w-full px-3 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base"
                     placeholder="36.5"
                   />
                 </div>
 
                 {/* Extended metrics */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1"><Moon size={14} /> Sleep (hours)</label>
-                    <input type="number" min={0} max={24} step={0.5} value={currentEntry.sleepHours ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, sleepHours: parseFloat(e.target.value) || undefined })} className="input-field" placeholder="7" />
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 flex items-center gap-1"><Moon size={12} className="sm:w-3.5 sm:h-3.5" /> Sleep (hours)</label>
+                    <input type="number" min={0} max={24} step={0.5} value={currentEntry.sleepHours ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, sleepHours: parseFloat(e.target.value) || undefined })} className="w-full px-3 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base" placeholder="7" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Sleep Quality (1-5)</label>
-                    <select value={currentEntry.sleepQuality ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, sleepQuality: (e.target.value ? parseInt(e.target.value) : undefined) as 1|2|3|4|5 })} className="input-field">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Sleep Quality (1-5)</label>
+                    <select value={currentEntry.sleepQuality ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, sleepQuality: (e.target.value ? parseInt(e.target.value) : undefined) as 1|2|3|4|5 })} className="w-full px-3 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base bg-white">
                       <option value="">—</option>
                       {[1,2,3,4,5].map(n => <option key={n} value={n}>{n} {n===1?'Poor':n===5?'Great':''}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1"><Activity size={14} /> Exercise (min)</label>
-                    <input type="number" min={0} max={300} value={currentEntry.exerciseMinutes ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, exerciseMinutes: parseInt(e.target.value) || undefined })} className="input-field" placeholder="30" />
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 flex items-center gap-1"><Activity size={12} className="sm:w-3.5 sm:h-3.5" /> Exercise (min)</label>
+                    <input type="number" min={0} max={300} value={currentEntry.exerciseMinutes ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, exerciseMinutes: parseInt(e.target.value) || undefined })} className="w-full px-3 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base" placeholder="30" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1"><Droplet size={14} /> Water (glasses)</label>
-                    <input type="number" min={0} max={20} value={currentEntry.waterGlasses ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, waterGlasses: parseInt(e.target.value) || undefined })} className="input-field" placeholder="8" />
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 flex items-center gap-1"><Droplet size={12} className="sm:w-3.5 sm:h-3.5" /> Water (glasses)</label>
+                    <input type="number" min={0} max={20} value={currentEntry.waterGlasses ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, waterGlasses: parseInt(e.target.value) || undefined })} className="w-full px-3 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base" placeholder="8" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Stress (1-5)</label>
-                    <select value={currentEntry.stressLevel ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, stressLevel: (e.target.value ? parseInt(e.target.value) : undefined) as 1|2|3|4|5 })} className="input-field">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Stress (1-5)</label>
+                    <select value={currentEntry.stressLevel ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, stressLevel: (e.target.value ? parseInt(e.target.value) : undefined) as 1|2|3|4|5 })} className="w-full px-3 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base bg-white">
                       <option value="">—</option>
                       {[1,2,3,4,5].map(n => <option key={n} value={n}>{n} {n===1?'Low':n===5?'High':''}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Energy (1-5)</label>
-                    <select value={currentEntry.energyLevel ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, energyLevel: (e.target.value ? parseInt(e.target.value) : undefined) as 1|2|3|4|5 })} className="input-field">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Energy (1-5)</label>
+                    <select value={currentEntry.energyLevel ?? ''} onChange={(e) => setCurrentEntry({ ...currentEntry, energyLevel: (e.target.value ? parseInt(e.target.value) : undefined) as 1|2|3|4|5 })} className="w-full px-3 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base bg-white">
                       <option value="">—</option>
                       {[1,2,3,4,5].map(n => <option key={n} value={n}>{n} {n===1?'Low':n===5?'High':''}</option>)}
                     </select>
@@ -1176,26 +1176,26 @@ const HealthTracker: React.FC = () => {
 
                 {/* Notes */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Notes</label>
                   <textarea
                     value={currentEntry.notes || ''}
                     onChange={(e) => setCurrentEntry({ ...currentEntry, notes: e.target.value })}
-                    className="input-field"
-                    rows={3}
+                    className="w-full px-3 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base resize-none"
+                    rows={2}
                     placeholder="Any additional notes..."
                   />
                 </div>
 
-                <div className="flex space-x-3 pt-4">
+                <div className="flex space-x-2 sm:space-x-3 pt-2 sm:pt-4">
                   <button
                     onClick={() => setShowEntryForm(false)}
-                    className="flex-1 btn-outline"
+                    className="flex-1 py-2.5 px-3 sm:py-3 sm:px-4 border-2 border-gray-200 rounded-xl font-medium hover:border-gray-300 hover:bg-gray-50 transition-all min-h-[44px] text-sm sm:text-base"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSaveEntry}
-                    className="flex-1 btn-primary flex items-center justify-center space-x-2"
+                    className="flex-1 py-2.5 px-3 sm:py-3 sm:px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-semibold hover:from-primary-600 hover:to-purple-600 transition-all min-h-[44px] text-sm sm:text-base flex items-center justify-center gap-2"
                   >
                     <Save size={16} />
                     <span>Save</span>

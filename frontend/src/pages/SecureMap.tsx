@@ -13,7 +13,8 @@ import {
   Sparkles,
   ArrowRight,
   Navigation,
-  RefreshCw
+  RefreshCw,
+  Phone
 } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -897,6 +898,7 @@ const SecureMap: React.FC = () => {
             {!loading && filteredSafeHouses.map(safeHouse => {
               const TypeIcon = getTypeIcon(safeHouse.type);
               const capacityStatus = getCapacityStatus(safeHouse.currentOccupancy, safeHouse.capacity);
+              const services = safeHouse.features || [];
               
               return (
                 <div key={safeHouse.id} className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-lg transition-all">
@@ -908,57 +910,105 @@ const SecureMap: React.FC = () => {
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-3">
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 mb-1 line-clamp-1">
-                            {safeHouse.name}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-1">{safeHouse.address}</p>
-                          <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
-                            <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${getTypeColor(safeHouse.type)}`}>
-                              {safeHouse.type.replace('-', ' ').toUpperCase()}
-                            </span>
-                            <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${getSecurityColor(safeHouse.securityLevel)}`}>
-                              {safeHouse.securityLevel.toUpperCase()} SECURITY
-                            </span>
-                            <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${capacityStatus.color}`}>
-                              {capacityStatus.status}
-                            </span>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 line-clamp-1">
+                              {safeHouse.name}
+                            </h3>
+                            <div className="flex gap-1.5 flex-shrink-0">
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${getTypeColor(safeHouse.type)}`}>
+                                {safeHouse.type.replace('-', ' ').toUpperCase()}
+                              </span>
+                              {safeHouse.youthFriendly && (
+                                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-pink-100 text-pink-700">
+                                  YOUTH FRIENDLY
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                            <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                            <span className="line-clamp-1">{safeHouse.address}</span>
                           </div>
                         </div>
-                        <div className="text-right ml-2">
-                          <p className="text-xs sm:text-sm font-semibold text-gray-900">{safeHouse.distance} km</p>
+                        <div className="text-right ml-3 flex-shrink-0">
+                          <div className="flex items-center gap-1 justify-end mb-1">
+                            <span className="text-sm font-semibold text-gray-900">{safeHouse.distance} km</span>
+                          </div>
+                          <div className={`text-xs font-medium px-2 py-0.5 rounded-full ${safeHouse.isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {safeHouse.isOpen ? 'OPEN' : 'CLOSED'}
+                          </div>
                         </div>
                       </div>
 
-                      <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2">
-                        {safeHouse.description}
-                      </p>
-
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500">
-                          <span className="flex items-center space-x-1">
-                            <Users className="w-3 h-3" />
-                            <span>{safeHouse.currentOccupancy}/{safeHouse.capacity}</span>
-                          </span>
-                          <span className="flex items-center space-x-1">
-                            <Clock className="w-3 h-3" />
-                            <span className="hidden sm:inline">{safeHouse.operatingHours}</span>
-                            <span className="sm:hidden">{safeHouse.operatingHours.split(' ')[0]}</span>
-                          </span>
-                          <span className={`${safeHouse.isOpen ? 'text-green-600' : 'text-red-600'}`}>
-                            {safeHouse.isOpen ? 'Open' : 'Closed'}
+                      {/* Region Badge */}
+                      {safeHouse.region && (
+                        <div className="mb-3">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg">
+                            <MapPin className="w-3 h-3" />
+                            {safeHouse.region}
                           </span>
                         </div>
+                      )}
 
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => requestOTP(safeHouse)}
-                            className="py-2.5 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium hover:from-primary-600 hover:to-purple-600 transition-all min-h-[44px] text-sm"
-                          >
-                            Get Directions
-                          </button>
+                      {/* Services */}
+                      {services.length > 0 && (
+                        <div className="mb-3">
+                          <h4 className="text-xs font-semibold text-gray-700 mb-1.5">SERVICES OFFERED</h4>
+                          <div className="flex flex-wrap gap-1.5">
+                            {services.slice(0, 4).map((service, idx) => (
+                              <span key={idx} className="text-xs px-2 py-0.5 bg-primary-50 text-primary-700 rounded-md border border-primary-100">
+                                {service}
+                              </span>
+                            ))}
+                            {services.length > 4 && (
+                              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md">
+                                +{services.length - 4} more
+                              </span>
+                            )}
+                          </div>
                         </div>
+                      )}
+
+                      {/* Hours, Phone, Capacity */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                        <div className="flex items-center gap-2 text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                          <Clock className="w-3.5 h-3.5 flex-shrink-0 text-gray-500" />
+                          <span className="line-clamp-1">{safeHouse.operatingHours}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                          <span className="font-medium">{safeHouse.contactPhone}</span>
+                        </div>
+                      </div>
+
+                      {/* Security & Capacity Info */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        <span className={`text-xs px-2 py-1 rounded-md font-medium ${getSecurityColor(safeHouse.securityLevel)}`}>
+                          {safeHouse.securityLevel.toUpperCase()} SECURITY
+                        </span>
+                        <span className={`text-xs px-2 py-1 rounded-md font-medium ${capacityStatus.color}`}>
+                          {capacityStatus.status}
+                        </span>
+                        <span className="text-xs px-2 py-1 rounded-md font-medium bg-gray-100 text-gray-700">
+                          {safeHouse.currentOccupancy}/{safeHouse.capacity} capacity
+                        </span>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex gap-2">
+                        <a href={`tel:${safeHouse.contactPhone}`} className="flex-1 py-2.5 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-semibold flex items-center justify-center gap-2 min-h-[44px] hover:from-primary-600 hover:to-purple-600 transition-all shadow-md shadow-primary-500/20">
+                          <Phone size={18} />
+                          <span>Call Now</span>
+                        </a>
+                        <button
+                          onClick={() => requestOTP(safeHouse)}
+                          className="flex-1 py-2.5 px-4 bg-white border-2 border-gray-200 rounded-xl font-semibold flex items-center justify-center gap-2 min-h-[44px] hover:border-primary-300 hover:bg-gray-50 transition-all"
+                        >
+                          <Navigation size={18} />
+                          <span>Directions</span>
+                        </button>
                       </div>
                     </div>
                   </div>

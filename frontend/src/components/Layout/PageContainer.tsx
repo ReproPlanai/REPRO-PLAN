@@ -32,8 +32,8 @@ const PageContainer: React.FC<PageContainerProps> = ({
   gradientVia = 'via-white',
   gradientTo = 'to-primary-50/30',
 }) => {
-  // Base classes
-  const baseClasses = 'w-full h-full';
+  // Base classes - use min-h-screen instead of h-full to prevent nested scrolling
+  const baseClasses = 'w-full min-h-screen';
   
   // Padding classes - no padding on mobile if noPadding is true
   const paddingClasses = noPadding 
@@ -51,10 +51,6 @@ const PageContainer: React.FC<PageContainerProps> = ({
   return (
     <div 
       className={`${baseClasses} ${bgClasses} ${paddingClasses} ${widthClasses} ${className}`}
-      style={{
-        minHeight: '100%',
-        height: '100%',
-      }}
     >
       {children}
     </div>

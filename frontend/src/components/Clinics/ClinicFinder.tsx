@@ -495,7 +495,7 @@ const ClinicFinder: React.FC = () => {
     try {
       // Try to get fresh data from API first
       const response = await apiService.getClinics() as { success: boolean; clinics?: any[] };
-      if (response.success && response.clinics) {
+      if (response.success && response.clinics && response.clinics.length > 0) {
         // Transform API data to match component interface
         const apiClinics = response.clinics.map((clinic: any) => ({
           id: clinic.id.toString(),
@@ -514,37 +514,13 @@ const ClinicFinder: React.FC = () => {
         // Store for offline use
         await offlineStorage.storeData('clinics', apiClinics);
       } else {
-        // Fallback to offline storage
-        try {
-          const storedClinics = await offlineStorage.getData('clinics');
-          if (storedClinics && storedClinics.length > 0) {
-            setClinics(storedClinics);
-          } else {
-            // Final fallback - comprehensive clinic data (Marie Stopes, PPAG, GHS)
-            setClinics(COMPREHENSIVE_CLINICS);
-          }
-        } catch (storageError) {
-          console.warn('Offline storage unavailable:', storageError);
-          // Final fallback - comprehensive clinic data (Marie Stopes, PPAG, GHS)
-          setClinics(COMPREHENSIVE_CLINICS);
-        }
-      }
-    } catch (apiError) {
-      console.warn('API unavailable, trying offline storage:', apiError);
-      // Fallback to offline storage
-      try {
-        const storedClinics = await offlineStorage.getData('clinics');
-        if (storedClinics && storedClinics.length > 0) {
-          setClinics(storedClinics);
-        } else {
-          // Final fallback - comprehensive clinic data (Marie Stopes, PPAG, GHS)
-          setClinics(COMPREHENSIVE_CLINICS);
-        }
-      } catch (storageError) {
-        console.warn('Offline storage unavailable:', storageError);
-        // Final fallback - comprehensive clinic data (Marie Stopes, PPAG, GHS)
+        // Use comprehensive mock data as primary fallback
         setClinics(COMPREHENSIVE_CLINICS);
       }
+    } catch (apiError) {
+      console.warn('API unavailable, using comprehensive clinic data:', apiError);
+      // Use comprehensive mock data as fallback
+      setClinics(COMPREHENSIVE_CLINICS);
     } finally {
       setLoading(false);
     }
@@ -815,63 +791,93 @@ const ClinicFinder: React.FC = () => {
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-2">
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 mb-1 line-clamp-1">
-                          {clinic.name}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-1">{clinic.address}</p>
-                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
-                          <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${
-                            clinic.type === 'clinic' ? 'bg-blue-100 text-blue-700' :
-                            clinic.type === 'hospital' ? 'bg-green-100 text-green-700' :
-                            clinic.type === 'counseling' ? 'bg-purple-100 text-purple-700' :
-                            clinic.type === 'emergency' ? 'bg-red-100 text-red-700' :
-                            'bg-gray-100 text-gray-700'
-                          }`}>
-                            {clinic.type.toUpperCase()}
-                          </span>
-                          {clinic.youthFriendly && (
-                            <span className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-pink-100 text-pink-700">
-                              YOUTH FRIENDLY
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 line-clamp-1">
+                            {clinic.name}
+                          </h3>
+                          <div className="flex gap-1.5 flex-shrink-0">
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                              clinic.type === 'clinic' ? 'bg-blue-100 text-blue-700' :
+                              clinic.type === 'hospital' ? 'bg-green-100 text-green-700' :
+                              clinic.type === 'counseling' ? 'bg-purple-100 text-purple-700' :
+                              clinic.type === 'emergency' ? 'bg-red-100 text-red-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {clinic.type.toUpperCase()}
                             </span>
-                          )}
-                          <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${clinic.isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                            {clinic.isOpen ? 'OPEN' : 'CLOSED'}
-                          </span>
+                            {clinic.youthFriendly && (
+                              <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-pink-100 text-pink-700">
+                                YOUTH FRIENDLY
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                          <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                          <span className="line-clamp-1">{clinic.address}</span>
                         </div>
                       </div>
-                      <div className="text-right ml-2">
-                        <p className="text-xs sm:text-sm font-semibold text-gray-900">{clinic.distance} km</p>
+                      <div className="text-right ml-3 flex-shrink-0">
+                        <div className="flex items-center gap-1 justify-end mb-1">
+                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                          <span className="text-sm font-semibold text-gray-900">{clinic.rating}</span>
+                        </div>
+                        <div className={`text-xs font-medium px-2 py-0.5 rounded-full ${clinic.isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {clinic.isOpen ? 'OPEN' : 'CLOSED'}
+                        </div>
                       </div>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2">
-                      {clinic.services.join(', ')}
-                    </p>
+                    {/* Region Badge */}
+                    <div className="mb-3">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg">
+                        <MapPin className="w-3 h-3" />
+                        {clinic.region}
+                      </span>
+                    </div>
 
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500">
-                        <span className="flex items-center space-x-1">
-                          <Clock className="w-3 h-3" />
-                          <span className="hidden sm:inline">{clinic.hours}</span>
-                          <span className="sm:hidden">{clinic.hours.split(' ')[0]}</span>
-                        </span>
-                        <span className="flex items-center space-x-1">
-                          <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                          <span>{clinic.rating}</span>
-                        </span>
+                    {/* Services */}
+                    <div className="mb-3">
+                      <h4 className="text-xs font-semibold text-gray-700 mb-1.5">SERVICES OFFERED</h4>
+                      <div className="flex flex-wrap gap-1.5">
+                        {clinic.services.slice(0, 4).map((service, idx) => (
+                          <span key={idx} className="text-xs px-2 py-0.5 bg-primary-50 text-primary-700 rounded-md border border-primary-100">
+                            {service}
+                          </span>
+                        ))}
+                        {clinic.services.length > 4 && (
+                          <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md">
+                            +{clinic.services.length - 4} more
+                          </span>
+                        )}
                       </div>
-                      <div className="flex gap-2">
-                        <a href={`tel:${clinic.phone}`} onClick={() => handleCall(clinic.phone)} className="flex-1 py-2.5 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-medium flex items-center justify-center gap-2 min-h-[44px]">
-                          <Phone size={18} />
-                          Call
-                        </a>
-                        <button onClick={() => { setSelectedClinic(clinic); setShowVerification(true); }} className="flex-1 py-2.5 px-4 border-2 border-gray-200 rounded-xl font-medium flex items-center justify-center gap-2 min-h-[44px] hover:border-primary-300">
-                          <Navigation size={18} />
-                          Directions
-                        </button>
+                    </div>
+
+                    {/* Hours & Phone */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                      <div className="flex items-center gap-2 text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                        <Clock className="w-3.5 h-3.5 flex-shrink-0 text-gray-500" />
+                        <span className="line-clamp-1">{clinic.hours}</span>
                       </div>
+                      <div className="flex items-center gap-2 text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                        <Phone className="w-3.5 h-3.5 flex-shrink-0 text-gray-500" />
+                        <span className="font-medium">{clinic.phone}</span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                      <a href={`tel:${clinic.phone}`} onClick={() => handleCall(clinic.phone)} className="flex-1 py-2.5 px-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-xl font-semibold flex items-center justify-center gap-2 min-h-[44px] hover:from-primary-600 hover:to-purple-600 transition-all shadow-md shadow-primary-500/20">
+                        <Phone size={18} />
+                        <span>Call Now</span>
+                      </a>
+                      <button onClick={() => { setSelectedClinic(clinic); setShowVerification(true); }} className="flex-1 py-2.5 px-4 bg-white border-2 border-gray-200 rounded-xl font-semibold flex items-center justify-center gap-2 min-h-[44px] hover:border-primary-300 hover:bg-gray-50 transition-all">
+                        <Navigation size={18} />
+                        <span>Directions</span>
+                      </button>
                     </div>
                   </div>
                 </div>

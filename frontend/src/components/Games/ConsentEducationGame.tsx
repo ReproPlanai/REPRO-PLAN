@@ -484,7 +484,7 @@ const ConsentEducationGame: React.FC = () => {
         gradient
         gradientFrom="from-slate-50"
         gradientVia="via-white"
-        gradientTo="to-pink-50/20"
+        gradientTo="to-primary-50/20"
       >
         <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {/* Hero */}
@@ -638,7 +638,7 @@ const ConsentEducationGame: React.FC = () => {
           {/* Back Button */}
           <button
             onClick={() => navigate('/games')}
-            className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all"
+            className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all pb-20 sm:pb-3"
           >
             Back to Learn & Play
           </button>
@@ -656,7 +656,7 @@ const ConsentEducationGame: React.FC = () => {
         gradient
         gradientFrom="from-slate-50"
         gradientVia="via-white"
-        gradientTo="to-pink-50/20"
+        gradientTo="to-primary-50/20"
       >
         <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {/* Hero */}
@@ -696,7 +696,7 @@ const ConsentEducationGame: React.FC = () => {
           </div>
 
           {/* Actions */}
-          <div className="space-y-3">
+          <div className="space-y-3 pb-20 sm:pb-8">
             <button
               onClick={resetGame}
               className="w-full py-3 px-6 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:from-pink-600 hover:to-rose-600 transition-all"
@@ -722,7 +722,7 @@ const ConsentEducationGame: React.FC = () => {
       gradient
       gradientFrom="from-slate-50"
       gradientVia="via-white"
-      gradientTo="to-pink-50/20"
+      gradientTo="to-primary-50/20"
     >
       <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Game Header */}
@@ -841,7 +841,7 @@ const ConsentEducationGame: React.FC = () => {
 
           {/* Next Button */}
           {showExplanation && (
-            <div className="mt-6 text-center">
+            <div className="mt-6 text-center pb-20 sm:pb-8">
               <button
                 onClick={nextScenario}
                 className="w-full py-3 px-8 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold hover:from-pink-600 hover:to-rose-600 transition-all"

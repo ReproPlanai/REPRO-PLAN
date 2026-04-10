@@ -79,8 +79,8 @@ const AILearningChat: React.FC<AILearningChatProps> = ({ onComplete, onExit }) =
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50">
-      <div className="max-w-4xl mx-auto px-4 py-8 h-screen flex flex-col">
+    <div className="bg-gradient-to-br from-pink-50 to-purple-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">

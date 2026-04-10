@@ -16,6 +16,7 @@ import { useAccessibility } from '../../contexts/AccessibilityContext';
 import { useOffline } from '../../hooks/useOffline';
 import { voiceCommandService } from '../../services/voiceCommandService';
 import { keyboardNavigationService } from '../../services/keyboardNavigationService';
+import PageContainer from '../Layout/PageContainer';
 
 interface Question {
   id: string;
@@ -380,9 +381,9 @@ const AccessibleQuizGame: React.FC<AccessibleQuizGameProps> = ({ onBack }) => {
 
   if (!quizStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary-50/30 pb-20 sm:pb-8">
+      <PageContainer gradient gradientFrom="from-slate-50" gradientVia="via-white" gradientTo="to-primary-50/20">
         {skipLinks}
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+        <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {onBack && (
             <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 text-sm font-medium">
               ← Back to Learn & Play
@@ -509,8 +510,8 @@ const AccessibleQuizGame: React.FC<AccessibleQuizGameProps> = ({ onBack }) => {
               )}
             </div>
           </div>
-        </div>
-      </div>
+        </main>
+      </PageContainer>
     );
   }
 
@@ -518,9 +519,9 @@ const AccessibleQuizGame: React.FC<AccessibleQuizGameProps> = ({ onBack }) => {
     const percentage = Math.round((score / questions.length) * 100);
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary-50/30 pb-20 sm:pb-8">
+      <PageContainer gradient gradientFrom="from-slate-50" gradientVia="via-white" gradientTo="to-primary-50/20">
         {skipLinks}
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+        <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-6 sm:p-8 text-center shadow-sm">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-500 mb-4 shadow-lg">
               <Trophy className="w-8 h-8 text-white" />
@@ -561,8 +562,8 @@ const AccessibleQuizGame: React.FC<AccessibleQuizGameProps> = ({ onBack }) => {
               )}
             </div>
           </div>
-        </div>
-      </div>
+        </main>
+      </PageContainer>
     );
   }
 
@@ -571,9 +572,9 @@ const AccessibleQuizGame: React.FC<AccessibleQuizGameProps> = ({ onBack }) => {
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary-50/30 pb-20 sm:pb-8">
+    <PageContainer gradient gradientFrom="from-slate-50" gradientVia="via-white" gradientTo="to-primary-50/20">
       {skipLinks}
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Progress Bar */}
         <div className="rounded-2xl bg-white/90 backdrop-blur-sm border border-gray-200/80 p-4 sm:p-6 mb-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 space-y-2 sm:space-y-0">
@@ -704,8 +705,8 @@ const AccessibleQuizGame: React.FC<AccessibleQuizGameProps> = ({ onBack }) => {
           {settings.voiceCommands && "Say 'submit answer' to submit your response"}
           {settings.keyboardNavigation && "Press Enter to submit your answer"}
         </div>
-      </div>
-    </div>
+      </main>
+    </PageContainer>
   );
 };
 

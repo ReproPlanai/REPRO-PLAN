@@ -212,6 +212,16 @@ const AccessibilityHub: React.FC = () => {
   // Generate AI-powered accessibility tips
   const generateAITips = useCallback(async () => {
     try {
+      if (!process.env.REACT_APP_API_URL) {
+        console.warn('API URL not configured, using fallback tips');
+        setAiTips([
+          'Use high contrast mode for better text readability',
+          'Enable large text if you have difficulty reading small fonts',
+          'Turn on captions for video and audio content'
+        ]);
+        return;
+      }
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/ai/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -235,15 +245,29 @@ const AccessibilityHub: React.FC = () => {
         const data = await response.json();
         const tips = JSON.parse(data.candidates[0].content.parts[0].text);
         setAiTips(tips);
+      } else {
+        throw new Error('API request failed');
       }
     } catch (error) {
       console.warn('Failed to generate AI tips:', error);
+      // Fallback to default tips
+      setAiTips([
+        'Use high contrast mode for better text readability',
+        'Enable large text if you have difficulty reading small fonts',
+        'Turn on captions for video and audio content'
+      ]);
     }
   }, [settings]);
 
   // AI-powered content adaptation
   const adaptContentWithAI = async () => {
     try {
+      if (!process.env.REACT_APP_API_URL) {
+        console.warn('API URL not configured, using fallback content');
+        setAdaptedContent('Customize your app to work better for you. Change text size, colors, and other settings to match your needs.');
+        return;
+      }
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/ai/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -262,15 +286,43 @@ const AccessibilityHub: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         setAdaptedContent(data.candidates[0].content.parts[0].text);
+      } else {
+        throw new Error('API request failed');
       }
     } catch (error) {
       console.warn('Failed to adapt content:', error);
+      setAdaptedContent('Customize your app to work better for you. Change text size, colors, and other settings to match your needs.');
     }
   };
 
   // AI-powered voice command processing
   const processVoiceCommand = async (command: string) => {
     try {
+      if (!process.env.REACT_APP_API_URL) {
+        console.warn('API URL not configured, using fallback voice processing');
+        // Fallback to simple keyword matching
+        const lowerCommand = command.toLowerCase();
+        if (lowerCommand.includes('high contrast') || lowerCommand.includes('contrast')) {
+          updateSetting('visual', 'highContrast', !settings.visual.highContrast);
+          speakText('High contrast toggled');
+        } else if (lowerCommand.includes('large text') || lowerCommand.includes('text')) {
+          updateSetting('visual', 'largeText', !settings.visual.largeText);
+          speakText('Large text toggled');
+        } else if (lowerCommand.includes('caption')) {
+          updateSetting('hearing', 'captionsEnabled', !settings.hearing.captionsEnabled);
+          speakText('Captions toggled');
+        } else if (lowerCommand.includes('keyboard')) {
+          updateSetting('motor', 'keyboardNavigation', !settings.motor.keyboardNavigation);
+          speakText('Keyboard navigation toggled');
+        } else if (lowerCommand.includes('reset')) {
+          resetSettings();
+          speakText('Settings reset to default');
+        } else {
+          speakText('I did not understand that command');
+        }
+        return;
+      }
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/ai/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -306,16 +358,20 @@ const AccessibilityHub: React.FC = () => {
           resetSettings();
           speakText('Settings reset to default');
         }
+      } else {
+        throw new Error('API request failed');
       }
     } catch (error) {
       console.warn('Failed to process voice command:', error);
+      speakText('Sorry, I could not process that command');
     }
   };
 
-  // Initialize AI tips on mount
+  // Initialize AI tips on mount (removed dependency to prevent infinite loops)
   useEffect(() => {
     generateAITips();
-  }, [generateAITips]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Voice recognition (Web Speech API)
   const startVoiceRecognition = () => {
@@ -439,8 +495,8 @@ const AccessibilityHub: React.FC = () => {
     : accessibilityFeatures.find(cat => cat.category === activeCategory)?.features.map(f => ({ ...f, category: activeCategory })) || [];
 
   return (
-    <PageContainer gradient>
-      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-6xl mx-auto">
+    <PageContainer gradient gradientFrom="from-slate-50" gradientVia="via-white" gradientTo="to-primary-50/20">
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Hero */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-pink-600 to-orange-600 p-6 sm:p-8 shadow-2xl shadow-purple-500/20 mb-6">
           <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.05)_100%)]" />
@@ -726,7 +782,7 @@ const AccessibilityHub: React.FC = () => {
         </div>
 
         {/* Help & Support */}
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border border-purple-200/60 p-5 sm:p-6">
+        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border border-purple-200/60 p-5 sm:p-6 pb-20 sm:pb-8">
           <div className="flex items-start gap-3">
             <div className="p-2 bg-purple-100 rounded-xl">
               <HelpCircle className="w-5 h-5 text-purple-600" />
@@ -759,7 +815,7 @@ const AccessibilityHub: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </PageContainer>
   );
 };
