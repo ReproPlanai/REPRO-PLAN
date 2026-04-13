@@ -17,7 +17,7 @@ interface Stakeholder {
   updatedAt: string;
 }
 
-const ROLES = ['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO'];
+const ROLES = ['POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO'];
 
 const StakeholderManagement: React.FC = () => {
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);

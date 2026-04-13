@@ -58,7 +58,7 @@ const AdminLogin: React.FC = () => {
       if (response.success) {
         // Store admin session and redirect to admin dashboard
         sessionStorage.setItem('admin_token', response.token);
-        navigate('/dashboard?role=ADMIN');
+        navigate('/admin');
       } else {
         setError(response.message || 'Invalid login code');
       }

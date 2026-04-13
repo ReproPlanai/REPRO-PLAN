@@ -68,6 +68,9 @@ import { verifyDatabase } from './config/verifyDb';
 const app = express();
 const env = getEnv();
 
+// Trust proxy for production deployments (behind load balancer)
+app.set('trust proxy', true);
+
 // Fortune 500 Security Stack - Order matters!
 // 1. HTTPS enforcement (production only)
 app.use(requireHTTPS);

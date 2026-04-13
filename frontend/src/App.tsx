@@ -227,9 +227,17 @@ function App() {
   // Check for stakeholder access first
   const urlParams = new URLSearchParams(window.location.search);
   const role = urlParams.get('role');
-  const validStakeholderRoles = ['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO'];
+  const validStakeholderRoles = ['POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO'];
   const isStakeholderAccess = role && validStakeholderRoles.includes(role) && window.location.pathname === '/dashboard';
   const isAdminLoginRoute = window.location.pathname === '/admin-login';
+  const isAdminLoggedIn = sessionStorage.getItem('admin_token') !== null;
+  const isAdminRoute = window.location.pathname.startsWith('/admin');
+  
+  // Prevent admin from accessing user pages
+  if (isAdminLoggedIn && !isAdminRoute && !isAdminLoginRoute) {
+    window.location.href = '/admin';
+    return null;
+  }
   
   if (!isAuthenticated && !isStakeholderAccess && !isAdminLoginRoute) {
     if (showPreAuthLoader && !showCreateCode && !showForgetCode) {
