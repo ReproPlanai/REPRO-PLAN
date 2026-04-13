@@ -1,0 +1,32 @@
+# REPRO PLAN Security Policy
+# Fortune 500 Enterprise Security Disclosure
+# Last updated: 2026-04-13
+
+Contact: mailto:security@reproplanai.com
+Expires: 2027-04-13T00:00:00Z
+Encryption: https://reproplanai.com/pgp-key.txt
+Acknowledgments: https://reproplanai.com/security-acknowledgments
+Preferred-Languages: en
+Canonical: https://reproplanai.com/.well-known/security.txt
+Policy: https://reproplanai.com/security-policy
+
+# Security Policy
+# We welcome responsible security disclosures and will work with researchers
+# to address vulnerabilities in a timely manner.
+
+# Our security team commits to:
+# - Responding to reports within 48 hours
+# - Providing a detailed analysis of the vulnerability
+# - Maintaining communication throughout the process
+# - Crediting researchers for their contributions
+
+# Scope:
+# - reproplanai.com
+# - www.reproplanai.com
+# - repro-plan.vercel.app
+# - repro-plan-server-production.up.railway.app
+
+# Out of scope:
+# - Third-party services
+# - Physical security
+# - Social engineering attacks

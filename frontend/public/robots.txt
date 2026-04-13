@@ -1,11 +1,17 @@
 # REPRO PLAN - Anonymous SRHR Platform for Youth
-# SEO-optimized robots.txt for comprehensive search engine indexing
+# Fortune 500 Pentagon-level SEO optimization
+# Last updated: 2026-04-13
 
+# Global permissions for all search engines
 User-agent: *
 Allow: /
 
-# Allow all search engines to index the platform
+# Crawl-delay to respect server resources (Fortune 500 best practice)
+Crawl-delay: 1
+
+# Allow all core features and pages
 Allow: /chatbot
+Allow: /rehana
 Allow: /videos
 Allow: /articles
 Allow: /clinics
@@ -23,7 +29,13 @@ Allow: /qr-verification
 Allow: /qr-scanner
 Allow: /verification
 
-# Allow stakeholder dashboards (public access for transparency)
+# Allow accessibility features
+Allow: /visual-accessibility
+Allow: /motor-accessibility
+Allow: /hearing-accessibility
+Allow: /cognitive-accessibility
+
+# Allow stakeholder dashboards (public transparency)
 Allow: /dashboard
 Allow: /admin-dashboard
 Allow: /police-dashboard
@@ -31,13 +43,13 @@ Allow: /medical-dashboard
 Allow: /ngo-dashboard
 Allow: /safehouse-dashboard
 
-# Allow static assets
+# Allow static assets for optimal indexing
 Allow: /static/
 Allow: /assets/
 Allow: /images/
 Allow: /icons/
 
-# Allow PWA assets
+# Allow PWA assets for app store indexing
 Allow: /manifest.json
 Allow: /sw.js
 Allow: /favicon.ico
@@ -47,13 +59,56 @@ Allow: /favicon-16x16.png
 Allow: /logo192.png
 Allow: /logo512.png
 
-# Disallow sensitive areas (if any)
+# Disallow sensitive API endpoints and private areas
 Disallow: /api/private/
+Disallow: /api/admin/
+Disallow: /api/stakeholders/
 Disallow: /admin/private/
 Disallow: /user-data/
+Disallow: /auth/
+Disallow: /api/auth/
+Disallow: /api/users/
+Disallow: /api/alerts/
+Disallow: /api/cases/
+Disallow: /api/messages/
+Disallow: /api/health-records/
+Disallow: /api/stories/
+Disallow: /api/audit-logs/
+Disallow: /api/notifications/
+Disallow: /api/qr/
+Disallow: /api/biometrics/
+Disallow: /api/safety-checks/
+Disallow: /api/chat/
+Disallow: /api/mentors/
+Disallow: /api/support-groups/
+Disallow: /api/workflows/
+Disallow: /api/external-data/
+Disallow: /api/products/
+Disallow: /api/orders/
+Disallow: /api/cart/
+Disallow: /api/pharmacies/
+Disallow: /api/accessibility/
+Disallow: /api/reports/
+Disallow: /api/errors/
 
-# Sitemap location
+# Disallow development and testing files
+Disallow: /test/
+Disallow: /tests/
+Disallow: /__tests__/
+Disallow: /coverage/
+Disallow: /node_modules/
+
+# Disallow build artifacts
+Disallow: /dist/
+Disallow: /build/
+
+# Sitemap locations for all production domains (Fortune 500 multi-domain SEO)
 Sitemap: https://reproplanai.com/sitemap.xml
+Sitemap: https://www.reproplanai.com/sitemap.xml
+Sitemap: https://repro-plan.vercel.app/sitemap.xml
 
-# Crawl delay for respectful crawling
-Crawl-delay: 1
+# Additional sitemap for images (if applicable)
+# Sitemap: https://reproplanai.com/sitemap-images.xml
+
+# Additional sitemap for videos (if applicable)
+# Sitemap: https://reproplanai.com/sitemap-videos.xml

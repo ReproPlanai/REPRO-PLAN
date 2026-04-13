@@ -80,22 +80,30 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false, // Allow embedded resources
 }));
 
-// 4. CORS - only allow frontend (normalize URL to prevent trailing slash mismatch)
+// 4. CORS - allow only production domains (Fortune 500 multi-domain support)
 const normalizeOrigin = (url: string): string => url.replace(/\/$/, '');
+const allowedOrigins = [
+  'https://reproplanai.com',
+  'https://www.reproplanai.com',
+  'https://repro-plan.vercel.app',
+].map(normalizeOrigin);
+
 app.use(cors({ 
   origin: (origin, callback) => {
-    const allowedOrigin = normalizeOrigin(env.FRONTEND_URL || '');
     const requestOrigin = origin ? normalizeOrigin(origin) : '';
     // Allow requests with no origin (mobile apps, curl, etc)
     if (!origin) return callback(null, true);
-    if (requestOrigin === allowedOrigin || allowedOrigin.includes(requestOrigin)) {
+    // Check if request origin is in allowed list
+    if (allowedOrigins.includes(requestOrigin)) {
       return callback(null, true);
     }
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Total-Count'],
+  maxAge: 86400 // Cache preflight requests for 24 hours
 }));
 
 // 5. Request validation

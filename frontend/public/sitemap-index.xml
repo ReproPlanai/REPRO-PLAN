@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+               http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Main Sitemap -->
+  <sitemap>
+    <loc>https://reproplanai.com/sitemap.xml</loc>
+    <lastmod>2026-04-13T00:00:00Z</lastmod>
+  </sitemap>
+
+  <!-- Future: Image Sitemap (when images are added) -->
+  <!-- 
+  <sitemap>
+    <loc>https://reproplanai.com/sitemap-images.xml</loc>
+    <lastmod>2026-04-13T00:00:00Z</lastmod>
+  </sitemap>
+  -->
+
+  <!-- Future: Video Sitemap (when videos are added) -->
+  <!-- 
+  <sitemap>
+    <loc>https://reproplanai.com/sitemap-videos.xml</loc>
+    <lastmod>2026-04-13T00:00:00Z</lastmod>
+  </sitemap>
+  -->
+
+</sitemapindex>
