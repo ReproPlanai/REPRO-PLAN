@@ -73,7 +73,8 @@ const CrimeReporting = lazy(() => import('./pages/CrimeReporting'));
 const AppLayoutContent: React.FC<{ children: React.ReactNode; isAuthenticated: boolean }> = ({ children, isAuthenticated }) => {
   const location = useLocation();
   const isDashboardRoute = location.pathname.startsWith('/dashboard');
-  const shouldShowMainNavigation = !isDashboardRoute;
+  const isAdminLoginRoute = location.pathname === '/admin-login';
+  const shouldShowMainNavigation = !isDashboardRoute && !isAdminLoginRoute;
 
   return (
     <>
