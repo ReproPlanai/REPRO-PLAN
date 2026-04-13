@@ -229,8 +229,9 @@ function App() {
   const role = urlParams.get('role');
   const validStakeholderRoles = ['ADMIN', 'POLICE', 'SAFEHOUSE', 'MEDICAL', 'NGO'];
   const isStakeholderAccess = role && validStakeholderRoles.includes(role) && window.location.pathname === '/dashboard';
+  const isAdminLoginRoute = window.location.pathname === '/admin-login';
   
-  if (!isAuthenticated && !isStakeholderAccess) {
+  if (!isAuthenticated && !isStakeholderAccess && !isAdminLoginRoute) {
     if (showPreAuthLoader && !showCreateCode && !showForgetCode) {
       return <PreAuthLoader />;
     }
