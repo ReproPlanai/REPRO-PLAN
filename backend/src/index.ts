@@ -177,7 +177,7 @@ app.get('/verify-db', async (_req, res) => {
   }
 });
 
-app.use('/authadmin-auth', adminAuthRoutes);
+app.use('/api/admin-auth', adminAuthRoutes);
 app.use('/api/', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/stakeholders', stakeholderRoutes);

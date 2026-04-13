@@ -353,11 +353,11 @@ class RealAPIService {
 
   // System Settings (Admin only)
   async getSystemSettings() {
-    return apiRequest('/admin/settings');
+    return apiRequest('/api/admin/settings');
   }
 
   async updateSystemSettings(settings: Partial<SystemSettings>) {
-    return apiRequest('/admin/settings', {
+    return apiRequest('/api/admin/settings', {
       method: 'PUT',
       body: JSON.stringify(settings)
     });
@@ -365,13 +365,13 @@ class RealAPIService {
 
   // Dashboard stats (Admin)
   async getDashboardStats() {
-    return apiRequest('/admin/dashboard-stats');
+    return apiRequest('/api/admin/dashboard-stats');
   }
 
   // Analytics (Admin)
   async getAnalytics(timeRange?: string) {
     const params = timeRange ? `?timeRange=${timeRange}` : '';
-    return apiRequest(`/admin/analytics${params}`);
+    return apiRequest(`/api/admin/analytics${params}`);
   }
 
   // Stories (Community Content)
@@ -388,14 +388,14 @@ class RealAPIService {
 
   // Backup & Restore
   async createBackup(data: any) {
-    return apiRequest('/admin/backup', {
+    return apiRequest('/api/admin/backup', {
       method: 'POST',
       body: JSON.stringify(data)
     });
   }
 
   async restoreBackup(backupId: string) {
-    return apiRequest(`/admin/restore/${backupId}`, {
+    return apiRequest(`/api/admin/restore/${backupId}`, {
       method: 'POST'
     });
   }
@@ -434,15 +434,15 @@ class RealAPIService {
 
   // Admin
   async getAdminStats() {
-    return apiRequest('/admin/dashboard-stats');
+    return apiRequest('/api/admin/dashboard-stats');
   }
 
   async getAdminSettings() {
-    return apiRequest('/admin/settings');
+    return apiRequest('/api/admin/settings');
   }
 
   async updateAdminSettings(settings: any) {
-    return apiRequest('/admin/settings', {
+    return apiRequest('/api/admin/settings', {
       method: 'PUT',
       body: JSON.stringify(settings)
     });
@@ -597,7 +597,7 @@ class RealAPIService {
 
   async getGameAnalytics(params?: { timeRange?: string; gameType?: string }) {
     const queryParams = params ? `?${new URLSearchParams(params as any).toString()}` : '';
-    return apiRequest(`/admin/game-analytics${queryParams}`);
+    return apiRequest(`/api/admin/game-analytics${queryParams}`);
   }
 
   async getChatRooms(userRole?: string) {
