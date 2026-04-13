@@ -49,6 +49,7 @@ const SignLanguage = lazy(() => import('./pages/SignLanguage'));
 const MedicationOrder = lazy(() => import('./pages/MedicationOrder'));
 const SecureMap = lazy(() => import('./pages/SecureMap'));
 const QRVerification = lazy(() => import('./pages/QRVerification'));
+const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 
 // Lazy loaded components
 const StorytellingPlatform = lazy(() => import('./components/Storytelling/StorytellingPlatform'));
@@ -288,6 +289,7 @@ function App() {
                   </div>
                 }>
                   <Routes>
+                    <Route path="/admin-login" element={<AdminLogin />} />
                     <Route path="/" element={<Home />} />
                     <Route path="/chatbot" element={<Chatbot />} />
                     <Route path="/ReproBot" element={<Chatbot />} />

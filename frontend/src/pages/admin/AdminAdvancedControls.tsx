@@ -14,6 +14,7 @@ import {
   Trash2
 } from 'lucide-react';
 import PageContainer from '../../components/Layout/PageContainer';
+import { AdminCard, AdminButton, AdminBadge } from '../../components/Admin';
 
 interface AuditLog {
   id: string;
@@ -163,15 +164,6 @@ const AdminAdvancedControls: React.FC = () => {
     }
   };
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'low': return 'bg-green-100 text-green-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'high': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
     <PageContainer gradient>
       <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-20 sm:pb-8 max-w-6xl mx-auto">
@@ -229,27 +221,29 @@ const AdminAdvancedControls: React.FC = () => {
               </div>
             </div>
             <div className="space-y-3">
-              <button
+              <AdminButton
                 onClick={handleMaintenance}
                 disabled={loading || systemStatus.status !== 'online'}
-                className="w-full px-4 py-3 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 rounded-xl text-sm font-medium text-yellow-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                variant="secondary"
+                icon={<RefreshCw className="w-4 h-4" />}
+                fullWidth
               >
-                <RefreshCw className="w-4 h-4" />
                 Enter Maintenance Mode
-              </button>
-              <button
+              </AdminButton>
+              <AdminButton
                 onClick={() => setConfirmShutdown(true)}
                 disabled={loading || systemStatus.status === 'shutdown'}
-                className="w-full px-4 py-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl text-sm font-medium text-red-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                variant="danger"
+                icon={<Power className="w-4 h-4" />}
+                fullWidth
               >
-                <Power className="w-4 h-4" />
                 Shutdown System
-              </button>
+              </AdminButton>
             </div>
           </div>
 
           {/* Role Controls */}
-          <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-5 sm:p-6">
+          <AdminCard padding="md" shadow="lg">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-orange-100 rounded-xl">
                 <Ban className="w-5 h-5 text-orange-600" />
@@ -261,25 +255,26 @@ const AdminAdvancedControls: React.FC = () => {
             </div>
             <div className="space-y-3">
               {['admin', 'super_admin', 'stakeholder', 'healthcare_provider', 'mentor'].map((role) => (
-                <button
+                <AdminButton
                   key={role}
                   onClick={() => {
                     setSelectedRole(role);
                     setConfirmDisable(true);
                   }}
                   disabled={loading}
-                  className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  variant="secondary"
+                  icon={<Ban className="w-4 h-4" />}
+                  fullWidth
                 >
-                  <Ban className="w-4 h-4" />
                   Disable {role.replace('_', ' ')} Role
-                </button>
+                </AdminButton>
               ))}
             </div>
-          </div>
+          </AdminCard>
         </div>
 
         {/* Audit Logs */}
-        <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm p-5 sm:p-6">
+        <AdminCard padding="md" shadow="lg">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
             <div className="flex items-center gap-3 mb-4 sm:mb-0">
               <div className="p-2 bg-blue-100 rounded-xl">
@@ -327,9 +322,9 @@ const AdminAdvancedControls: React.FC = () => {
             ) : (
               filteredLogs.map((log) => (
                 <div key={log.id} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-                  <div className={`px-2 py-1 rounded-lg text-xs font-medium ${getSeverityColor(log.severity)}`}>
+                  <AdminBadge variant={log.severity === 'high' ? 'danger' : log.severity === 'medium' ? 'warning' : 'success'}>
                     {log.severity.toUpperCase()}
-                  </div>
+                  </AdminBadge>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="font-medium text-gray-900 text-sm">{log.action}</p>
@@ -346,7 +341,7 @@ const AdminAdvancedControls: React.FC = () => {
               ))
             )}
           </div>
-        </div>
+        </AdminCard>
 
         {/* Shutdown Confirmation Modal */}
         {confirmShutdown && (

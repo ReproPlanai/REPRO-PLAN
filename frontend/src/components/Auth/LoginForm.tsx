@@ -20,6 +20,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
   const [showStakeholderDropdown, setShowStakeholderDropdown] = useState(false);
   const [showStakeholderSection, setShowStakeholderSection] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [adminTapCount, setAdminTapCount] = useState(0);
+  const adminTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -51,9 +53,29 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
     }, 1000);
   };
 
-  // Stakeholder roles configuration
+  // 5-tap gesture for admin login (in Privacy Protected section)
+  const handleAdminTap = () => {
+    setAdminTapCount(prev => prev + 1);
+    
+    // Clear existing timeout
+    if (adminTapTimeoutRef.current) {
+      clearTimeout(adminTapTimeoutRef.current);
+    }
+    
+    // Set new timeout to reset counter after 2 seconds
+    adminTapTimeoutRef.current = setTimeout(() => {
+      setAdminTapCount(0);
+    }, 2000);
+    
+    // Navigate to admin login after 5 taps
+    if (adminTapCount + 1 >= 5) {
+      window.location.href = '/admin-login';
+      setAdminTapCount(0);
+    }
+  };
+
+  // Stakeholder roles configuration (ADMIN removed - uses separate login)
   const stakeholderRoles = [
-    { value: 'ADMIN', label: 'Administrator', icon: '👨‍💼', color: 'from-red-500 to-pink-500' },
     { value: 'POLICE', label: 'Police', icon: '👮‍♂️', color: 'from-blue-500 to-indigo-500' },
     { value: 'SAFEHOUSE', label: 'Safe House', icon: '🏠', color: 'from-green-500 to-emerald-500' },
     { value: 'MEDICAL', label: 'Medical', icon: '👩‍⚕️', color: 'from-purple-500 to-violet-500' },
@@ -285,7 +307,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
             </div>
           </div>
 
-          <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 rounded-lg">
+          <div 
+            className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 rounded-lg cursor-pointer select-none transition-transform active:scale-95"
+            onClick={handleAdminTap}
+          >
             <div className="flex items-start space-x-3">
               <Shield className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div className="text-sm">
@@ -293,6 +318,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onCreateNew, onForgetCod
                 <p className="text-blue-700">
                   Your secret code is stored locally and never shared. Your identity remains completely anonymous.
                 </p>
+                {adminTapCount > 0 && adminTapCount < 5 && (
+                  <p className="text-blue-600 text-xs mt-1 opacity-60">
+                    Tap {5 - adminTapCount} more time{5 - adminTapCount !== 1 ? 's' : ''}...
+                  </p>
+                )}
               </div>
             </div>
           </div>

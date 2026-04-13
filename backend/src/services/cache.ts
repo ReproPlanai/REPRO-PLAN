@@ -27,11 +27,12 @@ setInterval(() => {
   }
 }, 300000); // 5 minutes
 
-export async function setOTP(key: string, otp: string): Promise<void> {
+export async function setOTP(key: string, otp: string, ttlSeconds?: number): Promise<void> {
   const fullKey = `${OTP_PREFIX}${key}`;
-  const expiresAt = Date.now() + OTP_TTL * 1000;
+  const ttl = ttlSeconds || OTP_TTL;
+  const expiresAt = Date.now() + ttl * 1000;
   memoryOTPStore.set(fullKey, { otp, expiresAt });
-  log.info({ key: fullKey }, 'OTP stored in memory');
+  log.info({ key: fullKey, ttl }, 'OTP stored in memory');
 }
 
 export async function getOTP(key: string): Promise<string | null> {

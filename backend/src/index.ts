@@ -30,6 +30,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { requireHTTPS, securityHeaders, validateRequest, sanitizeInput } from './middleware/security';
 import { apiLimiter, authLimiter, adminLimiter } from './middleware/rateLimiter';
 import authRoutes from './routes/auth';
+import adminAuthRoutes from './routes/admin-auth';
 import reprobotRoutes from './routes/reprobot';
 import transcribeRoutes from './routes/transcribe';
 import aiRoutes from './routes/ai';
@@ -176,7 +177,8 @@ app.get('/verify-db', async (_req, res) => {
   }
 });
 
-app.use('/auth', authRoutes);
+app.use('/authadmin-auth', adminAuthRoutes);
+app.use('/api/', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/stakeholders', stakeholderRoutes);
 app.use('/api/alerts', alertRoutes);

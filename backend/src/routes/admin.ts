@@ -46,6 +46,215 @@ router.get('/settings', async (req: Request, res: Response) => {
   }
 });
 
+// Get user analytics with detailed metrics
+router.get('/analytics/users', async (req: Request, res: Response) => {
+  try {
+    const { timeRange = '30d' } = req.query;
+    const days = parseInt(timeRange as string) || 30;
+    
+    // Get total users and signups
+    const totalUsers = await query(
+      "SELECT COUNT(*) as count FROM users"
+    );
+    
+    const newSignups = await query(
+      `SELECT COUNT(*) as count FROM users WHERE created_at > NOW() - INTERVAL '${days} days'`
+    );
+    
+    // Get login activity
+    const totalLogins = await query(
+      `SELECT COUNT(*) as count FROM users WHERE last_login IS NOT NULL`
+    );
+    
+    const recentLogins = await query(
+      `SELECT COUNT(*) as count FROM users WHERE last_login > NOW() - INTERVAL '${days} days'`
+    );
+    
+    // Get active users (logged in last 7 days)
+    const activeUsers = await query(
+      `SELECT COUNT(*) as count FROM users WHERE last_login > NOW() - INTERVAL '7 days'`
+    );
+    
+    // Get user activity with timestamps and IPs
+    const userActivity = await query(
+      `SELECT 
+        id,
+        secret_code,
+        created_at as signup_date,
+        last_login,
+        is_verified,
+        is_used,
+        phone_number,
+        CASE 
+          WHEN last_login > NOW() - INTERVAL '1 day' THEN 'today'
+          WHEN last_login > NOW() - INTERVAL '7 days' THEN 'week'
+          WHEN last_login > NOW() - INTERVAL '30 days' THEN 'month'
+          ELSE 'inactive'
+        END as activity_status
+       FROM users
+       ORDER BY created_at DESC
+       LIMIT 100`
+    );
+    
+    // Get daily signup trends
+    const dailySignups = await query(
+      `SELECT 
+        DATE(created_at) as date,
+        COUNT(*) as signups
+       FROM users
+       WHERE created_at > NOW() - INTERVAL '${days} days'
+       GROUP BY DATE(created_at)
+       ORDER BY date DESC`
+    );
+    
+    // Get daily login trends
+    const dailyLogins = await query(
+      `SELECT 
+        DATE(last_login) as date,
+        COUNT(*) as logins
+       FROM users
+       WHERE last_login > NOW() - INTERVAL '${days} days' AND last_login IS NOT NULL
+       GROUP BY DATE(last_login)
+       ORDER BY date DESC`
+    );
+    
+    // Get user demographics (if available)
+    const demographics = await query(
+      `SELECT 
+        demographics->>'gender' as gender,
+        demographics->>'ageRange' as age_range,
+        COUNT(*) as count
+       FROM users
+       WHERE demographics IS NOT NULL
+       GROUP BY demographics->>'gender', demographics->>'ageRange'`
+    );
+    
+    const analytics = {
+      summary: {
+        totalUsers: parseInt(totalUsers[0]?.count || 0),
+        totalLogins: parseInt(totalLogins[0]?.count || 0),
+        newSignups: parseInt(newSignups[0]?.count || 0),
+        recentLogins: parseInt(recentLogins[0]?.count || 0),
+        activeUsers: parseInt(activeUsers[0]?.count || 0),
+        timeRange: `${days}d`
+      },
+      trends: {
+        dailySignups: dailySignups.map((d: any) => ({
+          date: d.date,
+          signups: parseInt(d.signups)
+        })),
+        dailyLogins: dailyLogins.map((d: any) => ({
+          date: d.date,
+          logins: parseInt(d.logins)
+        }))
+      },
+      userActivity: userActivity.map((u: any) => ({
+        id: u.id,
+        signupDate: u.signup_date,
+        lastLogin: u.last_login,
+        activityStatus: u.activity_status,
+        isVerified: u.is_verified,
+        isUsed: u.is_used,
+        phoneNumber: u.phone_number
+      })),
+      demographics: demographics.map((d: any) => ({
+        gender: d.gender,
+        ageRange: d.age_range,
+        count: parseInt(d.count)
+      }))
+    };
+    
+    res.json({ success: true, analytics });
+  } catch (err) {
+    log.error({ err }, 'Failed to get user analytics');
+    res.status(500).json({ error: 'Failed to get user analytics' });
+  }
+});
+
+// Track user login with IP and timestamp
+router.post('/track-login', async (req: Request, res: Response) => {
+  try {
+    const { userId, email, phoneNumber } = req.body;
+    const ip = req.ip || req.connection.remoteAddress || 'unknown';
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    
+    // Log the login event
+    log.info({ userId, email, phoneNumber, ip, userAgent }, 'User login tracked');
+    
+    // Store in analytics table (if it exists)
+    try {
+      await query(
+        `INSERT INTO user_login_events (user_id, email, phone_number, ip_address, user_agent, event_type, created_at)
+         VALUES ($1, $2, $3, $4, $5, 'login', NOW())`,
+        [userId, email, phoneNumber, ip, userAgent]
+      );
+    } catch (dbErr) {
+      // Table might not exist yet, just log it
+      log.warn({ dbErr }, 'Could not store login event in database (table may not exist)');
+    }
+    
+    res.json({ success: true, message: 'Login tracked' });
+  } catch (err) {
+    log.error({ err }, 'Failed to track login');
+    res.status(500).json({ error: 'Failed to track login' });
+  }
+});
+
+// Get login events with IP addresses
+router.get('/analytics/login-events', async (req: Request, res: Response) => {
+  try {
+    const { limit = 50, offset = 0 } = req.query;
+    const limitNum = parseInt(limit as string) || 50;
+    const offsetNum = parseInt(offset as string) || 0;
+    
+    const events = await query(
+      `SELECT 
+        id,
+        user_id,
+        email,
+        phone_number,
+        ip_address,
+        user_agent,
+        event_type,
+        created_at
+       FROM user_login_events
+       ORDER BY created_at DESC
+       LIMIT $1 OFFSET $2`,
+      [limitNum, offsetNum]
+    );
+    
+    const total = await query(
+      'SELECT COUNT(*) as count FROM user_login_events'
+    );
+    
+    res.json({ 
+      success: true, 
+      events: events.map((e: any) => ({
+        id: e.id,
+        userId: e.user_id,
+        email: e.email,
+        phoneNumber: e.phone_number,
+        ipAddress: e.ip_address,
+        userAgent: e.user_agent,
+        eventType: e.event_type,
+        timestamp: e.created_at
+      })),
+      total: parseInt(total[0]?.count || 0),
+      limit: limitNum,
+      offset: offsetNum
+    });
+  } catch (err) {
+    log.error({ err }, 'Failed to get login events');
+    // If table doesn't exist, return empty array
+    res.json({ 
+      success: true, 
+      events: [], 
+      total: 0,
+      note: 'Login events table not yet created or no data available'
+    });
+  }
+});
+
 // Update system settings
 router.put('/settings', async (req: Request, res: Response) => {
   try {

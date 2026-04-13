@@ -4,9 +4,6 @@ import {
   Shield, 
   BarChart3, 
   Settings, 
-  Menu,
-  X,
-  Bell, 
   Download,
   AlertTriangle,
   CheckCircle,
@@ -40,7 +37,7 @@ import {
   Store,
   PlusCircle
 } from 'lucide-react';
-import { LogoCircular } from '../assets';
+import PageContainer from '../components/Layout/PageContainer';
 import SecureDataViewer from '../components/DataVisualization/SecureDataViewer';
 import { dataSecurityManager } from '../utils/dataSecurity';
 import { userVerificationService } from '../utils/userVerification';
@@ -82,6 +79,7 @@ import RoleStakeholderDirectoryPanel from '../components/Settings/RoleStakeholde
 import RolePlaybooksPanel from '../components/Settings/RolePlaybooksPanel';
 import RoleKnowledgeBasePanel from '../components/Settings/RoleKnowledgeBasePanel';
 import RoleFeedbackPanel from '../components/Settings/RoleFeedbackPanel';
+import { AdminHeader, AdminSidebar, AdminCard, AdminBadge } from '../components/Admin';
 
 interface AdminDashboardProps {
   userData: any;
@@ -187,6 +185,185 @@ const AnalyticsTab: React.FC<{
   );
 };
 
+const UserAnalyticsTab: React.FC<{
+  userAnalytics: any;
+  loginEvents: any[];
+  timeRange: string;
+  onTimeRangeChange: (range: string) => void;
+  onRefresh: () => void;
+}> = ({ userAnalytics, loginEvents, timeRange, onTimeRangeChange, onRefresh }) => {
+  if (!userAnalytics) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <p className="text-gray-600">Loading analytics...</p>
+      </div>
+    );
+  }
+
+  const { summary, userActivity, demographics } = userAnalytics;
+
+  return (
+    <div className="space-y-6">
+      {/* Time Range Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <p className="text-sm text-gray-600">User analytics and activity data</p>
+        <div className="flex items-center gap-2">
+          <select
+            value={timeRange}
+            onChange={(e) => onTimeRangeChange(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="90d">Last 90 days</option>
+          </select>
+          <button
+            onClick={onRefresh}
+            className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Summary Metrics */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Total Users</p>
+          <p className="text-2xl font-semibold text-gray-900">{summary.totalUsers}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Total Logins</p>
+          <p className="text-2xl font-semibold text-blue-600">{summary.totalLogins}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">New Signups</p>
+          <p className="text-2xl font-semibold text-green-600">{summary.newSignups}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Active Users</p>
+          <p className="text-2xl font-semibold text-purple-600">{summary.activeUsers}</p>
+        </div>
+      </div>
+
+      {/* User Activity Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">Recent User Activity</h3>
+          <p className="text-sm text-gray-600">Latest 100 users with signup and login timestamps</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">User ID</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">Signup Date</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">Last Login</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">Verified</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {userActivity.map((user: any) => (
+                <tr key={user.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-gray-900">{user.id}</td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {user.signupDate ? new Date(user.signupDate).toLocaleDateString() : 'N/A'}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      user.activityStatus === 'today' ? 'bg-green-100 text-green-800' :
+                      user.activityStatus === 'week' ? 'bg-blue-100 text-blue-800' :
+                      user.activityStatus === 'month' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {user.activityStatus}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {user.isVerified ? (
+                      <CheckCircle size={16} className="text-green-600" />
+                    ) : (
+                      <AlertCircle size={16} className="text-gray-400" />
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Login Events with IPs */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">Login Events with IP Addresses</h3>
+          <p className="text-sm text-gray-600">Recent login attempts with IP tracking</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">Timestamp</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">User ID</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">Email</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">IP Address</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">User Agent</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {loginEvents.length > 0 ? loginEvents.map((event: any) => (
+                <tr key={event.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-gray-600">
+                    {event.timestamp ? new Date(event.timestamp).toLocaleString() : 'N/A'}
+                  </td>
+                  <td className="px-4 py-3 text-gray-900">{event.userId || 'N/A'}</td>
+                  <td className="px-4 py-3 text-gray-600">{event.email || 'N/A'}</td>
+                  <td className="px-4 py-3 text-gray-900 font-mono text-xs">{event.ipAddress || 'N/A'}</td>
+                  <td className="px-4 py-3 text-gray-600 text-xs max-w-xs truncate">
+                    {event.userAgent || 'N/A'}
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                    No login events recorded yet. Enable tracking to start collecting data.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Demographics */}
+      {demographics && demographics.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">User Demographics</h3>
+            <p className="text-sm text-gray-600">Distribution by gender and age range</p>
+          </div>
+          <div className="p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {demographics.map((demo: any, index: number) => (
+                <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-sm font-medium text-gray-900">
+                    {demo.gender || 'Unknown'} - {demo.ageRange || 'Unknown'}
+                  </p>
+                  <p className="text-2xl font-semibold text-blue-600">{demo.count}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -203,6 +380,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
     systemHealth: 100,
     responseTime: 0
   });
+  const [userAnalytics, setUserAnalytics] = useState<any>(null);
+  const [loginEvents, setLoginEvents] = useState<any[]>([]);
+  const [analyticsTimeRange, setAnalyticsTimeRange] = useState('30d');
 
   // Connect to backend API
   const stakeholderAPI = useStakeholderAPI({
@@ -214,12 +394,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
   useEffect(() => {
     if (userData?.id) {
       fetchDashboardMetrics();
+      fetchUserAnalytics();
+      fetchLoginEvents();
       stakeholderAPI.fetchAlerts();
       stakeholderAPI.fetchCases();
       stakeholderAPI.fetchMessages();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData?.id]);
+  }, [userData?.id, analyticsTimeRange]);
+
+  const fetchUserAnalytics = async () => {
+    try {
+      const response = await apiService.getUserAnalytics(analyticsTimeRange);
+      if (response.success) {
+        setUserAnalytics(response.analytics);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user analytics:', error);
+    }
+  };
+
+  const fetchLoginEvents = async () => {
+    try {
+      const response = await apiService.getLoginEvents(20, 0);
+      if (response.success) {
+        setLoginEvents(response.events || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch login events:', error);
+    }
+  };
 
   const fetchDashboardMetrics = async () => {
     try {
@@ -306,6 +510,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
     { id: 'verification', label: 'Verification Requests', icon: UserCheck },
     { id: 'ecommerce', label: 'E-Commerce', icon: Store },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+    { id: 'user-analytics', label: 'User Analytics', icon: UsersIcon },
     { id: 'operations', label: 'Operations', icon: ClipboardList },
     { id: 'training', label: 'Training', icon: CheckCircle },
     { id: 'compliance', label: 'Compliance', icon: Shield },
@@ -340,123 +545,39 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
-      {/* Modern Header */}
-      <div className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/60 sticky top-0 z-40">
-        <div className="px-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden flex items-center justify-center shadow-md ring-2 ring-blue-100 bg-gradient-to-br from-blue-500 to-cyan-500">
-                <img 
-                  src={LogoCircular} 
-                  alt="REPRO PLAN Logo" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="min-w-0 flex-1 flex flex-col leading-[1]">
-                <h1 className="text-base sm:text-lg font-bold text-gray-900 truncate">Admin Dashboard</h1>
-                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block -mt-2 leading-none">System Administration Portal</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <button
-                onClick={() => setIsMenuOpen(true)}
-                className="lg:hidden p-2 text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-100 transition-colors"
-                aria-label="Open menu"
-              >
-                <Menu size={18} />
-              </button>
-              <button className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 relative rounded-xl hover:bg-gray-100 transition-colors">
-                <Bell size={18} className="sm:w-5 sm:h-5" />
-                {recentAlerts.filter(alert => alert.status === 'active').length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse"></span>
-                )}
-              </button>
-            </div>
-          </div>
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-primary-50/20"
+    >
+      <div className="flex flex-col lg:flex-row min-h-screen">
+        {/* Background Decorative Elements */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+          <div className="absolute top-20 left-10 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-[500px] h-[500px] bg-purple-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-pink-100/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
         </div>
-      </div>
 
-      <div className="flex flex-col lg:flex-row">
-        {/* Mobile Menu Drawer */}
-        {isMenuOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden">
-            <button
-              className="absolute inset-0 bg-black/40"
-              onClick={() => setIsMenuOpen(false)}
-              aria-label="Close menu"
-            />
-            <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl p-4">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-base font-semibold text-gray-900">Menu</span>
-                <button
-                  onClick={() => setIsMenuOpen(false)}
-                  className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
-                  aria-label="Close menu"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-              <nav className="space-y-2">
-                {tabs.map((tab) => {
-                  const Icon = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => {
-                        setActiveTab(tab.id);
-                        setIsMenuOpen(false);
-                      }}
-                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        activeTab === tab.id
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                      }`}
-                    >
-                      <Icon size={18} />
-                      <span>{tab.label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
-              <div className="mt-4 border-t border-gray-200 pt-4">
-                <button
-                  onClick={onLogout}
-                  className="w-full px-3 py-2 rounded-lg text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50"
-                >
-                  Exit Dashboard
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Desktop Sidebar */}
-        <div className="hidden lg:block w-56 xl:w-64 bg-white/80 backdrop-blur-sm shadow-sm border-r border-gray-200/60 min-h-screen">
-          <nav className="p-4 space-y-2">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md'
-                      : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700'
-                  }`}
-                >
-                  <Icon size={18} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-        </div>
+        {/* Sidebar */}
+        <AdminSidebar
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+          items={tabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
 
         {/* Main Content */}
-        <div className="flex-1 p-2 sm:p-4 lg:p-6 xl:p-8">
+        <div className="flex-1 flex flex-col min-h-screen">
+          {/* Header */}
+          <AdminHeader
+            onMenuToggle={() => setIsMenuOpen(true)}
+            title="Admin Dashboard"
+          />
+
+          {/* Content Area */}
+          <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
           {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="space-y-4 sm:space-y-6">
@@ -465,7 +586,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                 
                 {/* Stats Cards - Mobile Responsive */}
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
+                  <AdminCard hover padding="md" shadow="lg">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Total Users</p>
@@ -475,9 +596,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                         <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                       </div>
                     </div>
-                  </div>
+                  </AdminCard>
                   
-                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
+                  <AdminCard hover padding="md" shadow="lg">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Active Users</p>
@@ -487,9 +608,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                         <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                       </div>
                     </div>
-                  </div>
+                  </AdminCard>
                   
-                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
+                  <AdminCard hover padding="md" shadow="lg">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Emergency Alerts</p>
@@ -499,9 +620,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                         <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
                       </div>
                     </div>
-                  </div>
+                  </AdminCard>
                   
-                  <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-md transition-shadow">
+                  <AdminCard hover padding="md" shadow="lg">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <p className="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">System Health</p>
@@ -511,18 +632,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                         <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                       </div>
                     </div>
-                  </div>
+                  </AdminCard>
                 </div>
 
                 {/* Recent Alerts - Mobile Responsive */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                  <div className="p-3 sm:p-4 border-b border-gray-200">
-                    <h3 className="text-base sm:text-lg font-medium text-gray-900">Recent Alerts</h3>
+                <AdminCard padding="md" shadow="lg">
+                  <div className="p-3 sm:p-4 border-b border-gray-200/60">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">Recent Alerts</h3>
                   </div>
                   <div className="p-3 sm:p-4">
                     <div className="space-y-2 sm:space-y-3">
                       {recentAlerts.map((alert) => (
-                        <div key={alert.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-lg space-y-2 sm:space-y-0">
+                        <div key={alert.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50/80 backdrop-blur-sm rounded-xl space-y-2 sm:space-y-0 hover:bg-gray-100/80 transition-colors">
                           <div className="flex items-start sm:items-center space-x-3 min-w-0 flex-1">
                             <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-1.5 sm:mt-0 ${
                               alert.status === 'active' ? 'bg-red-500' : 
@@ -533,34 +654,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                               <p className="text-xs text-gray-500">{alert.time}</p>
                             </div>
                           </div>
-                          <span className={`px-2 py-1 text-xs rounded-full self-start sm:self-auto ${
-                            alert.status === 'active' ? 'bg-red-100 text-red-700' :
-                            alert.status === 'resolved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                          }`}>
+                          <AdminBadge 
+                            variant={alert.status === 'active' ? 'danger' : alert.status === 'resolved' ? 'success' : 'warning'}
+                          >
                             {alert.status}
-                          </span>
+                          </AdminBadge>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
+                </AdminCard>
 
                 {/* Secure Data Visualizations */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                  <SecureDataViewer
-                    data={adminData.userActivity}
-                    chartType="line"
-                    title="User Activity Trend"
-                    description="Monthly user activity and engagement metrics"
-                    userRole="ADMIN"
-                    onDataAccess={(accessLog) => {
-                      dataSecurityManager.logDataAccess(accessLog);
-                    }}
-                  />
+                  <AdminCard padding="lg" shadow="lg">
+                    <SecureDataViewer
+                      data={adminData.userActivity}
+                      chartType="line"
+                      title="User Activity Trend"
+                      description="Monthly user activity and engagement metrics"
+                      userRole="ADMIN"
+                      onDataAccess={(accessLog) => {
+                        dataSecurityManager.logDataAccess(accessLog);
+                      }}
+                    />
+                  </AdminCard>
                   
-                  <SecureDataViewer
-                    data={adminData.systemUsage}
-                    chartType="pie"
+                  <AdminCard padding="lg" shadow="lg">
+                    <SecureDataViewer
+                      data={adminData.systemUsage}
+                      chartType="pie"
                     title="System Resource Usage"
                     description="Current system resource utilization"
                     userRole="ADMIN"
@@ -568,18 +691,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
                       dataSecurityManager.logDataAccess(accessLog);
                     }}
                   />
+                  </AdminCard>
                 </div>
 
-                <SecureDataViewer
-                  data={adminData.securityAlerts}
-                  chartType="bar"
-                  title="Security Alerts Distribution"
-                  description="Security incidents and threat analysis"
-                  userRole="ADMIN"
-                  onDataAccess={(accessLog) => {
-                    dataSecurityManager.logDataAccess(accessLog);
-                  }}
-                />
+                <AdminCard padding="lg" shadow="lg">
+                  <SecureDataViewer
+                    data={adminData.securityAlerts}
+                    chartType="bar"
+                    title="Security Alerts Distribution"
+                    description="Security incidents and threat analysis"
+                    userRole="ADMIN"
+                    onDataAccess={(accessLog) => {
+                      dataSecurityManager.logDataAccess(accessLog);
+                    }}
+                  />
+                </AdminCard>
               </div>
             </div>
           )}
@@ -1145,6 +1271,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
             </div>
           )}
 
+          {activeTab === 'user-analytics' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900">User Analytics</h2>
+              <UserAnalyticsTab
+                userAnalytics={userAnalytics}
+                loginEvents={loginEvents}
+                timeRange={analyticsTimeRange}
+                onTimeRangeChange={setAnalyticsTimeRange}
+                onRefresh={() => {
+                  fetchUserAnalytics();
+                  fetchLoginEvents();
+                }}
+              />
+            </div>
+          )}
+
           {activeTab === 'operations' && (
             <div className="space-y-6">
               <h2 className="text-xl font-semibold text-gray-900">Operations Center</h2>
@@ -1592,8 +1734,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ userData, onLogout }) =
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

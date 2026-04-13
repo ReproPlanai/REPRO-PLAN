@@ -828,6 +828,37 @@ class RealAPIService {
     return apiRequest(`/api/orders/${orderId}/receipt`);
   }
 
+  // Admin OTP methods
+  async requestAdminOTP(email: string) {
+    return apiRequest('/api/admin-auth/request-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+  }
+
+  async verifyAdminOTP(email: string, otp: string) {
+    return apiRequest('/api/admin-auth/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp })
+    });
+  }
+
+  // Admin analytics methods
+  async getUserAnalytics(timeRange = '30d') {
+    return apiRequest(`/api/admin/analytics/users?timeRange=${timeRange}`);
+  }
+
+  async trackLogin(userId: string, email?: string, phoneNumber?: string) {
+    return apiRequest('/api/admin/track-login', {
+      method: 'POST',
+      body: JSON.stringify({ userId, email, phoneNumber })
+    });
+  }
+
+  async getLoginEvents(limit = 50, offset = 0) {
+    return apiRequest(`/api/admin/analytics/login-events?limit=${limit}&offset=${offset}`);
+  }
+
   // Clear auth
   clearToken() {
     localStorage.removeItem('auth_token');

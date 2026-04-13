@@ -17,6 +17,7 @@ const envSchema = z.object({
   MAPBOX_ACCESS_KEY: z.string().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
   DEV_MODE: z.string().default('false').transform((val) => val === 'true'),
+  ADMIN_EMAIL: z.string().email().default('reproplanllc@gmail.com'),
   // NVIDIA NIM API keys
   NVIDIA_MISTRAL_API_KEY: z.string().optional(),
   NVIDIA_PHI_API_KEY: z.string().optional(),

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Phone, Mail, UserPlus, X } from 'lucide-react';
 import { apiService } from '../../services/api';
+import PageContainer from '../../components/Layout/PageContainer';
+import { AdminCard, AdminButton, AdminInput, AdminBadge } from '../../components/Admin';
 
 interface Stakeholder {
   id: number;
@@ -67,39 +69,42 @@ const StakeholderManagement: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <PageContainer
+      gradient
+      gradientFrom="from-slate-50"
+      gradientVia="via-white"
+      gradientTo="to-primary-50/20"
+    >
+      <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Stakeholder Management</h2>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Stakeholder Management</h1>
           <p className="text-sm text-gray-600 mt-1">Manage portal stakeholders by role</p>
         </div>
-        <button
+        <AdminButton
           onClick={() => setShowAddModal(true)}
-          className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+          icon={<UserPlus size={18} />}
         >
-          <UserPlus size={16} />
-          <span>Add Stakeholder</span>
-        </button>
+          Add Stakeholder
+        </AdminButton>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <AdminCard padding="md" shadow="lg">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              type="text"
-              placeholder="Search by phone, name, email, or role..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+          <AdminInput
+            type="text"
+            placeholder="Search by phone, name, email, or role..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            icon={<Search size={18} />}
+            fullWidth
+          />
           <div className="flex items-center gap-2">
             <Filter size={18} className="text-gray-400" />
             <select
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
             >
               <option value="all">All Roles</option>
               {ROLES.map((r) => (
@@ -110,24 +115,24 @@ const StakeholderManagement: React.FC = () => {
             </select>
           </div>
         </div>
-      </div>
+      </AdminCard>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <AdminCard hover padding="md" shadow="lg">
           <p className="text-sm text-gray-600">Total Stakeholders</p>
           <p className="text-2xl font-semibold text-gray-900 mt-1">{stakeholders.length}</p>
-        </div>
+        </AdminCard>
         {ROLES.map((role) => (
-          <div key={role} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <AdminCard key={role} hover padding="md" shadow="lg">
             <p className="text-sm text-gray-600">{role}</p>
             <p className="text-2xl font-semibold text-gray-900 mt-1">
               {stakeholders.filter((s) => s.role === role).length}
             </p>
-          </div>
+          </AdminCard>
         ))}
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <AdminCard padding="md" shadow="lg">
         <div className="block sm:hidden p-3 space-y-3">
           {loading ? (
             <div className="text-center text-gray-500 py-6">Loading...</div>
@@ -142,7 +147,7 @@ const StakeholderManagement: React.FC = () => {
               >
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-900">{s.name || s.role}</span>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">{s.role}</span>
+                  <AdminBadge variant="default">{s.role}</AdminBadge>
                 </div>
                 <div className="flex items-center gap-1 text-sm text-gray-600">
                   <Phone size={14} />
@@ -192,7 +197,7 @@ const StakeholderManagement: React.FC = () => {
                   >
                     <td className="px-4 py-3 text-sm text-gray-900">#{s.id}</td>
                     <td className="px-4 py-3 text-sm">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">{s.role}</span>
+                      <AdminBadge variant="default">{s.role}</AdminBadge>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">{s.name || '-'}</td>
                     <td className="px-4 py-3 text-sm text-gray-600">{s.phoneNumber}</td>
@@ -204,7 +209,7 @@ const StakeholderManagement: React.FC = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </AdminCard>
 
       {selectedStakeholder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -260,7 +265,8 @@ const StakeholderManagement: React.FC = () => {
           }}
         />
       )}
-    </div>
+      </div>
+    </PageContainer>
   );
 };
 
