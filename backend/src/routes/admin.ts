@@ -343,7 +343,7 @@ router.get('/dashboard-stats', async (req: Request, res: Response) => {
     
     // Try to get from Railway Redis cache
     try {
-      const cachedStats = await getCached(cacheKey);
+      const cachedStats = await getCached(cacheKey) as any;
       if (cachedStats) {
         log.info('Returning cached dashboard stats');
         res.json({ 
