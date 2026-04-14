@@ -76,6 +76,7 @@ import RoleStakeholderDirectoryPanel from '../components/Settings/RoleStakeholde
 import RolePlaybooksPanel from '../components/Settings/RolePlaybooksPanel';
 import RoleKnowledgeBasePanel from '../components/Settings/RoleKnowledgeBasePanel';
 import RoleFeedbackPanel from '../components/Settings/RoleFeedbackPanel';
+import SafeHouseBottomNavigation from '../components/Layout/SafeHouseBottomNavigation';
 
 interface SafeHouseDashboardProps {
   userData: any;
@@ -1176,6 +1177,8 @@ const SafeHouseDashboard: React.FC<SafeHouseDashboardProps> = ({ userData, onLog
           )}
         </div>
       </div>
+      
+      <SafeHouseBottomNavigation />
     </div>
   );
 };

@@ -8,7 +8,8 @@
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn src/index.ts",
     "lint": "tsc --noEmit && echo 'TypeScript check passed'",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "cleanup:test-users": "ts-node src/scripts/cleanupTestUsers.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",

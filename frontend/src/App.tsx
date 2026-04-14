@@ -74,7 +74,8 @@ const AppLayoutContent: React.FC<{ children: React.ReactNode; isAuthenticated: b
   const location = useLocation();
   const isDashboardRoute = location.pathname.startsWith('/dashboard');
   const isAdminLoginRoute = location.pathname === '/admin-login';
-  const shouldShowMainNavigation = !isDashboardRoute && !isAdminLoginRoute;
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  const shouldShowMainNavigation = !isDashboardRoute && !isAdminLoginRoute && !isAdminRoute;
 
   return (
     <>

@@ -76,6 +76,7 @@ import RoleStakeholderDirectoryPanel from '../components/Settings/RoleStakeholde
 import RolePlaybooksPanel from '../components/Settings/RolePlaybooksPanel';
 import RoleKnowledgeBasePanel from '../components/Settings/RoleKnowledgeBasePanel';
 import RoleFeedbackPanel from '../components/Settings/RoleFeedbackPanel';
+import MedicalBottomNavigation from '../components/Layout/MedicalBottomNavigation';
 
 interface MedicalDashboardProps {
   userData: any;
@@ -1194,6 +1195,8 @@ const MedicalDashboard: React.FC<MedicalDashboardProps> = ({ userData, onLogout 
             </div>
           )}
         </div>
+      
+      <MedicalBottomNavigation />
       </div>
     </div>
   );

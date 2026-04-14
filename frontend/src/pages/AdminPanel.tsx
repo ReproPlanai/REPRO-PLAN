@@ -19,6 +19,8 @@ import AdminAdvancedControls from './admin/AdminAdvancedControls';
 import UserManagement from './admin/UserManagement';
 import StakeholderManagement from './admin/StakeholderManagement';
 import SystemSettings from './admin/SystemSettings';
+import AdminBottomNavigation from '../components/Layout/AdminBottomNavigation';
+import ApiStatusModal from '../components/Admin/ApiStatusModal';
 
 interface SystemStats {
   users: {
@@ -58,6 +60,9 @@ const AdminPanel: React.FC = () => {
   const [stats, setStats] = useState<SystemStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showApiModal, setShowApiModal] = useState(false);
+  const [apiStatus, setApiStatus] = useState<'online' | 'degraded' | 'offline'>('online');
+  const [lastUpdated, setLastUpdated] = useState<string>();
 
   useEffect(() => {
     fetchData();
@@ -68,13 +73,25 @@ const AdminPanel: React.FC = () => {
       setLoading(true);
       const statsRes = await apiService.getAdminStats?.();
       if (statsRes?.success) {
-        setStats(statsRes.data);
+        setStats(statsRes.stats);
+        setApiStatus(statsRes.fromCache ? 'degraded' : 'online');
+        setLastUpdated(statsRes.cachedAt);
+        if (statsRes.fromCache) {
+          setShowApiModal(true);
+        }
       }
     } catch (err) {
       setError('Failed to load admin data');
+      setApiStatus('offline');
+      setShowApiModal(true);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRetry = () => {
+    setShowApiModal(false);
+    fetchData();
   };
 
   const handleLogout = () => {
@@ -86,6 +103,24 @@ const AdminPanel: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center">
         <RefreshCw className="w-8 h-8 animate-spin text-indigo-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md text-center">
+          <AlertTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Error Loading Dashboard</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={fetchData}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
@@ -156,10 +191,23 @@ const AdminPanel: React.FC = () => {
         )}
 
         {/* Dashboard Tab */}
-        {activeTab === 'dashboard' && stats && (
+        {activeTab === 'dashboard' && (
           <div className="space-y-6">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {!stats ? (
+              <div className="bg-white p-8 rounded-xl shadow-sm border text-center">
+                <RefreshCw className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Data Available</h3>
+                <p className="text-gray-600 mb-4">Unable to load dashboard statistics. Please check your connection and try again.</p>
+                <button
+                  onClick={fetchData}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                >
+                  Refresh Data
+                </button>
+              </div>
+            ) : (
+              <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white p-6 rounded-xl shadow-sm border">
                 <div className="flex items-center gap-3 mb-4">
                   <Users className="w-5 h-5 text-blue-600" />
@@ -243,7 +291,6 @@ const AdminPanel: React.FC = () => {
               </div>
             </div>
 
-            {/* Messages & Response Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-white p-6 rounded-xl shadow-sm border">
                 <div className="flex items-center gap-3 mb-4">
@@ -279,14 +326,116 @@ const AdminPanel: React.FC = () => {
                 </div>
               </div>
             </div>
+            </>
+            )}
           </div>
         )}
 
         {/* Analytics Tab */}
-        {activeTab === 'analytics' && (
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">System Analytics</h3>
-            <p className="text-gray-600">Analytics data visualization would be implemented here with charts and graphs showing trends over time.</p>
+        {activeTab === 'analytics' && stats && (
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900">System Analytics</h3>
+            
+            {/* User Growth Chart */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border">
+              <h4 className="font-semibold text-gray-900 mb-4">User Overview</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Total Users</p>
+                  <p className="text-2xl font-bold text-blue-600">{stats.users.total}</p>
+                </div>
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Verified Users</p>
+                  <p className="text-2xl font-bold text-green-600">{stats.users.verified}</p>
+                </div>
+                <div className="p-4 bg-purple-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Active (7d)</p>
+                  <p className="text-2xl font-bold text-purple-600">{stats.users.active}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Stakeholders by Role */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border">
+              <h4 className="font-semibold text-gray-900 mb-4">Stakeholders by Role</h4>
+              <div className="space-y-3">
+                {Object.entries(stats.stakeholders.byRole).map(([role, count]) => (
+                  <div key={role} className="flex items-center justify-between">
+                    <span className="text-gray-700 capitalize">{role.toLowerCase()}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-indigo-600 rounded-full" 
+                          style={{ width: `${(count / stats.stakeholders.total) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">{count}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Alerts Status */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border">
+              <h4 className="font-semibold text-gray-900 mb-4">Alert Status</h4>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Total</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.alerts.total}</p>
+                </div>
+                <div className="p-4 bg-orange-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Active</p>
+                  <p className="text-2xl font-bold text-orange-600">{stats.alerts.active}</p>
+                </div>
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Resolved</p>
+                  <p className="text-2xl font-bold text-green-600">{stats.alerts.resolved}</p>
+                </div>
+                <div className="p-4 bg-red-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Critical</p>
+                  <p className="text-2xl font-bold text-red-600">{stats.alerts.critical}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Cases Status */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border">
+              <h4 className="font-semibold text-gray-900 mb-4">Cases Status</h4>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Total</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.cases.total}</p>
+                </div>
+                <div className="p-4 bg-orange-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Open</p>
+                  <p className="text-2xl font-bold text-orange-600">{stats.cases.open}</p>
+                </div>
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-gray-600">In Progress</p>
+                  <p className="text-2xl font-bold text-blue-600">{stats.cases.inProgress}</p>
+                </div>
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Resolved</p>
+                  <p className="text-2xl font-bold text-green-600">{stats.cases.resolved}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Response Metrics */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border">
+              <h4 className="font-semibold text-gray-900 mb-4">Response Metrics</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-teal-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Average Response Time</p>
+                  <p className="text-2xl font-bold text-teal-600">{stats.responseMetrics.averageResponseTime}m</p>
+                </div>
+                <div className="p-4 bg-indigo-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Alerts Today</p>
+                  <p className="text-2xl font-bold text-indigo-600">{stats.responseMetrics.totalAlertsToday}</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -302,6 +451,16 @@ const AdminPanel: React.FC = () => {
         {/* Settings Tab */}
         {activeTab === 'settings' && <SystemSettings />}
       </div>
+      
+      <AdminBottomNavigation />
+      
+      <ApiStatusModal
+        isOpen={showApiModal}
+        onClose={() => setShowApiModal(false)}
+        lastUpdated={lastUpdated}
+        apiStatus={apiStatus}
+        onRetry={handleRetry}
+      />
     </div>
   );
 };

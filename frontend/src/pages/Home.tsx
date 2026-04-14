@@ -22,12 +22,19 @@ import {
 import { LogoCircular } from '../assets';
 import PWAInstallPrompt from '../components/PWAInstallPrompt';
 import PageContainer from '../components/Layout/PageContainer';
+import SurveyCompletionModal from '../components/Modals/SurveyCompletionModal';
+import OnboardingCompletionModal from '../components/Modals/OnboardingCompletionModal';
+import { apiService } from '../services/api';
+import { secretCodeManager } from '../utils/secretCode';
 
 const Home: React.FC = () => {
   const { t } = useTranslation();
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [clinicCount, setClinicCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showSurveyModal, setShowSurveyModal] = useState(false);
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
 
   const quickAccessItems = [
     {
@@ -135,6 +142,46 @@ const Home: React.FC = () => {
 
     fetchClinicData();
   }, []);
+
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      try {
+        const secretCode = secretCodeManager.getSecretCode();
+        if (secretCode) {
+          const userResponse = await apiService.verifyUser(String(secretCode));
+          if (userResponse?.success && userResponse.user) {
+            setUserData(userResponse.user);
+            
+            // Check if user needs to complete survey
+            if (!userResponse.user.survey_link || userResponse.user.survey_link === '') {
+              setShowSurveyModal(true);
+            }
+            
+            // Check if user needs to complete onboarding (empty demographics)
+            if (!userResponse.user.demographics || Object.keys(userResponse.user.demographics).length === 0) {
+              setShowOnboardingModal(true);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check user status:', error);
+      }
+    };
+
+    checkUserStatus();
+  }, []);
+
+  const handleSurveyContinue = () => {
+    setShowSurveyModal(false);
+    // Navigate to survey page
+    window.location.href = userData?.survey_link || '/survey';
+  };
+
+  const handleOnboardingContinue = () => {
+    setShowOnboardingModal(false);
+    // Navigate to onboarding/profile completion page
+    window.location.href = '/profile';
+  };
 
   return (
     <PageContainer
@@ -299,6 +346,20 @@ const Home: React.FC = () => {
           alert('To install REPRO PLAN as an app:\n\n1. Open this page in your browser\n2. Look for "Add to Home Screen" in your browser menu\n3. Tap "Add" to install the app');
           setShowInstallPrompt(false);
         }}
+      />
+
+      {/* Survey Completion Modal */}
+      <SurveyCompletionModal
+        isOpen={showSurveyModal}
+        onClose={() => setShowSurveyModal(false)}
+        onContinue={handleSurveyContinue}
+      />
+
+      {/* Onboarding Completion Modal */}
+      <OnboardingCompletionModal
+        isOpen={showOnboardingModal}
+        onClose={() => setShowOnboardingModal(false)}
+        onContinue={handleOnboardingContinue}
       />
     </PageContainer>
   );

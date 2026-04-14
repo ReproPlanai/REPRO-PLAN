@@ -79,6 +79,7 @@ import RoleStakeholderDirectoryPanel from '../components/Settings/RoleStakeholde
 import RolePlaybooksPanel from '../components/Settings/RolePlaybooksPanel';
 import RoleKnowledgeBasePanel from '../components/Settings/RoleKnowledgeBasePanel';
 import RoleFeedbackPanel from '../components/Settings/RoleFeedbackPanel';
+import PoliceBottomNavigation from '../components/Layout/PoliceBottomNavigation';
 
 interface PoliceDashboardProps {
   userData: any;
@@ -1152,6 +1153,8 @@ const PoliceDashboard: React.FC<PoliceDashboardProps> = ({ userData, onLogout })
             </div>
           )}
         </div>
+      
+      <PoliceBottomNavigation />
       </div>
     </div>
   );

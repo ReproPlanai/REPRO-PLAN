@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { createServiceLogger } from '../config/logger';
 import { query } from '../config/db';
+import { getCached, setCached } from '../services/cache';
 
 const log = createServiceLogger('admin');
 const router = Router();
@@ -270,6 +271,8 @@ router.put('/settings', async (req: Request, res: Response) => {
 
 // Get dashboard stats
 router.get('/dashboard-stats', async (req: Request, res: Response) => {
+  const cacheKey = 'admin:dashboard-stats';
+  
   try {
     // Query all counts from database
     const userCount = await query('SELECT COUNT(*) as count FROM users');
@@ -327,13 +330,41 @@ router.get('/dashboard-stats', async (req: Request, res: Response) => {
       responseMetrics: {
         averageResponseTime: Math.round(parseFloat(avgResponseTime[0]?.avg || 0)),
         totalAlertsToday: parseInt(alertsToday[0].count)
-      }
+      },
+      cachedAt: new Date().toISOString()
     };
 
-    res.json({ success: true, stats });
+    // Cache in Railway Redis for 5 minutes
+    await setCached(cacheKey, stats, 300);
+
+    res.json({ success: true, stats, fromCache: false });
   } catch (err) {
-    log.error({ err }, 'Failed to get dashboard stats');
-    res.status(500).json({ error: 'Failed to get dashboard stats' });
+    log.error({ err }, 'Failed to get dashboard stats from database, trying cache');
+    
+    // Try to get from Railway Redis cache
+    try {
+      const cachedStats = await getCached(cacheKey);
+      if (cachedStats) {
+        log.info('Returning cached dashboard stats');
+        res.json({ 
+          success: true, 
+          stats: cachedStats, 
+          fromCache: true,
+          cachedAt: cachedStats.cachedAt,
+          warning: 'Using cached data - Database unavailable'
+        });
+        return;
+      }
+    } catch (cacheErr) {
+      log.error({ err: cacheErr }, 'Failed to get from cache');
+    }
+
+    // If both DB and cache fail
+    log.error({ err }, 'Failed to get dashboard stats from both DB and cache');
+    res.status(500).json({ 
+      error: 'Failed to get dashboard stats',
+      warning: 'Database and cache unavailable'
+    });
   }
 });
 

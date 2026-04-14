@@ -75,6 +75,7 @@ import RoleStakeholderDirectoryPanel from '../components/Settings/RoleStakeholde
 import RolePlaybooksPanel from '../components/Settings/RolePlaybooksPanel';
 import RoleKnowledgeBasePanel from '../components/Settings/RoleKnowledgeBasePanel';
 import RoleFeedbackPanel from '../components/Settings/RoleFeedbackPanel';
+import NGOBottomNavigation from '../components/Layout/NGOBottomNavigation';
 
 interface NGODashboardProps {
   userData: any;
@@ -1208,6 +1209,8 @@ const NGODashboard: React.FC<NGODashboardProps> = ({ userData, onLogout }) => {
           )}
         </div>
       </div>
+      
+      <NGOBottomNavigation />
     </div>
   );
 };
